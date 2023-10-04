@@ -1,0 +1,2 @@
+const a = {"hello":"", "vodka":"martini", "james":"nomd"};
+println(a);
