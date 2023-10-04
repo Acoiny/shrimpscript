@@ -61,13 +61,3 @@ list[0] = "b";
 # dictionaries
 
 const dict = {"boss": "jeffrey", "employee": "bob"};  //keys MUST be strings
-
-# a small standard library
-
-NOTE: to view the basic library use compiler with '-f' flag
-
-print(args...)
-println(args...)
-input([arg]);
-type(arg);
-...
