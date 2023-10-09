@@ -438,6 +438,12 @@ void compiler::block() {
     consume("expected '}' to end block", TOKEN_BRACE_CLOSE);
 }
 
+void compiler::importStatement() {
+    expression();
+    consume("expect ';' after import statement", TOKEN_SEMICOLON);
+    emitByte(OP_IMPORT);
+}
+
 void compiler::expressionStatement() {
     expression();
     consume("expect ';' after end of expression", TOKEN_SEMICOLON);
@@ -704,7 +710,10 @@ void compiler::statement() {
         ifStatement();
     } else if(match(TOKEN_FOR)) {
         forStatement();
-    } else {
+    } else if (match(TOKEN_IMPORT)) {
+        importStatement();
+    }
+    else {
         expressionStatement();
     }
 }

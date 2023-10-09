@@ -2,14 +2,17 @@
 
 #include "nativeFunctions.hpp"
 
+#include "runFile.hpp"
+
 #ifdef DEBUG_TRACE_EXECUTION
 #include <iomanip>
 #endif
 
 memoryManager globalMemory;
 
-VM::VM() : ip(), activeChunk(nullptr), memory(globalMemory), callFrames(), compiler(*this) {
+VM::VM() : ip(), activeChunk(nullptr), memory(globalMemory), callFrames() {
     memory.setVM(this);
+    currentCompiler = new compiler(*this);
 
     stack = new value[STACK_MAX];
     activeCallFrameBottom = stack;
@@ -19,12 +22,33 @@ VM::VM() : ip(), activeChunk(nullptr), memory(globalMemory), callFrames(), compi
 }
 
 void VM::interpret(char *str) {
-    activeChunk = compiler.compiling(str);
+    activeChunk = currentCompiler->compiling(str);
     scriptChunk = activeChunk;
     gcReady = true;
-    if(!compiler.errorOccured()) {
+    if(!currentCompiler->errorOccured()) {
         run();
     }
+}
+
+void VM::interpretImportFile(char* str) {
+    chunk* prevActiveChunk = activeChunk;
+    chunk* prevScriptChunk = scriptChunk;
+    compiler* prevCompiler = currentCompiler;
+
+    currentCompiler = new compiler(*this);
+
+    activeChunk = currentCompiler->compiling(str);
+    scriptChunk = activeChunk;
+    gcReady = true;
+    if (!currentCompiler->errorOccured()) {
+        run();
+    }
+
+    activeChunk = prevActiveChunk;
+    scriptChunk = prevScriptChunk;
+
+    delete currentCompiler;
+    currentCompiler = prevCompiler;
 }
 
 VM::~VM() {
@@ -441,6 +465,11 @@ bool VM::setObjectIndex(obj* object, value &index, value& val) {
     }
 }
 
+bool VM::importFile(const char* filename) {
+
+    return runImportFile(filename, *this);
+}
+
 exitCodes VM::run() {
     ip = activeChunk->getInstructionPointer();
     char c;
@@ -779,6 +808,20 @@ exitCodes VM::run() {
             case OP_PULL_INSTANCE_FROM_THIS: {
                 objThis* th = (objThis*)(pop().as.object);
                 push(value(th->getThis()));
+                break;
+            }
+            case OP_IMPORT: {
+                value fileName = pop();
+                if (!(fileName.getType() == VAL_OBJ && fileName.as.object->getType() == OBJ_STR)) {
+                    runtimeError("importname must be a string");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                auto fileNameStr = (objString*)fileName.as.object;
+                auto prevIP = ip;
+                if (!importFile(fileNameStr->getChars()))
+                    return INTERPRET_RUNTIME_ERROR;
+                ip = prevIP;
+
                 break;
             }
             case OP_RETURN:

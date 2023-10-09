@@ -138,6 +138,8 @@ class compiler {
 
 	void statement();
 
+	void importStatement();
+
 	void expressionStatement();
 
 	void ifStatement();
@@ -191,7 +193,7 @@ class compiler {
 
 	static void this_key(bool canAssign, compiler& cmp);
 
-	precFuncTableEntry precedenceTable[45] = {
+	precFuncTableEntry precedenceTable[46] = {
 			{nullptr, nullptr, PREC_NONE}, //[TOKEN_ERROR] = 
 			{nullptr, nullptr, PREC_NONE}, //[TOKEN_SEMICOLON] = 
 			{nullptr, dot, PREC_CALL}, //[TOKEN_DOT] =
@@ -236,6 +238,7 @@ class compiler {
 			{this_key, nullptr, PREC_NONE}, //[TOKEN_THIS]
 			{nullptr, nullptr, PREC_NONE}, //[TOKEN_BREAK]
 			{nullptr, nullptr, PREC_NONE}, //[TOKEN_CONTINUE]
+			{nullptr, nullptr, PREC_NONE}, //[TOKEN_IMPORT]
 			{nullptr, nullptr, PREC_NONE}, //[TOKEN_EOF] = 
 	};
 

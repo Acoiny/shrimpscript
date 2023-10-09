@@ -1,12 +1,3 @@
-const asd = "hello";
-
-fun reverse(str) {
-	if(str.len() == 0) {
-		return "";
-	}
-
-
-	return str.at(str.len() - 1) + reverse(str.sub(0, str.len() - 1));
-}
-
-println(reverse(asd));
+import "incl.shrimp";
+test();
+println("main file");

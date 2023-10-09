@@ -55,6 +55,8 @@ enum tokenType{
     TOKEN_BREAK,
     TOKEN_CONTINUE,
 
+    TOKEN_IMPORT,
+
     TOKEN_EOF
 };
 

@@ -155,6 +155,8 @@ int debug::disassembleInstruction(char inst, chunk *ch, int offset) {
             return simpleInstruction("OP_SET_INDEX", ch, offset);
         case OP_THIS:
             return simpleInstruction("OP_THIS", ch, offset);
+        case OP_IMPORT:
+            return simpleInstruction("OP_IMPORT", ch, offset);
         case OP_RETURN:
             return simpleInstruction("OP_RETURN", ch, offset);
         default: {

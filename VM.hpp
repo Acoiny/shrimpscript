@@ -122,6 +122,8 @@ class VM {
 
     bool setObjectIndex(obj* object, value &index, value& val);
 
+    bool importFile(const char* filename);
+
 public:
     ~VM();
 
@@ -129,8 +131,10 @@ public:
 
     void interpret(char *str);
 
+    void interpretImportFile(char* str);
+
     memoryManager &memory;
-    compiler compiler;
+    compiler *currentCompiler;
 
     exitCodes run();
 };

@@ -223,8 +223,14 @@ token scanner::identifierToken() {
             default:
                 return scanRestIdentifier(tk);
             }
-        case 'i':
-            return confirmNext("f", 1, TOKEN_IF, tk);
+        case 'i': {
+            switch (peek(1)) {
+            case 'f':
+                return confirmNext("f", 1, TOKEN_IF, tk);
+            default:
+                return confirmNext("mport", 5, TOKEN_IMPORT, tk);
+            }
+        }
         case 'e':
             return confirmNext("lse", 3, TOKEN_ELSE, tk);
         case 'l':

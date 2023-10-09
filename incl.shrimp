@@ -1,0 +1,5 @@
+import "incl2.shrimp";
+
+fun test() {
+	println("test function");
+}

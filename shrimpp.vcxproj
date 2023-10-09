@@ -30,6 +30,7 @@
     <ClCompile Include="nativeMathFunctions.cpp" />
     <ClCompile Include="nativeStringFunctions.cpp" />
     <ClCompile Include="obj.cpp" />
+    <ClCompile Include="runFile.cpp" />
     <ClCompile Include="scanner.cpp" />
     <ClCompile Include="value.cpp" />
     <ClCompile Include="VM.cpp" />
@@ -46,11 +47,13 @@
     <ClInclude Include="nativeMathFunctions.hpp" />
     <ClInclude Include="nativeStringFunctions.hpp" />
     <ClInclude Include="obj.hpp" />
+    <ClInclude Include="runFile.hpp" />
     <ClInclude Include="scanner.hpp" />
     <ClInclude Include="value.hpp" />
     <ClInclude Include="VM.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="incl.shrimp" />
     <None Include="shrimpcode.🦐" />
   </ItemGroup>
   <ItemGroup>

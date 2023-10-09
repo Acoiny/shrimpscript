@@ -68,6 +68,8 @@ enum opCodes : char {
     OP_MAP_APPEND,
 
     OP_THIS,
+
+    OP_IMPORT
 };
 
 class chunk {
