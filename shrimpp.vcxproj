@@ -47,6 +47,8 @@
     <ClInclude Include="nativeMathFunctions.hpp" />
     <ClInclude Include="nativeStringFunctions.hpp" />
     <ClInclude Include="obj.hpp" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="resource1.h" />
     <ClInclude Include="runFile.hpp" />
     <ClInclude Include="scanner.hpp" />
     <ClInclude Include="value.hpp" />
@@ -57,10 +59,13 @@
     <None Include="shrimpcode.🦐" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="resources.rc" />
+    <Text Include="text.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="text.txt" />
+    <ResourceCompile Include="shrimpp.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="shrimp.ico" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
