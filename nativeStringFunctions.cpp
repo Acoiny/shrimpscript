@@ -18,7 +18,7 @@ static value nativeString_Len(int arity, value* args, bool& success) {
 }
 
 
-static value nativeString_SubStr(int arity, value* args, bool& success) {
+static value nativeString_Slice(int arity, value* args, bool& success) {
 	if (arity < 1 || arity > 2) {
 		
 		success = false;
@@ -50,19 +50,19 @@ static value nativeString_SubStr(int arity, value* args, bool& success) {
 	if (indexOne < 0 || indexTwo < 0) {
 		
 		success = false;
-		return nativeFunctions::erro("cut: substring can't be created with negativ indices");
+		return nativeFunctions::erro("slice: substring can't be created with negativ indices");
 	}
 
 	if (indexTwo >= len) {
 		
 		success = false;
-		return nativeFunctions::erro("cut: second index must be lesser than string length");
+		return nativeFunctions::erro("slice: second index must be lesser than string length");
 	}
 
-	if (indexOne >= indexTwo) {
+	if (indexOne > indexTwo) {
 		
 		success = false;
-		return nativeFunctions::erro("cut: first index must be lesser than second index");
+		return nativeFunctions::erro("slice: first index must be lesser than second index");
 	}
 
 
@@ -133,7 +133,7 @@ static value nativeString_At(int arity, value* args, bool& success) {
 	}
 
 	while (index < 0) {
-		index = (str->getLen() - 1) + index;
+		index += (str->getLen() - 1);
 	}
 
 	char atChar[1] = { str->getChars()[index] };
@@ -148,7 +148,7 @@ void nativeStringFunctions(std::unordered_map<objString*, value>& globals, std::
 
 	//tied to string objects
 	stringFunTable.insert_or_assign(objString::copyString("len", 3), value(objNativeFunction::createNativeFunction(nativeString_Len)));
-	stringFunTable.insert_or_assign(objString::copyString("sub", 3), value(objNativeFunction::createNativeFunction(nativeString_SubStr)));
+	stringFunTable.insert_or_assign(objString::copyString("slice", 5), value(objNativeFunction::createNativeFunction(nativeString_Slice)));
 	stringFunTable.insert_or_assign(objString::copyString("chr", 3), value(objNativeFunction::createNativeFunction(nativeString_Chr)));
 	stringFunTable.insert_or_assign(objString::copyString("at", 2), value(objNativeFunction::createNativeFunction(nativeString_At)));
 }

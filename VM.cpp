@@ -314,6 +314,8 @@ bool VM::invoke() {
             value result = ((objNativeFunction*)(stringFunctions.at(name).as.object))->fun(argc, stackTop - argc - 1, success);
             stackTop -= argc + 1;
             push(result);
+            if(!success)
+                return runtimeError(((objString*)result.as.object)->getChars());
             return success;
         }
         else {
@@ -327,6 +329,8 @@ bool VM::invoke() {
             value result = ((objNativeFunction*)(arrayFunctions.at(name).as.object))->fun(argc, stackTop - argc - 1, success);
             stackTop -= argc + 1;
             push(result);
+            if (!success)
+                return runtimeError(((objString*)result.as.object)->getChars());
             return success;
         }
         else {
@@ -341,6 +345,8 @@ bool VM::invoke() {
             value result = ((objNativeFunction*)(fileFunctions.at(name).as.object))->fun(argc, stackTop - argc - 1, success);
             stackTop -= argc + 1;
             push(result);
+            if (!success)
+                return runtimeError(((objString*)result.as.object)->getChars());
             return success;
         }
         else {
