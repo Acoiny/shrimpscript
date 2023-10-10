@@ -313,6 +313,7 @@ bool VM::invoke() {
         if (method.getType() == VAL_OBJ && method.as.object->getType() == OBJ_FUN) {
             return call(method, argc);
         }
+        return runtimeError("no function with name '", name->getChars(), "' on instance");
         break;
     }
     case OBJ_NAT_INSTANCE: {
@@ -381,9 +382,11 @@ bool VM::invoke() {
     default:
         return runtimeError("unknown error");
     }
+    return runtimeError("unknown error");
 }
 
 bool VM::superInvoke() {
+    //TODO: profile super invoke (and normal super call)
     objString* name = (objString*)activeChunk->getConstant(readShort()).as.object;
     int argc = readByte();
     value callee = peek(argc);

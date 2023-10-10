@@ -1,15 +1,48 @@
-class A {
-	fun init(name) {
+class pokemon{
+	fun init(name, health, attack) {
 		this.name = name;
+		this.health = health;
+		this.attack = attack;
+	}
+	
+	fun attack(other) {
+		println("attacking");
+		if(this.health <= 0) {
+			println(this.name, " is dead and can't attack");
+			return;
+		}
+		const damage = (this.attack - Math.floor(Math.rand() * 5));
+		
+		println(this.name, " attacks ", other.name);
+		println("damage: ", damage);
+		
+		other.health = other.health - damage;
+		
+		println(other.name, " has ", other.health > 0 ? other.health : 0, " hp left");
 	}
 }
 
-class B : A {
+class pikachu : pokemon {
 	fun init() {
-		super.init("bbb");
+		super.init("pikachu", 100, 8);
 	}
 }
 
-const b = B();
+class charmander : pokemon {
+	fun init() {
+		super.init("charmander", 80, 12);
+	}
+}
 
-println(b.name);
+const p = pikachu();
+const c = charmander();
+
+while(p.health > 0 and c.health > 0) {
+	p.attack(c);
+	input();
+	c.attack(p);
+	input();
+}
+
+println("pikachu health: ", p.health);
+println("charmander health: ", c.health);
