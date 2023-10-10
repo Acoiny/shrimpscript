@@ -17,6 +17,7 @@ enum position {
 enum precedence {
 	PREC_NONE,
 	PREC_ASSIGN,
+	PREC_CONDITIONAL,
 	PREC_OR,
 	PREC_AND,
 	PREC_EQUALITY,
@@ -193,7 +194,9 @@ class compiler {
 
 	static void this_key(bool canAssign, compiler& cmp);
 
-	precFuncTableEntry precedenceTable[46] = {
+	static void ternary(bool canAssign, compiler& cmp);
+
+	precFuncTableEntry precedenceTable[47] = {
 			{nullptr, nullptr, PREC_NONE}, //[TOKEN_ERROR] = 
 			{nullptr, nullptr, PREC_NONE}, //[TOKEN_SEMICOLON] = 
 			{nullptr, dot, PREC_CALL}, //[TOKEN_DOT] =
@@ -208,6 +211,8 @@ class compiler {
 			{nullptr, binary, PREC_FACTOR}, //[TOKEN_DIVIDE] = 
 			{nullptr, binary, PREC_FACTOR}, //[TOKEN_MODULO] = 
 			{unary, nullptr, PREC_UNARY}, //[TOKEN_BANG] = 
+			//TODO: check precedence for question mark operator
+			{nullptr, ternary, PREC_CONDITIONAL}, //[TOKEN_QUESTIONMARK]
 			{nullptr, binary, PREC_COMPARISON}, //[TOKEN_BANG_EQUALS] = 
 			{nullptr, binary, PREC_COMPARISON}, //[TOKEN_EQUALS_EQUALS] = 
 			{nullptr, binary, PREC_COMPARISON}, //[TOKEN_LESS] = 

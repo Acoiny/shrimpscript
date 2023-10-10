@@ -22,6 +22,7 @@
     <ClCompile Include="chunk.cpp" />
     <ClCompile Include="compiler.cpp" />
     <ClCompile Include="debug.cpp" />
+    <ClCompile Include="commandHandler.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="memoryManager.cpp" />
     <ClCompile Include="nativeArrayFunctions.cpp" />
@@ -40,6 +41,7 @@
     <ClInclude Include="compiler.hpp" />
     <ClInclude Include="debug.hpp" />
     <ClInclude Include="defines.hpp" />
+    <ClInclude Include="commandHandler.hpp" />
     <ClInclude Include="memoryManager.hpp" />
     <ClInclude Include="nativeArrayFunctions.hpp" />
     <ClInclude Include="nativeFileFunctions.hpp" />
@@ -47,8 +49,6 @@
     <ClInclude Include="nativeMathFunctions.hpp" />
     <ClInclude Include="nativeStringFunctions.hpp" />
     <ClInclude Include="obj.hpp" />
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="resource1.h" />
     <ClInclude Include="runFile.hpp" />
     <ClInclude Include="scanner.hpp" />
     <ClInclude Include="value.hpp" />
@@ -91,7 +91,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>ClangCL</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">

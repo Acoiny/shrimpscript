@@ -103,6 +103,8 @@ token scanner::scanToken() {
                 return makeToken(TOKEN_BANG);
             }
         }
+        case '?':
+            return makeToken(TOKEN_QUESTIONMARK);
         case '\0':
             return makeToken(TOKEN_EOF);
 

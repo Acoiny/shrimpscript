@@ -19,12 +19,21 @@
     <Filter Include="Source Files\Native Functions">
       <UniqueIdentifier>{a821e4f0-6270-4208-854c-119c294900df}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Virtual Machine">
+      <UniqueIdentifier>{abb69452-6916-481d-bc9f-baf8511703f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Virtual Machine">
+      <UniqueIdentifier>{4aa14506-5872-4b53-b6c4-62c717b32b3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Output">
+      <UniqueIdentifier>{9b6ce3bf-5f51-4ee0-a9c2-cf29f1a6cfb9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Output">
+      <UniqueIdentifier>{95ca3e3c-6a68-4d90-ae2f-6804f84ac317}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="compiler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="debug.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
@@ -33,19 +42,7 @@
     <ClCompile Include="memoryManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="obj.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="scanner.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="value.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="VM.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="chunk.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="nativeFunctions.cpp">
@@ -66,6 +63,24 @@
     <ClCompile Include="runFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="chunk.cpp">
+      <Filter>Source Files\Virtual Machine</Filter>
+    </ClCompile>
+    <ClCompile Include="obj.cpp">
+      <Filter>Source Files\Virtual Machine</Filter>
+    </ClCompile>
+    <ClCompile Include="value.cpp">
+      <Filter>Source Files\Virtual Machine</Filter>
+    </ClCompile>
+    <ClCompile Include="VM.cpp">
+      <Filter>Source Files\Virtual Machine</Filter>
+    </ClCompile>
+    <ClCompile Include="debug.cpp">
+      <Filter>Source Files\Output</Filter>
+    </ClCompile>
+    <ClCompile Include="commandHandler.cpp">
+      <Filter>Source Files\Output</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shrimpcode.🦐">
@@ -77,28 +92,10 @@
     <ClInclude Include="defines.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="chunk.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="compiler.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="debug.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="memoryManager.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="obj.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="scanner.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="value.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="VM.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="nativeStringFunctions.hpp">
@@ -119,11 +116,26 @@
     <ClInclude Include="runFile.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h">
+    <ClInclude Include="VM.hpp">
+      <Filter>Header Files\Virtual Machine</Filter>
+    </ClInclude>
+    <ClInclude Include="scanner.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="resource1.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="chunk.hpp">
+      <Filter>Header Files\Virtual Machine</Filter>
+    </ClInclude>
+    <ClInclude Include="obj.hpp">
+      <Filter>Header Files\Virtual Machine</Filter>
+    </ClInclude>
+    <ClInclude Include="value.hpp">
+      <Filter>Header Files\Virtual Machine</Filter>
+    </ClInclude>
+    <ClInclude Include="debug.hpp">
+      <Filter>Header Files\Output</Filter>
+    </ClInclude>
+    <ClInclude Include="commandHandler.hpp">
+      <Filter>Header Files\Output</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -106,7 +106,8 @@ static value nativeString_To_Chr(int arity, value* args, bool& success) {
 		return nativeFunctions::erro("to_chr: argument must be a number");
 	}
 
-	char chr[1] = { args->as.number };
+	char chr[1];
+	chr[0] = args->as.number;
 
 	return value(objString::copyString(chr, 1));
 }

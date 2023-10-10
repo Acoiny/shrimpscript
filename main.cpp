@@ -3,6 +3,7 @@
 #include <fstream>
 
 #include "runFile.hpp"
+#include "commandHandler.hpp"
 
 #include "VM.hpp"
 #include "defines.hpp"
@@ -42,6 +43,10 @@ int main(int argc, char** argv) {
         repl();
 #endif
     } else if(argc == 2){
+        if (argv[1][0] == '-') {
+            commandHandler print(argv[1]);
+            return 0;
+        }
         runFile(argv[1]);
     } else {
         std::cerr << "usage: shrimpp [path]" << std::endl;

@@ -405,6 +405,20 @@ void compiler::this_key(bool canAssign, compiler& cmp) {
     cmp.emitByte(OP_THIS);
 }
 
+void compiler::ternary(bool canAssign, compiler& cmp) {
+    size_t elseJump = cmp.emitJump(OP_JUMP_IF_FALSE);
+    cmp.emitByte(OP_POP);
+
+    cmp.expression();
+    size_t exitJump = cmp.emitJump(OP_JUMP);
+
+    cmp.patchJump(elseJump);
+    cmp.consume("expect ':' after first expression", TOKEN_COLON);
+
+    cmp.expression();
+    cmp.patchJump(exitJump);
+}
+
 void compiler::expression() {
     parsePrec(PREC_ASSIGN);
 }

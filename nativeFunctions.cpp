@@ -99,9 +99,9 @@ static value native_Type(int argc, value* args, bool& success) {
 	case OBJ_LIST:
 		return value(objString::copyString("list", 4));
 	case OBJ_NAT_FUN:
-		return value(objString::copyString("native_function", 15));
+		return value(objString::copyString("native function", 15));
 	case OBJ_NAT_INSTANCE:
-		return value(objString::copyString("native_object", 13));
+		return value(objString::copyString("native object", 13));
 	default:
 		return value(objString::copyString("unknown", 7));
 	}
@@ -139,6 +139,9 @@ static value native_Input(int arity, value* args, bool& success) {
 
 	for (size_t i = 0; i < tmp.size(); i++)
 	{
+		if (i == 0 && tmp.at(i) == '-')
+			continue;
+
 		if (tmp.at(i) == '.') {
 			if (!foundDot) {
 				foundDot = true;
