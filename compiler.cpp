@@ -444,6 +444,7 @@ void compiler::ternary(bool canAssign, compiler& cmp) {
     size_t exitJump = cmp.emitJump(OP_JUMP);
 
     cmp.patchJump(elseJump);
+    cmp.emitByte(OP_POP);
     cmp.consume("expect ':' after first expression", TOKEN_COLON);
 
     cmp.expression();
@@ -940,7 +941,6 @@ void compiler::functionDeclaration() {
 }
 
 void compiler::method() {
-    consume("expect method name", TOKEN_IDENTIFIER);
 
     int constant = identifierConstant(prevToken);
 
@@ -958,7 +958,6 @@ void compiler::method() {
 }
 
 void compiler::memberVar() {
-    consume("expect variable name", TOKEN_IDENTIFIER);
 
     int constant = identifierConstant(prevToken);
 
@@ -1006,10 +1005,17 @@ void compiler::classDeclaration() {
     currentPosition = TYPE_METHOD;
     while(!check(TOKEN_BRACE_CLOSE) && !check(TOKEN_EOF) && !hadError) {
         if (match(TOKEN_FUN)) {
+            consume("expect method name", TOKEN_IDENTIFIER);
             method();
         }
         else {
-            memberVar();
+            consume("expect identifier", TOKEN_IDENTIFIER);
+            if (check(TOKEN_PAREN_OPEN)) {
+                method();
+            }
+            else {
+                memberVar();
+            }
         }
     }
     currentPosition = prevPos;
