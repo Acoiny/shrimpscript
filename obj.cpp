@@ -159,14 +159,13 @@ void objClass::setSuperClass(objClass* cl) {
 
 bool objClass::hasInitFunction() {
 	objString* name = globalMemory.initString;
-	auto it = table.find(name);
-	if (it == table.end()) {
-		return false;
-	}
-	auto el = table.at(name);
+	
+	auto el = tableGet(name);
 
 	if (el.getType() == VAL_OBJ && el.as.object->getType() == OBJ_FUN)
 		return true;
+
+	return false;
 }
 
 //objInstance functions
