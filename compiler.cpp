@@ -938,7 +938,7 @@ void compiler::memberVar() {
         emitByte(OP_NIL);
     }
 
-    consume("expect ';' after member vaiable", TOKEN_SEMICOLON);
+    consume("expect ';' after member variable", TOKEN_SEMICOLON);
 
     emitByte(OP_MEMBER_VARIABLE);
     emitBytes((constant >> 8) & 0xff, constant & 0xff);
@@ -957,6 +957,12 @@ void compiler::classDeclaration() {
 
     emitByte(OP_CLASS);
     emitBytes((var >> 8) & 0xff, var & 0xff);
+
+    if (match(TOKEN_COLON)) {
+        expression();
+        emitByte(OP_INHERIT);
+    }
+
     defineVariable(var);
 
 
@@ -967,7 +973,7 @@ void compiler::classDeclaration() {
     beginScope();
     position prevPos = currentPosition;
     currentPosition = TYPE_METHOD;
-    while(!check(TOKEN_BRACE_CLOSE) && !check(TOKEN_EOF)) {
+    while(!check(TOKEN_BRACE_CLOSE) && !check(TOKEN_EOF) && !hadError) {
         if (match(TOKEN_FUN)) {
             method();
         }

@@ -721,6 +721,16 @@ exitCodes VM::run() {
                 push(value(klass));
                 break;
             }
+            case OP_INHERIT: {
+                value superKlass = pop();
+                if (!(superKlass.getType() == VAL_OBJ && superKlass.as.object->getType() == OBJ_CLASS)) {
+                    runtimeError("can only inherit from other classes");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                value klass = peek(0);
+                ((objClass*)(klass.as.object))->setSuperClass((objClass*)superKlass.as.object);
+                break;
+            }
             case OP_MEMBER_VARIABLE:
                 if (!defineMemberVar())
                     return INTERPRET_RUNTIME_ERROR;

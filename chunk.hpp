@@ -56,6 +56,7 @@ enum opCodes : char {
     OP_GET_PROPERTY,
 
     OP_CLASS,
+    OP_INHERIT,
     OP_MEMBER_VARIABLE,
     OP_METHOD,
     OP_INVOKE,

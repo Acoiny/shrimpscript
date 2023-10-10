@@ -1,3 +1,20 @@
-const res = 12 == 12 ? "rischtisch" : "foisch";
+class asd{
+	i = 10;
 
-println(res);
+	fun test() {
+		this.i = 11;
+	}
+
+	fun init() {
+		println("init asd");
+	}
+}
+
+class asd2 : asd {
+	j = 3;
+}
+
+let b = asd2();
+
+
+println(" -- ", b.j);

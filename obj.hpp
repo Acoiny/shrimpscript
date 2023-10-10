@@ -110,6 +110,8 @@ class objClass : public obj {
 
     objString* name;
 
+    objClass* superClass;
+
     std::unordered_map<objString *, value> table;
 
 public:
@@ -118,11 +120,14 @@ public:
     objString* getName() const;
 
     void tableSet(objString* n, value &val);
-    std::unordered_map<objString *, value> &getTable();
+
+    value tableGet(objString* k);
 
     bool hasInitFunction();
 
     static objClass* createObjClass(objString* name);
+
+    void setSuperClass(objClass* cl);
 };
 
 class objInstance : public obj {

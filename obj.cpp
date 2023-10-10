@@ -123,7 +123,7 @@ objNativeFunction* objNativeFunction::createNativeFunction(nativeFn fn) {
 }
 
 //objClass functions
-objClass::objClass() : name(nullptr) {
+objClass::objClass() : name(nullptr), superClass(nullptr) {
 	type = OBJ_CLASS;
 }
 
@@ -135,10 +135,26 @@ void objClass::tableSet(objString* name, value& val) {
 	table.insert_or_assign(name, val);
 }
 
+value objClass::tableGet(objString* k) {
+	if (table.find(k) == table.end()) {
+		if (superClass != nullptr) {
+			return superClass->tableGet(k);
+		}
+
+		return value();
+	}
+
+	return table.at(k);
+}
+
 objClass* objClass::createObjClass(objString* name) {
 	auto* cl = (objClass*)globalMemory.allocateObject<objClass>();
 	cl->name = name;
 	return cl;
+}
+
+void objClass::setSuperClass(objClass* cl) {
+	superClass = cl;
 }
 
 bool objClass::hasInitFunction() {
@@ -153,10 +169,6 @@ bool objClass::hasInitFunction() {
 		return true;
 }
 
-std::unordered_map<objString*, value>& objClass::getTable() {
-	return table;
-}
-
 //objInstance functions
 objInstance::objInstance() : klass(nullptr) {
 	type = OBJ_INSTANCE;
@@ -166,7 +178,7 @@ objInstance* objInstance::createInstance(objClass* kl) {
 	auto* ins = (objInstance*)globalMemory.allocateObject<objInstance>();
 
 	ins->klass = kl;
-	ins->table = kl->getTable();
+	//ins->table = kl->getTable();
 
 	return ins;
 }
@@ -177,7 +189,7 @@ void objInstance::tableSet(objString* n, value val) {
 
 value objInstance::tableGet(objString* k) {
 	if (table.find(k) == table.end()) {
-		return value();
+		return klass->tableGet(k);
 	}
 	return table.at(k);
 }
