@@ -264,6 +264,8 @@ token scanner::identifierToken() {
             return confirmNext("r", 1, TOKEN_OR, tk);
         case 'r':
             return confirmNext("eturn", 5, TOKEN_RETURN, tk);
+        case 's':
+            return confirmNext("uper", 4, TOKEN_SUPER, tk);
         case 'w':
             return confirmNext("hile", 4, TOKEN_WHILE, tk);
         default:{

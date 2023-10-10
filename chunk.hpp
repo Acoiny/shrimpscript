@@ -69,6 +69,8 @@ enum opCodes : char {
     OP_MAP_APPEND,
 
     OP_THIS,
+    OP_SUPER,
+    OP_SUPER_INVOKE,
 
     OP_IMPORT
 };

@@ -1,20 +1,15 @@
-class asd{
-	i = 10;
-
-	fun test() {
-		this.i = 11;
+class A {
+	fun init(name) {
+		this.name = name;
 	}
+}
 
+class B : A {
 	fun init() {
-		println("init asd");
+		super.init("bbb");
 	}
 }
 
-class asd2 : asd {
-	j = 3;
-}
+const b = B();
 
-let b = asd2();
-
-
-println(" -- ", b.j);
+println(b.name);

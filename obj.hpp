@@ -108,6 +108,8 @@ class objClass : public obj {
     friend class memoryManager;
     friend class value;
 
+    friend class objThis;
+
     objString* name;
 
     objClass* superClass;
@@ -133,6 +135,8 @@ public:
 class objInstance : public obj {
     friend class memoryManager;
     friend class value;
+
+    friend class objThis;
 
     objClass* klass;
 
@@ -166,6 +170,8 @@ public:
     uintptr_t getAddress();
 
     objInstance* getThis();
+
+    value accessSuperClassVariable(objString* k);
 };
 
 

@@ -136,7 +136,7 @@ void objClass::tableSet(objString* name, value& val) {
 }
 
 value objClass::tableGet(objString* k) {
-	if (table.find(k) == table.end()) {
+	if (table.count(k) == 0) {
 		if (superClass != nullptr) {
 			return superClass->tableGet(k);
 		}
@@ -187,7 +187,7 @@ void objInstance::tableSet(objString* n, value val) {
 }
 
 value objInstance::tableGet(objString* k) {
-	if (table.find(k) == table.end()) {
+	if (table.count(k) == 0) {
 		return klass->tableGet(k);
 	}
 	return table.at(k);
@@ -221,6 +221,10 @@ uintptr_t objThis::getAddress() {
 
 objInstance* objThis::getThis() {
 	return this_instance;
+}
+
+value objThis::accessSuperClassVariable(objString* k) {
+	return this_instance->klass->superClass->tableGet(k);
 }
 
 //objNativeInstance functions

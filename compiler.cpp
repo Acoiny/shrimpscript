@@ -405,6 +405,37 @@ void compiler::this_key(bool canAssign, compiler& cmp) {
     cmp.emitByte(OP_THIS);
 }
 
+void compiler::super_key(bool canAssign, compiler& cmp) {
+    if (!(cmp.currentPosition == TYPE_METHOD || cmp.currentPosition == TYPE_INIT)) {
+        cmp.error("can only use 'super' in class methods");
+    }
+
+    cmp.consume("expect '.' after 'super' keyword", TOKEN_DOT);
+    cmp.consume("expect identifier", TOKEN_IDENTIFIER);
+    int index = cmp.identifierConstant(cmp.prevToken);
+    
+    if (cmp.match(TOKEN_PAREN_OPEN)) {
+        cmp.emitByte(OP_THIS);
+        int argc = 0;
+        if (!cmp.check(TOKEN_PAREN_CLOSE)) {
+            do {
+                cmp.expression();
+                argc++;
+                if (argc > UINT8_MAX) {
+                    cmp.error("functions can have a maximum of 255 arguments");
+                }
+            } while (cmp.match(TOKEN_COMMA));
+        }
+        cmp.consume("expect ')' after function call", TOKEN_PAREN_CLOSE);
+        cmp.emitByte(OP_SUPER_INVOKE);
+        cmp.emitBytes((index >> 8) & 0xff, (index) & 0xff);
+        cmp.emitByte((opCodes)argc);
+    } else {
+        cmp.emitByte(OP_SUPER);
+        cmp.emitBytes((index >> 8) & 0xff, (index) & 0xff);
+    }
+}
+
 void compiler::ternary(bool canAssign, compiler& cmp) {
     size_t elseJump = cmp.emitJump(OP_JUMP_IF_FALSE);
     cmp.emitByte(OP_POP);

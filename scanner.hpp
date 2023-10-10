@@ -55,6 +55,8 @@ enum tokenType{
     TOKEN_RETURN,
     TOKEN_CLASS,
     TOKEN_THIS,
+    TOKEN_SUPER,
+
     TOKEN_BREAK,
     TOKEN_CONTINUE,
 

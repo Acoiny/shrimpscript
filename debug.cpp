@@ -63,7 +63,7 @@ int debug::callInstruction(const char *name, chunk *ch, int offset) {
     return offset + 2;
 }
 
-int debug::invokeInstructione(const char* name, chunk* ch, int offset) {
+int debug::invokeInstruction(const char* name, chunk* ch, int offset) {
     short jmpOffset = (ch->peekByte(offset + 1)) << 8 | ch->peekByte(offset + 2);
     int args = ch->peekByte(offset + 1);
     cout.width(4);
@@ -146,7 +146,7 @@ int debug::disassembleInstruction(char inst, chunk *ch, int offset) {
         case OP_MEMBER_VARIABLE:
             return constantInstruction("OP_MEMBER_VAR", ch, offset);
         case OP_INVOKE:
-            return invokeInstructione("OP_INVOKE", ch, offset);
+            return invokeInstruction("OP_INVOKE", ch, offset);
         case OP_APPEND:
             return appendInstruction("OP_APPEND", ch, offset);
         case OP_GET_INDEX:
@@ -155,6 +155,10 @@ int debug::disassembleInstruction(char inst, chunk *ch, int offset) {
             return simpleInstruction("OP_SET_INDEX", ch, offset);
         case OP_THIS:
             return simpleInstruction("OP_THIS", ch, offset);
+        case OP_SUPER:
+            return constantInstruction("OP_SUPER", ch, offset);
+        case OP_SUPER_INVOKE:
+            return invokeInstruction("OP_SUPER_INVOKE", ch, offset);
         case OP_IMPORT:
             return simpleInstruction("OP_IMPORT", ch, offset);
         case OP_RETURN:

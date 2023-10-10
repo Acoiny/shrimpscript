@@ -365,7 +365,7 @@ bool VM::invoke() {
     case OBJ_FILE: {
         if (fileFunctions.find(name) != fileFunctions.end()) {
             bool success = true;
-            objNativeFunction* funnn = (objNativeFunction*)fileFunctions.at(name).as.object;
+            //objNativeFunction* funnn = (objNativeFunction*)fileFunctions.at(name).as.object;
             value result = ((objNativeFunction*)(fileFunctions.at(name).as.object))->fun(argc, stackTop - argc - 1, success);
             stackTop -= argc + 1;
             push(result);
@@ -381,6 +381,26 @@ bool VM::invoke() {
     default:
         return runtimeError("unknown error");
     }
+}
+
+bool VM::superInvoke() {
+    objString* name = (objString*)activeChunk->getConstant(readShort()).as.object;
+    int argc = readByte();
+    value callee = peek(argc);
+
+    auto* instance = (objInstance*)callee.as.object;
+
+    value this_val = value(objThis::createObjThis(instance));
+
+    value method = ((objThis*)this_val.as.object)->accessSuperClassVariable(name);
+
+    peek(argc) = this_val;
+
+    if (method.getType() == VAL_OBJ && method.as.object->getType() == OBJ_FUN) {
+        return call(method, argc);
+    }
+
+    return runtimeError("no function with name '", name->getChars(), "' on superclass");
 }
 
 static bool validateIndex(double &index, size_t len) {
@@ -815,6 +835,16 @@ exitCodes VM::run() {
             case OP_THIS:
                 push(value(((objThis*)activeCallFrameBottom[-1].as.object)->getThis()));
                 break;
+            case OP_SUPER: {
+                auto name = (objString*)activeChunk->getConstant(readShort()).as.object;
+                push(((objThis*)activeCallFrameBottom[-1].as.object)->accessSuperClassVariable(name));
+                break;
+            }
+            case OP_SUPER_INVOKE: {
+                if (!superInvoke())
+                    return INTERPRET_RUNTIME_ERROR;
+                break;
+            }
             case OP_PULL_INSTANCE_FROM_THIS: {
                 objThis* th = (objThis*)(pop().as.object);
                 push(value(th->getThis()));

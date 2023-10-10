@@ -118,6 +118,8 @@ class VM {
 
     bool invoke();
 
+    bool superInvoke();
+
     bool getObjectIndex(obj* object, value &index);
 
     bool setObjectIndex(obj* object, value &index, value& val);

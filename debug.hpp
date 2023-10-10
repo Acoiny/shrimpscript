@@ -10,7 +10,7 @@ namespace debug {
     int simpleInstruction(const char* name, chunk* ch, int offset);
     int jumpInstruction(const char* name, int sign, chunk *ch, int offset);
     int callInstruction(const char* name, chunk* ch, int offset);
-    int invokeInstructione(const char* name, chunk* ch, int offset);
+    int invokeInstruction(const char* name, chunk* ch, int offset);
 
     int disassembleInstruction(char inst, chunk* ch, int offset);
     void disassembleChunk(chunk *ch);

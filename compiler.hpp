@@ -194,9 +194,11 @@ class compiler {
 
 	static void this_key(bool canAssign, compiler& cmp);
 
+	static void super_key(bool canAssign, compiler& cmp);
+
 	static void ternary(bool canAssign, compiler& cmp);
 
-	precFuncTableEntry precedenceTable[47] = {
+	precFuncTableEntry precedenceTable[48] = {
 			{nullptr, nullptr, PREC_NONE}, //[TOKEN_ERROR] = 
 			{nullptr, nullptr, PREC_NONE}, //[TOKEN_SEMICOLON] = 
 			{nullptr, dot, PREC_CALL}, //[TOKEN_DOT] =
@@ -241,6 +243,7 @@ class compiler {
 			{nullptr, nullptr, PREC_NONE}, //[TOKEN_RETURN] = 
 			{nullptr, nullptr, PREC_NONE}, //[TOKEN_CLASS] = 
 			{this_key, nullptr, PREC_NONE}, //[TOKEN_THIS]
+			{super_key, nullptr, PREC_NONE}, //[TOKEN_SUPER]
 			{nullptr, nullptr, PREC_NONE}, //[TOKEN_BREAK]
 			{nullptr, nullptr, PREC_NONE}, //[TOKEN_CONTINUE]
 			{nullptr, nullptr, PREC_NONE}, //[TOKEN_IMPORT]
