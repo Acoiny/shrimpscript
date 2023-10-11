@@ -340,7 +340,7 @@ void compiler::dot(bool canAssign, compiler &cmp) {
 
 void compiler::list(bool canAssign, compiler& cmp) {
     size_t len = 0;
-    cmp.currentChunk->writeConstant(value(objList::createList()), cmp.prevToken.line);
+    cmp.emitByte(OP_LIST);
     
     if (!cmp.check(TOKEN_SQUARE_CLOSE)) {
         do {

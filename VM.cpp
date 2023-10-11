@@ -832,6 +832,10 @@ exitCodes VM::run() {
                 pop();
                 break;
             }
+            case OP_LIST: {
+                push(value(objList::createList()));
+                break;
+            }
             case OP_APPEND: {
                 size_t len = readSizeT();
                 objList* list = (objList*)peek(len).as.object;

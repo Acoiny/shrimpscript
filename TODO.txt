@@ -1,0 +1,8 @@
+Features to implement/fix:
+
+-fix arrays on class instances all sharing  the same
+
+-super keyword chaining
+-post increment
+-stack trace
+-functions and classes knowing own names, and printing them

@@ -31,6 +31,9 @@
     <Filter Include="Header Files\Output">
       <UniqueIdentifier>{95ca3e3c-6a68-4d90-ae2f-6804f84ac317}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Text">
+      <UniqueIdentifier>{baa79f2b-1d25-408a-9ab8-19f3649f128d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="compiler.cpp">
@@ -84,9 +87,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="shrimpcode.🦐">
-      <Filter>Source Files</Filter>
+      <Filter>Text</Filter>
     </None>
-    <None Include="incl.shrimp" />
+    <None Include="incl.shrimp">
+      <Filter>Text</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="defines.hpp">
@@ -139,9 +144,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="text.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ResourceCompile Include="shrimpp.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
@@ -150,5 +152,13 @@
     <Image Include="shrimp.ico">
       <Filter>Resource Files</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="text.txt">
+      <Filter>Text</Filter>
+    </Text>
+    <Text Include="TODO.txt">
+      <Filter>Text</Filter>
+    </Text>
   </ItemGroup>
 </Project>

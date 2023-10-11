@@ -60,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="text.txt" />
+    <Text Include="TODO.txt" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="shrimpp.rc" />

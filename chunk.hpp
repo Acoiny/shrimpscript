@@ -68,6 +68,7 @@ enum opCodes : char {
     OP_INVOKE,
     OP_PULL_INSTANCE_FROM_THIS,
 
+    OP_LIST,
     OP_APPEND,
     OP_GET_INDEX,
     OP_SET_INDEX,
