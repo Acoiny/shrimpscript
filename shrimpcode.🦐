@@ -1,6 +1,11 @@
-{
-let a = 1;
-let b = --a + 2;
+class A{
+	
+	name = "klass";
 
-println("a: ", a, ", b: ", b);
+	say() {
+		println(this.name);
+	}
 }
+const a = A();
+a.say();
+A.say();

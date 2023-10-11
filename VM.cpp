@@ -379,6 +379,18 @@ bool VM::invoke() {
         }
         break;
     }
+    case OBJ_CLASS: {
+        auto klass = (objClass*)callee.as.object;
+
+        value method = klass->tableGet(name);
+
+        if (method.getType() == VAL_OBJ && method.as.object->getType() == OBJ_FUN) {
+            return call(method, argc);
+        }
+        return runtimeError("no function with name '", name->getChars(), "' on instance");
+        break;
+        break;
+    }
     default:
         return runtimeError("unknown error");
     }
@@ -885,9 +897,15 @@ exitCodes VM::run() {
                     return INTERPRET_RUNTIME_ERROR;
                 break;
             }
-            case OP_THIS:
+            case OP_THIS: {
+                value this_val = activeCallFrameBottom[-1];
+                if (!(this_val.getType() == VAL_OBJ && this_val.as.object->getType() == OBJ_THIS)) {
+                    runtimeError("no valid 'this' object");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
                 push(value(((objThis*)activeCallFrameBottom[-1].as.object)->getThis()));
                 break;
+            }
             case OP_SUPER: {
                 auto name = (objString*)activeChunk->getConstant(readShort()).as.object;
                 push(((objThis*)activeCallFrameBottom[-1].as.object)->accessSuperClassVariable(name));
