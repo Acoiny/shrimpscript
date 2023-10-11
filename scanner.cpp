@@ -41,10 +41,20 @@ token scanner::scanToken() {
             return stringToken('"');
         case '\'':
             return stringToken('\'');
-        case '+':
+        case '+': {
+            if (peek(1) == '+') {
+                advance();
+                return makeToken(TOKEN_PLUS_PLUS);
+            }
             return makeToken(TOKEN_PLUS);
-        case '-':
+        }
+        case '-': {
+            if (peek(1) == '+') {
+                advance();
+                return makeToken(TOKEN_MINUS_MINUS);
+            }
             return makeToken(TOKEN_MINUS);
+        }
         case '*':
             return makeToken(TOKEN_TIMES);
         case '/':

@@ -511,6 +511,22 @@ exitCodes VM::run() {
                 push(activeChunk->getConstant(ind));
                 break;
             }
+            case OP_INCREMENT: {
+                if (peek(0).getType() != VAL_NUM) {
+                    runtimeError("can only increment numbers");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                peek(0).as.number++;
+                break;
+            }
+            case OP_DECREMENT: {
+                if (peek(0).getType() != VAL_NUM) {
+                    runtimeError("can only decrement numbers");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                peek(0).as.number--;
+                break;
+            }
             case OP_ADD:
                 if (!add())
                     return INTERPRET_RUNTIME_ERROR;

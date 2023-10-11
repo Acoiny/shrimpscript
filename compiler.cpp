@@ -137,6 +137,12 @@ void compiler::unary(bool canAssign, compiler &cmp) {
         case TOKEN_BANG:
             cmp.emitByte(OP_NOT);
             break;
+        case TOKEN_PLUS_PLUS:
+            cmp.emitByte(OP_INCREMENT);
+            break;
+        case TOKEN_MINUS_MINUS:
+            cmp.emitByte(OP_DECREMENT);
+            break;
     }
 }
 
@@ -1057,6 +1063,10 @@ void compiler::parsePrec(precedence prec) {
     while (prec <= getRule(currentToken)->precedence) {
         advance();
         parseFn infixRule = getRule(prevToken)->infix;
+        if (infixRule == nullptr) {
+            error("unexpected character");
+            return;
+        }
         infixRule(canAssign, *this);
     }
 

@@ -198,7 +198,7 @@ class compiler {
 
 	static void ternary(bool canAssign, compiler& cmp);
 
-	precFuncTableEntry precedenceTable[48] = {
+	precFuncTableEntry precedenceTable[50] = {
 			{nullptr, nullptr, PREC_NONE}, //[TOKEN_ERROR] = 
 			{nullptr, nullptr, PREC_NONE}, //[TOKEN_SEMICOLON] = 
 			{nullptr, dot, PREC_CALL}, //[TOKEN_DOT] =
@@ -208,12 +208,14 @@ class compiler {
 			{literal, nullptr, PREC_PRIMARY}, //[TOKEN_TRUE] = 
 			{literal, nullptr, PREC_PRIMARY}, //[TOKEN_FALSE] = 
 			{nullptr, binary, PREC_TERM}, //[TOKEN_PLUS] =
+			//TODO: check increment
+			{unary, nullptr, PREC_UNARY}, //[TOKEN_PLUS_PLUS]
 			{unary, binary, PREC_TERM},//[TOKEN_MINUS] = 
+			{unary, nullptr, PREC_UNARY}, //[TOKEN_MINUS_MINUS]
 			{nullptr, binary, PREC_FACTOR}, //[TOKEN_TIMES] = 
 			{nullptr, binary, PREC_FACTOR}, //[TOKEN_DIVIDE] = 
 			{nullptr, binary, PREC_FACTOR}, //[TOKEN_MODULO] = 
 			{unary, nullptr, PREC_UNARY}, //[TOKEN_BANG] = 
-			//TODO: check precedence for question mark operator
 			{nullptr, ternary, PREC_CONDITIONAL}, //[TOKEN_QUESTIONMARK]
 			{nullptr, binary, PREC_COMPARISON}, //[TOKEN_BANG_EQUALS] = 
 			{nullptr, binary, PREC_COMPARISON}, //[TOKEN_EQUALS_EQUALS] = 

@@ -1,10 +1,4 @@
-class A{
-	name = "asd";
+let a = 1;
+let b = a+ ++a;
 
-	say() {
-		println(this.name);
-	}
-}
-
-let a = A();
-a.say();
+println(b);

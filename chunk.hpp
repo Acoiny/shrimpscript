@@ -17,6 +17,8 @@ enum opCodes : char {
 
     OP_NEGATE,
     OP_NOT,
+    OP_INCREMENT,
+    OP_DECREMENT,
 
     OP_EQUALS,
     OP_NOT_EQUALS,
