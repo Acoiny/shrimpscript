@@ -114,6 +114,15 @@ void memoryManager::markValue(value& val) {
 	}
 }
 
+/*
+* this overload is only necessary because of the dictionary object
+*/
+void memoryManager::markValue(const value& val) {
+	if (val.type == VAL_OBJ) {
+		markObject(val.as.object);
+	}
+}
+
 void memoryManager::markRoots() {
 	for (int i = 0; i < vm->stackTop - vm->stack; ++i) {
 		markValue(vm->stack[i]);
@@ -189,7 +198,7 @@ void memoryManager::blackenObject(obj* obj) {
 	case OBJ_MAP: {
 		objMap* map = (objMap*)obj;
 		for (auto& el : map->data) {
-			markObject(el.first);
+			markValue(el.first);
 			markValue(el.second);
 		}
 		break;

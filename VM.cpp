@@ -455,11 +455,8 @@ bool VM::getObjectIndex(obj* object, value &index) {
         break;
     }
     case OBJ_MAP: {
-        if (!(index.getType() == VAL_OBJ && index.as.object->getType() == OBJ_STR))
-            return runtimeError("dicitonary index must be a string");
-        
         auto* map = (objMap*)object;
-        value res = map->getValueAt((objString*)index.as.object);
+        value res = map->getValueAt(index);
 
         pop();
         push(res);
@@ -488,11 +485,8 @@ bool VM::setObjectIndex(obj* object, value &index, value& val) {
         return true;
     }
     case OBJ_MAP: {
-        if (!(index.getType() == VAL_OBJ && index.as.object->getType() == OBJ_STR))
-            return runtimeError("dictionary index must be a string");
-
         auto* map = (objMap*)object;
-        map->insertElement((objString*)index.as.object, val);
+        map->insertElement(index, val);
         return true;
     }
     default:
@@ -756,7 +750,7 @@ exitCodes VM::run() {
 
                 if (!(itOver.getType() == VAL_OBJ && itOver.as.object->getType() == OBJ_LIST)) {
                     runtimeError("cannot iterate over variable");
-                        return INTERPRET_RUNTIME_ERROR;
+                    return INTERPRET_RUNTIME_ERROR;
                 }
 
                 objList* arr = ((objList*)itOver.as.object);
@@ -858,14 +852,9 @@ exitCodes VM::run() {
                 {
                     value key = peek(len * 2 - i);
 
-                    if (!(key.getType() == VAL_OBJ && key.as.object->getType() == OBJ_STR)) {
-                        runtimeError("dictionary key must be a string");
-                        return INTERPRET_RUNTIME_ERROR;
-                    }
-
                     value val = peek(len * 2 - i - 1);
 
-                    map->insertElement((objString*)key.as.object, val);
+                    map->insertElement(key, val);
                 }
 
                 for (size_t i = 0; i < len; i++) {

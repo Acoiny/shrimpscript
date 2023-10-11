@@ -55,7 +55,8 @@ class memoryManager {
 
     void markObject(obj *obj);
 
-    void markValue(value &val);
+    void markValue(value& val);
+    void markValue(const value &val);
 
     void traceReferences();
 

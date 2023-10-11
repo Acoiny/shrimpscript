@@ -22,6 +22,8 @@ union trueVal{
 };
 
 class value {
+    friend class memoryManager;
+
     valType type;
 
     friend std::ostream &operator<<(std::ostream& os, const value& val);
@@ -38,6 +40,7 @@ public:
     explicit value(uintptr_t address);
     valType getType();
 
+    bool operator==(const value& rhs) const;
 };
 
 

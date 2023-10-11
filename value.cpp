@@ -53,7 +53,7 @@ std::ostream& value::printObject(std::ostream& os) const {
 			else
 				setComma = true;
 
-			os << "\"" << ((objString*)el.first)->chars << "\" : " << el.second;
+			os << el.first << " : " << el.second;
 			
 		}
 		os << "}";
@@ -119,4 +119,8 @@ std::ostream& operator<<(std::ostream& os, const value& val) {
 		break;
 	}
 	return os;
+}
+
+bool value::operator==(const value& rhs) const {
+	return this->type == rhs.type && this->as.address == rhs.as.address;
 }

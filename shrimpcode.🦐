@@ -1,3 +1,3 @@
-let i = 2;
-let a = ++i;
-println(i);
+const map = {23 : "aa", "hello": 23};
+
+println(map['hello']);

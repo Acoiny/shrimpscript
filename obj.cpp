@@ -279,14 +279,14 @@ size_t objMap::getSize() {
 	return data.size();
 }
 
-value objMap::getValueAt(objString* key) {
+value objMap::getValueAt(const value& key) {
 	if (data.count(key) == 0)
 		return value();
 
 	return data.at(key);
 }
 
-void objMap::insertElement(objString* key, const value& val) {
+void objMap::insertElement(const value& key, const value& val) {
 	data.insert_or_assign(key, val);
 }
 

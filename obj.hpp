@@ -211,21 +211,27 @@ public:
     static objList* createList();
 };
 
+struct myMapHash {
+    size_t operator()(const value& rhs) const {
+        return rhs.as.address;
+    }
+};
+
 //TODO: finish map object
 class objMap : public obj{
     friend class memoryManager;
     friend class value;
 
 public:
-    std::unordered_map<objString*, value> data;
+    std::unordered_map<value, value, myMapHash> data;
 
     objMap();
 
     size_t getSize();
 
-    value getValueAt(objString* key);
+    value getValueAt(const value& key);
 
-    void insertElement(objString* key, const value& val);
+    void insertElement(const value& key, const value& val);
 
     static objMap* createMap();
 };
