@@ -1,8 +1,11 @@
-Features to implement/fix:
+Features to implement:
 
--fix arrays on class instances all sharing  the same
-
--super keyword chaining
--post increment
+-correct pre- and post increment and decrement
 -stack trace
 -functions and classes knowing own names, and printing them
+
+
+
+Fixes to do:
+
+-super keyword chaining

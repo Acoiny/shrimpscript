@@ -261,7 +261,7 @@ void compiler::checkConsts(bool isConst, opCodes setOP, token& checkNameGlobal) 
 }
 
 void compiler::namedVariable(token &name, bool canAssign) {
-    opCodes setOP, getOP;
+    opCodes setOP, getOP, incOP, decOP;
 
     bool isConst = false;
 
@@ -269,23 +269,35 @@ void compiler::namedVariable(token &name, bool canAssign) {
     if (arg != -1) {
         getOP = OP_GET_LOCAL;
         setOP = OP_SET_LOCAL;
+
+        incOP = OP_INCREMENT_LOCAL;
+        decOP = OP_DECREMENT_LOCAL;
     } else {
         arg = identifierConstant(name);
         getOP = OP_GET_GLOBAL;
         setOP = OP_SET_GLOBAL;
+
+        incOP = OP_INCREMENT_GLOBAL;
+        decOP = OP_DECREMENT_GLOBAL;
     }
 
-    
-    if (canAssign && match(TOKEN_EQUALS)) {
+    if (canAssign && match(TOKEN_PLUS_PLUS)) {
+        checkConsts(isConst, setOP, name);
+        emitByte(incOP);
+    }
+    else if (canAssign && match(TOKEN_MINUS_MINUS)) {
+        checkConsts(isConst, setOP, name);
+        emitByte(decOP);
+    } else if (canAssign && match(TOKEN_EQUALS)) {
         checkConsts(isConst, setOP, name);
 
         expression();
         emitByte(setOP);
-        emitBytes((arg >> 8) & 0xff, arg & 0xff);
     } else {
         emitByte(getOP);
-        emitBytes((arg >> 8) & 0xff, arg & 0xff);
     }
+    
+    emitBytes((arg >> 8) & 0xff, arg & 0xff);
 }
 
 void compiler::variable(bool canAssign, compiler &cmp) {
@@ -462,6 +474,9 @@ void compiler::preCrement(bool canAssign, compiler& cmp) {
 
     if (var == -1) {
         var = cmp.identifierConstant(cmp.prevToken);
+
+        cmp.checkConsts(isConst, OP_SET_GLOBAL, cmp.prevToken);
+
         if (op.type == TOKEN_PLUS_PLUS) {
             cmp.emitByte(OP_INCREMENT_GLOBAL);
         } else {
@@ -469,6 +484,9 @@ void compiler::preCrement(bool canAssign, compiler& cmp) {
         }
     }
     else {
+
+        cmp.checkConsts(isConst, OP_SET_LOCAL, cmp.prevToken);
+
         if (op.type == TOKEN_PLUS_PLUS) {
             cmp.emitByte(OP_INCREMENT_LOCAL);
         }
