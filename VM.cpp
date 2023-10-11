@@ -540,7 +540,6 @@ exitCodes VM::run() {
 
                 var.as.number++;
                 globals.insert_or_assign(name, var);
-                push(var);
                 break;
             }
             case OP_DECREMENT_GLOBAL: {
@@ -560,7 +559,6 @@ exitCodes VM::run() {
 
                 var.as.number--;
                 globals.insert_or_assign(name, var);
-                push(var);
                 break;
             }
             case OP_INCREMENT_LOCAL: {
