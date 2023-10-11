@@ -25,6 +25,7 @@ enum precedence {
 	PREC_TERM,
 	PREC_FACTOR,
 	PREC_UNARY,
+	PREC_INCREMENT,
 	PREC_CALL,
 	PREC_PRIMARY
 };
@@ -106,6 +107,8 @@ class compiler {
 	void declareVariable(bool isConst);
 
 	int resolveLocal(bool &isConst);
+
+	void checkConsts(bool isConst, opCodes setOP, token& checkNameGlobal);
 
 	void namedVariable(token& name, bool canAssign);
 
@@ -198,6 +201,8 @@ class compiler {
 
 	static void ternary(bool canAssign, compiler& cmp);
 
+	static void preCrement(bool canAssign, compiler& cmp);
+
 	precFuncTableEntry precedenceTable[50] = {
 			{nullptr, nullptr, PREC_NONE}, //[TOKEN_ERROR] = 
 			{nullptr, nullptr, PREC_NONE}, //[TOKEN_SEMICOLON] = 
@@ -208,10 +213,10 @@ class compiler {
 			{literal, nullptr, PREC_PRIMARY}, //[TOKEN_TRUE] = 
 			{literal, nullptr, PREC_PRIMARY}, //[TOKEN_FALSE] = 
 			{nullptr, binary, PREC_TERM}, //[TOKEN_PLUS] =
-			//TODO: check increment
-			{unary, nullptr, PREC_UNARY}, //[TOKEN_PLUS_PLUS]
+			//TODO: increment and decrement MUST change variable itself
+			{preCrement, nullptr, PREC_INCREMENT}, //[TOKEN_PLUS_PLUS]
 			{unary, binary, PREC_TERM},//[TOKEN_MINUS] = 
-			{unary, nullptr, PREC_UNARY}, //[TOKEN_MINUS_MINUS]
+			{preCrement, nullptr, PREC_INCREMENT}, //[TOKEN_MINUS_MINUS]
 			{nullptr, binary, PREC_FACTOR}, //[TOKEN_TIMES] = 
 			{nullptr, binary, PREC_FACTOR}, //[TOKEN_DIVIDE] = 
 			{nullptr, binary, PREC_FACTOR}, //[TOKEN_MODULO] = 

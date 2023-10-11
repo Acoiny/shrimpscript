@@ -137,12 +137,6 @@ void compiler::unary(bool canAssign, compiler &cmp) {
         case TOKEN_BANG:
             cmp.emitByte(OP_NOT);
             break;
-        case TOKEN_PLUS_PLUS:
-            cmp.emitByte(OP_INCREMENT);
-            break;
-        case TOKEN_MINUS_MINUS:
-            cmp.emitByte(OP_DECREMENT);
-            break;
     }
 }
 
@@ -252,38 +246,38 @@ int compiler::resolveLocal(bool &isConst) {
     return -1;
 }
 
+void compiler::checkConsts(bool isConst, opCodes setOP, token& checkNameGlobal) {
+    if (isConst)
+        error("can't reassign const variables");
+
+    //checking globals here, so memcmp isn't called as often
+    if (setOP == OP_SET_GLOBAL) {
+        for (auto& el : globalConsts) {
+            if (identifiersEqual(checkNameGlobal, el)) {
+                error("can't reassign const variables");
+            }
+        }
+    }
+}
+
 void compiler::namedVariable(token &name, bool canAssign) {
     opCodes setOP, getOP;
 
     bool isConst = false;
 
-    token checkNameGlobal;
-
     int arg = resolveLocal(isConst);
     if (arg != -1) {
         getOP = OP_GET_LOCAL;
         setOP = OP_SET_LOCAL;
-
     } else {
         arg = identifierConstant(name);
-        checkNameGlobal = name;
         getOP = OP_GET_GLOBAL;
         setOP = OP_SET_GLOBAL;
     }
 
     
     if (canAssign && match(TOKEN_EQUALS)) {
-        if(isConst)
-            error("can't reassign const variables");
-        
-        //checking globals here, so memcmp isn't called as often
-        if (setOP == OP_SET_GLOBAL) {
-            for (auto& el : globalConsts) {
-                if (identifiersEqual(checkNameGlobal, el)) {
-                    error("can't reassign const variables");
-                }
-            }
-        }
+        checkConsts(isConst, setOP, name);
 
         expression();
         emitByte(setOP);
@@ -456,6 +450,36 @@ void compiler::ternary(bool canAssign, compiler& cmp) {
     cmp.expression();
     cmp.patchJump(exitJump);
 }
+
+void compiler::preCrement(bool canAssign, compiler& cmp) {
+    token op = cmp.prevToken;
+
+    cmp.advance();
+
+    bool isConst = false;
+
+    int var = cmp.resolveLocal(isConst);
+
+    if (var == -1) {
+        var = cmp.identifierConstant(cmp.prevToken);
+        if (op.type == TOKEN_PLUS_PLUS) {
+            cmp.emitByte(OP_INCREMENT_GLOBAL);
+        } else {
+            cmp.emitByte(OP_DECREMENT_GLOBAL);
+        }
+    }
+    else {
+        if (op.type == TOKEN_PLUS_PLUS) {
+            cmp.emitByte(OP_INCREMENT_LOCAL);
+        }
+        else {
+            cmp.emitByte(OP_DECREMENT_LOCAL);
+        }
+    }
+
+    cmp.emitBytes((var >> 8) & 0xff, var & 0xff);
+}
+
 
 void compiler::expression() {
     parsePrec(PREC_ASSIGN);

@@ -161,6 +161,14 @@ int debug::disassembleInstruction(char inst, chunk *ch, int offset) {
             return invokeInstruction("OP_SUPER_INVOKE", ch, offset);
         case OP_IMPORT:
             return simpleInstruction("OP_IMPORT", ch, offset);
+        case OP_INCREMENT_GLOBAL:
+            return constantInstruction("OP_INCREMENT_GLOBAL", ch, offset);
+        case OP_DECREMENT_GLOBAL:
+            return constantInstruction("OP_DECREMENT_GLOBAL", ch, offset);
+        case OP_INCREMENT_LOCAL:
+            return constantInstruction("OP_INCREMENT_LOCAL", ch, offset);
+        case OP_DECREMENT_LOCAL:
+            return constantInstruction("OP_DECREMENT_LOCAL", ch, offset);
         case OP_RETURN:
             return simpleInstruction("OP_RETURN", ch, offset);
         default: {

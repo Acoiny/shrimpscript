@@ -511,20 +511,54 @@ exitCodes VM::run() {
                 push(activeChunk->getConstant(ind));
                 break;
             }
-            case OP_INCREMENT: {
-                if (peek(0).getType() != VAL_NUM) {
+            case OP_INCREMENT_GLOBAL: {
+                objString* name = (objString*)activeChunk->getConstant(readShort()).as.object;
+
+                if (!globals.count(name)) {
+                    runtimeError("no variable with name '", name->getChars(), "'");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+
+                value var = globals.at(name);
+
+                if (var.getType() != VAL_NUM) {
                     runtimeError("can only increment numbers");
                     return INTERPRET_RUNTIME_ERROR;
                 }
-                peek(0).as.number++;
+
+                var.as.number++;
+                globals.insert_or_assign(name, var);
+                push(var);
                 break;
             }
-            case OP_DECREMENT: {
-                if (peek(0).getType() != VAL_NUM) {
-                    runtimeError("can only decrement numbers");
+            case OP_DECREMENT_GLOBAL: {
+                objString* name = (objString*)activeChunk->getConstant(readShort()).as.object;
+
+                if (!globals.count(name)) {
+                    runtimeError("no variable with name '", name->getChars(), "'");
                     return INTERPRET_RUNTIME_ERROR;
                 }
-                peek(0).as.number--;
+
+                value var = globals.at(name);
+
+                if (var.getType() != VAL_NUM) {
+                    runtimeError("can only increment numbers");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+
+                var.as.number--;
+                globals.insert_or_assign(name, var);
+                push(var);
+                break;
+            }
+            case OP_INCREMENT_LOCAL: {
+                int index = readShort();
+                push(value(++activeCallFrameBottom[index].as.number));
+                break;
+            }
+            case OP_DECREMENT_LOCAL: {
+                int index = readShort();
+                push(value(--activeCallFrameBottom[index].as.number));
                 break;
             }
             case OP_ADD:
@@ -628,7 +662,7 @@ exitCodes VM::run() {
             case OP_GET_GLOBAL: {
                 objString *name = (objString *) activeChunk->getConstant(readShort()).as.object;
 
-                if (globals.find(name) == globals.end()) {
+                if (!globals.count(name)) {
                     runtimeError("no variable with name '", name->getChars(), "'");
                     return INTERPRET_RUNTIME_ERROR;
                 }

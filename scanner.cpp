@@ -49,7 +49,7 @@ token scanner::scanToken() {
             return makeToken(TOKEN_PLUS);
         }
         case '-': {
-            if (peek(1) == '+') {
+            if (peek(1) == '-') {
                 advance();
                 return makeToken(TOKEN_MINUS_MINUS);
             }
