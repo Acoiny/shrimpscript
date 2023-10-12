@@ -246,6 +246,24 @@ int compiler::resolveLocal(bool &isConst) {
     return -1;
 }
 
+int compiler::resolveLocal(bool& isConst, token comp) {
+    for (int i = locals.size() - 1; i >= 0; --i) {
+        local* loc = &locals.at(i);
+        if (identifiersEqual(loc->name, comp)) {
+            if (loc->depth == -1) {
+                error("can't initialize local with itself");
+            }
+
+            if (loc->isConst)
+                isConst = true;
+
+            return i;
+        }
+    }
+
+    return -1;
+}
+
 void compiler::checkConsts(bool isConst, opCodes setOP, token& checkNameGlobal) {
     if (isConst)
         error("can't reassign const variables");
@@ -286,22 +304,26 @@ void compiler::namedVariable(token &name, bool canAssign) {
         emitByte(getOP);
         emitBytes((arg >> 8) & 0xff, arg & 0xff);
         emitByte(incOP);
+        emitBytes((arg >> 8) & 0xff, arg & 0xff);
     }
     else if (canAssign && match(TOKEN_MINUS_MINUS)) {
         checkConsts(isConst, setOP, name);
         emitByte(getOP);
         emitBytes((arg >> 8) & 0xff, arg & 0xff);
         emitByte(decOP);
-    } else if (canAssign && match(TOKEN_EQUALS)) {
+        emitBytes((arg >> 8) & 0xff, arg & 0xff);
+    }
+    else if (canAssign && match(TOKEN_EQUALS)) {
         checkConsts(isConst, setOP, name);
 
         expression();
         emitByte(setOP);
+        emitBytes((arg >> 8) & 0xff, arg & 0xff);
     } else {
         emitByte(getOP);
+        emitBytes((arg >> 8) & 0xff, arg & 0xff);
     }
     
-    emitBytes((arg >> 8) & 0xff, arg & 0xff);
 }
 
 void compiler::variable(bool canAssign, compiler &cmp) {
@@ -472,7 +494,7 @@ void compiler::preCrement(bool canAssign, compiler& cmp) {
 
     bool isConst = false;
 
-    int var = cmp.resolveLocal(isConst);
+    int var = cmp.resolveLocal(isConst, cmp.currentToken);
 
     if (var == -1) {
         var = cmp.identifierConstant(cmp.currentToken);

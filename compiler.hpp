@@ -109,6 +109,9 @@ class compiler {
 
 	int resolveLocal(bool &isConst);
 
+	//overload to use in preCrement, which can't consume the identifier
+	int resolveLocal(bool& isConst, token comp);
+
 	void checkConsts(bool isConst, opCodes setOP, token& checkNameGlobal);
 
 	void namedVariable(token& name, bool canAssign);

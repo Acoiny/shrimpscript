@@ -4,9 +4,11 @@ Features to implement:
 -stack trace
 -functions and classes knowing own names, and printing them
 
--correct pre- and post increment and decrement -- IN TESTING
 
 
 Fixes to do:
+
+-correct pre- and post increment and decrement -- ERROR IN LOOPS
+
 
 -super keyword chaining -- IN TESTING

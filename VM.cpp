@@ -513,7 +513,7 @@ exitCodes VM::run() {
             std::cout << " [" << std::setw(6) << std::left << stack[i] << "] ";
         }
         std::cout << std::endl;
-        debug::disassembleInstruction(*ip, activeChunk, (ip - activeChunk->getInstructionPointer()));
+        debug::disassembleInstruction(*ip, activeFunc->getChunkPtr(), (ip - activeFunc->getChunkPtr()->getInstructionPointer()));
 #endif
         switch (c = readByte()) {
             case OP_CONSTANT: {
@@ -561,12 +561,20 @@ exitCodes VM::run() {
             }
             case OP_INCREMENT_LOCAL: {
                 int index = readShort();
-                push(value(++activeCallFrameBottom[index].as.number));
+                if (activeCallFrameBottom[index].getType() != VAL_NUM) {
+                    runtimeError("can only increment numbers");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                activeCallFrameBottom[index].as.number++;
                 break;
             }
             case OP_DECREMENT_LOCAL: {
                 int index = readShort();
-                push(value(--activeCallFrameBottom[index].as.number));
+                if (activeCallFrameBottom[index].getType() != VAL_NUM) {
+                    runtimeError("can only increment numbers");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                activeCallFrameBottom[index].as.number++;
                 break;
             }
             case OP_ADD:
