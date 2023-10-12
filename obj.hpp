@@ -68,11 +68,17 @@ public:
     static objString* takeString(const char* chars, const unsigned int len);
 };
 
+//forward declaring objClass
+
+class objClass;
+
 class objFunction : public obj {
     friend class memoryManager;
     friend class value;
 
     chunk* funChunk;
+
+    objClass* klass;
 
     unsigned char arity;
 
@@ -85,6 +91,12 @@ public:
     chunk* getChunkPtr();
 
     int getArity() const;
+
+    void setClass(objClass* cl);
+
+    bool isMethod() const;
+
+    objClass* getClass() const;
 
     static objFunction* createObjFunction(chunk* ch, int arity);
 };
@@ -124,6 +136,8 @@ public:
     void tableSet(objString* n, value &val);
 
     value tableGet(objString* k);
+
+    value superTableGet(objString* k);
 
     bool hasInitFunction();
 
@@ -170,8 +184,6 @@ public:
     uintptr_t getAddress();
 
     objInstance* getThis();
-
-    value accessSuperClassVariable(objString* k);
 };
 
 
@@ -217,7 +229,7 @@ struct myMapHash {
     }
 };
 
-//TODO: finish map object
+
 class objMap : public obj{
     friend class memoryManager;
     friend class value;

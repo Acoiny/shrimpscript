@@ -132,9 +132,8 @@ void memoryManager::markRoots() {
 		markValue(el.second);
 	}
 
-	for (auto& el : vm->scriptChunk->constants) {
-		markValue(el);
-	}
+	markObject(vm->activeFunc);
+	markObject(vm->scriptFunc);
 
 	for (auto& el : vm->stringFunctions) {
 		markObject(el.first);

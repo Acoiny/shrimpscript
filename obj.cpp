@@ -91,7 +91,7 @@ bool obj::isMark() {
 }
 
 ///object function
-objFunction::objFunction() : funChunk(nullptr), arity(0) {
+objFunction::objFunction() : funChunk(nullptr), arity(0), klass(nullptr) {
 	type = OBJ_FUN;
 }
 
@@ -110,6 +110,19 @@ int objFunction::getArity() const {
 	return arity;
 }
 
+void objFunction::setClass(objClass* cl) {
+	klass = cl;
+}
+
+bool objFunction::isMethod() const {
+	return klass != nullptr;
+}
+
+objClass* objFunction::getClass() const {
+	return klass;
+}
+
+//objNativeFunction functions
 objNativeFunction::objNativeFunction() : fun(nullptr) {
 	type = OBJ_NAT_FUN;
 }
@@ -145,6 +158,10 @@ value objClass::tableGet(objString* k) {
 	}
 
 	return table.at(k);
+}
+
+value objClass::superTableGet(objString* k) {
+	return superClass->tableGet(k);
 }
 
 objClass* objClass::createObjClass(objString* name) {
@@ -221,10 +238,6 @@ uintptr_t objThis::getAddress() {
 
 objInstance* objThis::getThis() {
 	return this_instance;
-}
-
-value objThis::accessSuperClassVariable(objString* k) {
-	return this_instance->klass->superClass->tableGet(k);
 }
 
 //objNativeInstance functions

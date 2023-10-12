@@ -10,7 +10,7 @@
 
 memoryManager globalMemory;
 
-VM::VM() : ip(), activeChunk(nullptr), memory(globalMemory), callFrames() {
+VM::VM() : ip(), activeFunc(nullptr), memory(globalMemory), callFrames() {
     memory.setVM(this);
     currentCompiler = new compiler(*this);
 
@@ -22,8 +22,8 @@ VM::VM() : ip(), activeChunk(nullptr), memory(globalMemory), callFrames() {
 }
 
 void VM::interpret(char *str) {
-    activeChunk = currentCompiler->compiling(str);
-    scriptChunk = activeChunk;
+    activeFunc = currentCompiler->compiling(str);
+    scriptFunc = activeFunc;
     gcReady = true;
     if(!currentCompiler->errorOccured()) {
         run();
@@ -31,21 +31,21 @@ void VM::interpret(char *str) {
 }
 
 void VM::interpretImportFile(char* str) {
-    chunk* prevActiveChunk = activeChunk;
-    chunk* prevScriptChunk = scriptChunk;
+    objFunction* prevActiveFunc = activeFunc;
+    objFunction* prevScriptFunc = scriptFunc;
     compiler* prevCompiler = currentCompiler;
 
     currentCompiler = new compiler(*this);
 
-    activeChunk = currentCompiler->compiling(str);
-    scriptChunk = activeChunk;
+    activeFunc = currentCompiler->compiling(str);
+    scriptFunc = activeFunc;
     gcReady = true;
     if (!currentCompiler->errorOccured()) {
         run();
     }
 
-    activeChunk = prevActiveChunk;
-    scriptChunk = prevScriptChunk;
+    activeFunc = prevActiveFunc;
+    scriptFunc= prevScriptFunc;
 
     delete currentCompiler;
     currentCompiler = prevCompiler;
@@ -200,7 +200,7 @@ bool VM::areEqual(value b, value a) {
 bool VM::call(value callee, int arity) {
     auto *fun = (objFunction*)callee.as.object;
     callFrames[callDepth].bottom = activeCallFrameBottom;
-    callFrames[callDepth].ch = activeChunk;
+    callFrames[callDepth].func = activeFunc;
     callFrames[callDepth].top = stackTop - arity;
     callDepth++;
 
@@ -221,8 +221,8 @@ bool VM::call(value callee, int arity) {
         peek(arity) = tmp;
     }
     activeCallFrameBottom = stackTop - arity;
-    activeChunk = fun->getChunkPtr();
-    ip = activeChunk->getInstructionPointer();
+    activeFunc = fun;
+    ip = activeFunc->getChunkPtr()->getInstructionPointer();
 
     return true;
 }
@@ -270,8 +270,10 @@ bool VM::callValue(value callee, int arity) {
 
 void VM::defineMethod() {
     value method = peek(0);
-    objString* name = (objString*)activeChunk->getConstant(readShort()).as.object;
+    objString* name = (objString*)activeFunc->getChunkPtr()->getConstant(readShort()).as.object;
     objClass* cl = (objClass*)peek(1).as.object;
+
+    ((objFunction*)method.as.object)->setClass(cl);
 
     cl->tableSet(name, method);
     pop();
@@ -284,7 +286,7 @@ bool VM::defineMemberVar() {
         return runtimeError("cannot initialize member variables with 'nil'");
 
     value tmp = peek(1);
-    objString* name = (objString*)activeChunk->getConstant(readShort()).as.object;
+    objString* name = (objString*)activeFunc->getChunkPtr()->getConstant(readShort()).as.object;
     objClass* cl = (objClass*)peek(1).as.object;
 
     cl->tableSet(name, val);
@@ -294,7 +296,7 @@ bool VM::defineMemberVar() {
 }
 
 bool VM::invoke() {
-    objString* name = (objString*)activeChunk->getConstant(readShort()).as.object;
+    objString* name = (objString*)activeFunc->getChunkPtr()->getConstant(readShort()).as.object;
     int argc = readByte();
     value callee = peek(argc);
     
@@ -399,7 +401,7 @@ bool VM::invoke() {
 
 bool VM::superInvoke() {
     //TODO: profile super invoke (and normal super call)
-    objString* name = (objString*)activeChunk->getConstant(readShort()).as.object;
+    objString* name = (objString*)activeFunc->getChunkPtr()->getConstant(readShort()).as.object;
     int argc = readByte();
     value callee = peek(argc);
 
@@ -407,7 +409,9 @@ bool VM::superInvoke() {
 
     value this_val = value(objThis::createObjThis(instance));
 
-    value method = ((objThis*)this_val.as.object)->accessSuperClassVariable(name);
+    //TODO: access activeFunc
+    value method = activeFunc->getClass()->superTableGet(name);
+    //value method = ((objThis*)this_val.as.object)->accessSuperClassVariable(name);
 
     peek(argc) = this_val;
 
@@ -500,7 +504,7 @@ bool VM::importFile(const char* filename) {
 }
 
 exitCodes VM::run() {
-    ip = activeChunk->getInstructionPointer();
+    ip = activeFunc->getChunkPtr()->getInstructionPointer();
     char c;
     for (;;) {
 #ifdef DEBUG_TRACE_EXECUTION
@@ -514,11 +518,11 @@ exitCodes VM::run() {
         switch (c = readByte()) {
             case OP_CONSTANT: {
                 short ind = readShort();
-                push(activeChunk->getConstant(ind));
+                push(activeFunc->getChunkPtr()->getConstant(ind));
                 break;
             }
             case OP_INCREMENT_GLOBAL: {
-                objString* name = (objString*)activeChunk->getConstant(readShort()).as.object;
+                objString* name = (objString*)activeFunc->getChunkPtr()->getConstant(readShort()).as.object;
 
                 if (!globals.count(name)) {
                     runtimeError("no variable with name '", name->getChars(), "'");
@@ -537,7 +541,7 @@ exitCodes VM::run() {
                 break;
             }
             case OP_DECREMENT_GLOBAL: {
-                objString* name = (objString*)activeChunk->getConstant(readShort()).as.object;
+                objString* name = (objString*)activeFunc->getChunkPtr()->getConstant(readShort()).as.object;
 
                 if (!globals.count(name)) {
                     runtimeError("no variable with name '", name->getChars(), "'");
@@ -658,13 +662,13 @@ exitCodes VM::run() {
                 break;
             }
             case OP_DEFINE_GLOBAL: {
-                objString *name = (objString *) activeChunk->getConstant(readShort()).as.object;
+                objString *name = (objString *)activeFunc->getChunkPtr()->getConstant(readShort()).as.object;
                 globals.insert_or_assign(name, peek(0));
                 pop();
                 break;
             }
             case OP_GET_GLOBAL: {
-                objString *name = (objString *) activeChunk->getConstant(readShort()).as.object;
+                objString *name = (objString *)activeFunc->getChunkPtr()->getConstant(readShort()).as.object;
 
                 if (!globals.count(name)) {
                     runtimeError("no variable with name '", name->getChars(), "'");
@@ -675,7 +679,7 @@ exitCodes VM::run() {
                 break;
             }
             case OP_SET_GLOBAL: {
-                objString *name = (objString *) activeChunk->getConstant(readShort()).as.object;
+                objString *name = (objString *)activeFunc->getChunkPtr()->getConstant(readShort()).as.object;
                 if (!globals.count(name)) {
                     runtimeError("no global variable with name '", name->getChars(), "'");
                     return INTERPRET_RUNTIME_ERROR;
@@ -695,7 +699,7 @@ exitCodes VM::run() {
                 short ind = readShort();
                 if(peek(1).getType() == VAL_OBJ && peek(1).as.object->getType() == OBJ_INSTANCE) {
                     auto* instance = (objInstance*)peek(1).as.object;
-                    auto* name = (objString*)activeChunk->getConstant(ind).as.object;
+                    auto* name = (objString*)activeFunc->getChunkPtr()->getConstant(ind).as.object;
                     value val = pop();
                     if(val.getType() == VAL_NIL) {
                         instance->tableDelete(name);
@@ -712,7 +716,7 @@ exitCodes VM::run() {
                 short ind = readShort();
                 if(peek(0).getType() == VAL_OBJ && peek(0).as.object->getType() == OBJ_INSTANCE) {
                     auto* instance = (objInstance*)peek(0).as.object;
-                    auto* name = (objString*)activeChunk->getConstant(ind).as.object;
+                    auto* name = (objString*)activeFunc->getChunkPtr()->getConstant(ind).as.object;
                     value val = instance->tableGet(name);
                     if(val.getType() == VAL_NIL) {
                         runtimeError("no property of name ", name->getChars(), " on instance");
@@ -781,7 +785,7 @@ exitCodes VM::run() {
             }
             case OP_FUNCTION: {
                 int constIndex = readShort();
-                value fn = activeChunk->getConstant(constIndex);
+                value fn = activeFunc->getChunkPtr()->getConstant(constIndex);
                 push(fn);
                 break;
             }
@@ -793,7 +797,7 @@ exitCodes VM::run() {
                 break;
             }
             case OP_CLASS: {
-                objString* klassName = (objString*)(activeChunk->getConstant(readShort()).as.object);
+                objString* klassName = (objString*)(activeFunc->getChunkPtr()->getConstant(readShort()).as.object);
                 objClass* klass = objClass::createObjClass(klassName);
                 push(value(klass));
                 break;
@@ -898,8 +902,14 @@ exitCodes VM::run() {
                 break;
             }
             case OP_SUPER: {
-                auto name = (objString*)activeChunk->getConstant(readShort()).as.object;
-                push(((objThis*)activeCallFrameBottom[-1].as.object)->accessSuperClassVariable(name));
+                auto name = (objString*)activeFunc->getChunkPtr()->getConstant(readShort()).as.object;
+
+                //TODO: access activeFuncs superclass -- add class to methods
+                if (!activeFunc->isMethod()) {
+                    runtimeError("no superclass");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                push(value(activeFunc->getClass()->superTableGet(name)));
                 break;
             }
             case OP_SUPER_INVOKE: {
@@ -934,7 +944,7 @@ exitCodes VM::run() {
                     callDepth--;
                     activeCallFrameBottom = callFrames[callDepth].bottom;
                     stackTop = callFrames[callDepth].top;
-                    activeChunk = callFrames[callDepth].ch;
+                    activeFunc = callFrames[callDepth].func;
                     value tmpRetAdd = pop();
                     //uintptr_t returnAddress = ((objFunction*)(tmpRetAdd.as.object))->retAddress;
                     uintptr_t returnAddress;
@@ -956,7 +966,7 @@ exitCodes VM::run() {
 template<typename... Ts>
 bool VM::runtimeError(const char *msg, Ts... args) {
 
-    unsigned int line = activeChunk->getLine((ip - activeChunk->getInstructionPointer()));
+    unsigned int line = activeFunc->getChunkPtr()->getLine((ip - activeFunc->getChunkPtr()->getInstructionPointer()));
     std::cerr << "[line " << line << "] -> " << msg;
     (std::cerr << ... << args);
     std::cerr << std::endl;

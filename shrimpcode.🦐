@@ -1,3 +1,26 @@
-const map = {23 : "aa", "hello": 23};
+class A {
 
-println(map['hello']);
+	aa = "HELLO";
+
+	test() {
+		println("A");
+	}
+}
+
+class B : A {
+	test() {
+		println("B");
+		super.test();
+	}
+}
+
+class C : B {
+	test() {
+		println("C");
+		return super.aa;
+	}
+}
+
+let c = C();
+let tt = c.test();
+print(tt);

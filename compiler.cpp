@@ -1121,7 +1121,7 @@ void compiler::parsePrec(precedence prec) {
     }
 }
 
-chunk* compiler::compiling(char *str) {
+objFunction* compiler::compiling(char *str) {
 
     scanr.init(str);
 
@@ -1142,7 +1142,7 @@ chunk* compiler::compiling(char *str) {
     debug::disassembleChunk(currentChunk);
 #endif
 
-    return currentChunk;
+    return objFunction::createObjFunction(currentChunk, 0);
 }
 
 bool compiler::errorOccured() {

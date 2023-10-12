@@ -6,6 +6,7 @@
 
 class compiler;
 class VM;
+class objFunction;
 
 enum position {
 	TYPE_SCRIPT,
@@ -266,7 +267,7 @@ public:
 
 	~compiler();
 
-	chunk* compiling(char* str);
+	objFunction* compiling(char* str);
 
 	bool errorOccured();
 };

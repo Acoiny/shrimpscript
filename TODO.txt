@@ -1,11 +1,12 @@
 Features to implement:
 
--correct pre- and post increment and decrement
+-string formatting when using double quotes ""
 -stack trace
 -functions and classes knowing own names, and printing them
 
+-correct pre- and post increment and decrement -- IN TESTING
 
 
 Fixes to do:
 
--super keyword chaining
+-super keyword chaining -- IN TESTING

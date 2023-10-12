@@ -30,7 +30,7 @@ enum exitCodes {
 
 struct callFrame{
     value* bottom;
-    chunk* ch;
+    objFunction* func;
     value* top;
 };
 
@@ -42,8 +42,8 @@ class VM {
 
     bool gcReady = false;
 
-    chunk *activeChunk;
-    chunk* scriptChunk;
+    objFunction* activeFunc;
+    objFunction* scriptFunc;
 
     //size_t stackSize = 0;
     value *stack;
