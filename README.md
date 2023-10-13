@@ -1,4 +1,5 @@
 # shrimpp
+![shrimpscript icon]()
 My first attempt at creating my own interpreted language. It still borrows a lot of stuff from "Crafting Interpreters" by Robert Nystrom,
 though I added a lot of stuff myself.
 
