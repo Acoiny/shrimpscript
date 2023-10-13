@@ -8,6 +8,7 @@ enum tokenType{
     TOKEN_COLON,
     TOKEN_NUMBER,
     TOKEN_STRING,
+    TOKEN_STRING_ESCAPE,
     TOKEN_TRUE,
     TOKEN_FALSE,
     TOKEN_PLUS,

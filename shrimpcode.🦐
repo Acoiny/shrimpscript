@@ -1,3 +1,9 @@
-for(let i = 0; i < 10; i++) {
-	println(i);
+let a = 'a';
+
+let start = clock();
+
+for(let i = 0; i < 100; i++) {
+	a = a + "a";
 }
+
+println(clock() - start);

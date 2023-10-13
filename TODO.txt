@@ -8,7 +8,6 @@ Features to implement:
 
 Fixes to do:
 
--correct pre- and post increment and decrement -- ERROR IN LOOPS
-
+-correct pre- and post increment and decrement -- IN TESTING
 
 -super keyword chaining -- IN TESTING

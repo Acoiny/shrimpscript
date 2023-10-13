@@ -156,6 +156,8 @@ token scanner::numberToken() {
 token scanner::stringToken(char endAt) {
     advance();
     token str{TOKEN_STRING, current};
+    if (endAt == '\"')
+        str.type = TOKEN_STRING_ESCAPE;
     int len = 0;
     while(*current != endAt) {
         if(*current == '\0') {

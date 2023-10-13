@@ -45,6 +45,68 @@ objString* objString::copyString(const char* chars, const unsigned int len) {
 	return str;
 }
 
+objString* objString::copyStringEscape(const char* chars, const unsigned int len) {
+	char* tmp = new char[len + 1];
+	
+	size_t newLen = 0;
+	size_t pos = 0;
+
+	for (size_t i = 0; pos < len; i++)
+	{
+		if (chars[pos] == '\\') {
+			newLen++;
+			switch (chars[pos + 1]) {
+			case 'n':
+				pos += 2;
+				tmp[i] = '\n';
+				break;
+			case 'r':
+				pos += 2;
+				tmp[i] = '\r';
+				break;
+			case 't':
+				pos += 2;
+				tmp[i] = '\t';
+				break;
+			case 'a':
+				pos += 2;
+				tmp[i] = '\a';
+				break;
+			default:
+				newLen++;
+				tmp[i] = chars[pos];
+				pos++;
+			}
+		}
+		else {
+			newLen++;
+			tmp[i] = chars[pos];
+			pos++;
+		}
+	}
+	char* escapedStr = new char[newLen + 1];
+	memcpy(escapedStr, tmp, newLen);
+	escapedStr[newLen] = '\0';
+	delete[] tmp;
+	tmp = escapedStr;
+
+	if (globalMemory.internedStrings.count(tmp)) {
+		objString* ret = globalMemory.internedStrings.at(tmp);
+		delete[] tmp;
+		return ret;
+	}
+
+
+	auto* str = (objString*)globalMemory.allocateObject<objString>();
+	str->mark();
+	str->init(tmp, len);
+	globalMemory.internedStrings.insert_or_assign(str->chars, str);
+	str->unmark();
+
+	delete[] tmp;
+	return str;
+}
+
 objString* objString::takeString(const char* chars, const unsigned int len) {
 
 	auto interned = globalMemory.internedStrings.find(chars);

@@ -65,6 +65,7 @@ public:
     char* getChars();
 
     static objString* copyString(const char* chars, const unsigned int len);
+    static objString* copyStringEscape(const char* chars, const unsigned int len);
     static objString* takeString(const char* chars, const unsigned int len);
 };
 

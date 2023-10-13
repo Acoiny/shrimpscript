@@ -186,6 +186,7 @@ class compiler {
 	static void grouping(bool canAssign, compiler& cmp);
 
 	static void string(bool canAssign, compiler& cmp);
+	static void stringEscape(bool canAssign, compiler& cmp);
 
 	static void variable(bool canAssign, compiler& cmp);
 
@@ -207,13 +208,14 @@ class compiler {
 
 	static void preCrement(bool canAssign, compiler& cmp);
 
-	precFuncTableEntry precedenceTable[50] = {
+	precFuncTableEntry precedenceTable[51] = {
 			{nullptr, nullptr, PREC_NONE}, //[TOKEN_ERROR] = 
 			{nullptr, nullptr, PREC_NONE}, //[TOKEN_SEMICOLON] = 
 			{nullptr, dot, PREC_CALL}, //[TOKEN_DOT] =
 			{nullptr, nullptr, PREC_NONE}, //[TOKEN_COLON]
 			{number, nullptr, PREC_NONE}, //[TOKEN_NUMBER] = 
 			{string, nullptr, PREC_NONE}, //[TOKEN_STRING] = 
+			{stringEscape, nullptr, PREC_NONE}, //[TOKEN_STRING_ESCAPE]
 			{literal, nullptr, PREC_PRIMARY}, //[TOKEN_TRUE] = 
 			{literal, nullptr, PREC_PRIMARY}, //[TOKEN_FALSE] = 
 			{nullptr, binary, PREC_TERM}, //[TOKEN_PLUS] =

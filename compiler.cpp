@@ -228,6 +228,11 @@ void compiler::string(bool canAssign, compiler &cmp) {
     cmp.currentChunk->writeConstant(value(str), cmp.prevToken.line);
 }
 
+void compiler::stringEscape(bool canAssign, compiler& cmp) {
+    auto* str = objString::copyStringEscape(cmp.prevToken.start, cmp.prevToken.len);
+    cmp.currentChunk->writeConstant(value(str), cmp.prevToken.line);
+}
+
 int compiler::resolveLocal(bool &isConst) {
     for (int i = locals.size() - 1; i >= 0; --i) {
         local *loc = &locals.at(i);
