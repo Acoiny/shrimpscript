@@ -1,5 +1,5 @@
 # shrimpp
-![shrimpscript icon](/shrimp.ico)
+![shrimpscript icon](/shrimp.ico | width = 100 | height = 100)
 My first attempt at creating my own interpreted language. It still borrows a lot of stuff from "Crafting Interpreters" by Robert Nystrom,
 though I added a lot of stuff myself.
 
