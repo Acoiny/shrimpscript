@@ -8,9 +8,10 @@ though I added a lot of stuff myself.
 ```
 ## variables:
 ```
-let a = "i am a variable";  
+let a = "i am a changeable variable";  
 const b = "i can't be changed";  
 ```
+**NOTE: const variables currently don't work in repl, due to them being compile-time evaluated**
 ## control flow similar to C
 ### if-statement
 ```
@@ -41,35 +42,60 @@ fun foo(num) {
   return result;  
 }
 ```
-**(NOTE: functions are first class objects, but cannot be declared in blocks/other functions - also closures aren't supported (yet?))**
+**NOTE: functions are first class objects, but cannot be declared in blocks/other functions - also closures aren't supported (yet?)**
 ## import
 ```
 import 'file.shrimp';
 ```
 **import takes a file path (relative to the current directory) and executes the corresponding file
-this can be used to import functions/classes and more from the file**
+this can be used to import functions/classes and more**
 ## classes:
+### class declaration
 ```
 class bar{  
   variable = 23;  
 
-  //init function gets called when creating objects (optional)  
+  //init function gets called when creating objects (optional)
   fun init(name) {  
     this.name = name;  
   }  
-
+  doBar() {
+    //code
+  }
 }  
-
-let instance = bar("jeff");  
-bar.name = "not jeff anymore";  
+```
+### inheritance
+```
+class foo : bar{
+  init() {
+    //super keyword calls superclass function
+    super.init('foo');
+    //can also access superclass variables (only class variables)
+    super.variable = 32;
+  }
+}
+```
+### creating class instance
+```
+let instance = bar("jeff");
+```
+### getting and setting instance properties
+```
+let name = instance.name;
+instance.name = "not jeff anymore";  
 ```
 ## lists
 ```
 const list = ["a", 23, bar];  
 list.append(23);  
-list[0] = "b";  
+list[0] = "b";
+const length = list.len();
 ```
 ## dictionaries
 ```
-const dict = {"boss": "jeffrey", "employee": "bob"};  //keys MUST be strings
+const dict = {"boss": "jeffrey", "employee": "bob", 0: "number"};
+let boss = dict["boss"]; //boss = "jeffrey"
+let empty = dict['hello']; //empty = nil
+dict['new'] = 42; //sets new field
 ```
+**dictionaries allow the storing two value pairs, with the first being used as the key to access the second**
