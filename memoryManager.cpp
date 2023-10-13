@@ -157,7 +157,8 @@ void memoryManager::blackenObject(obj* obj) {
 	switch (obj->getType()) {
 	case OBJ_CLASS: {
 		auto* cl = (objClass*)obj;
-		markObject(cl->getName());
+		markObject(cl->name);
+		markObject(cl->superClass);
 		for (auto& el : cl->table) {
 			markObject(el.first);
 			markValue(el.second);
@@ -166,6 +167,8 @@ void memoryManager::blackenObject(obj* obj) {
 	}
 	case OBJ_FUN: {
 		auto* fn = (objFunction*)obj;
+		markObject(fn->name);
+		markObject(fn->klass);
 		for (auto& el : fn->funChunk->constants) {
 			markValue(el);
 		}
@@ -173,6 +176,7 @@ void memoryManager::blackenObject(obj* obj) {
 	}
 	case OBJ_INSTANCE: {
 		auto* cl = (objInstance*)obj;
+		markObject(cl->klass);
 		for (auto& el : cl->table) {
 			markObject(el.first);
 			markValue(el.second);
@@ -202,7 +206,10 @@ void memoryManager::blackenObject(obj* obj) {
 		}
 		break;
 	}
-	case OBJ_THIS:
+	case OBJ_THIS: {
+		auto th = (objThis*)obj;
+		markObject(th->this_instance);
+	}
 	case OBJ_NAT_FUN:
 	case OBJ_STR:
 		break;
@@ -268,15 +275,15 @@ void memoryManager::sweep() {
 }
 
 void memoryManager::collectGarbage() {
-#ifdef DEBUG_LOG_GC
-	std::cout << " -- GC started:" << std::endl;
-	size_t before = bytesAllocated;
-#endif
-	
 	//stopping if vm is not created yet
 	if (!(vm != nullptr && vm->gcReady)) {
 		return;
 	}
+
+#ifdef DEBUG_LOG_GC
+	std::cout << " -- GC started:" << std::endl;
+	size_t before = bytesAllocated;
+#endif
 
 
 	markRoots();
@@ -290,4 +297,8 @@ void memoryManager::collectGarbage() {
 	std::cout << " -- end GC: from " << before << " to " << bytesAllocated <<
 		" next at " << nextGC << std::endl;
 #endif
+}
+
+size_t memoryManager::getHeapSize() {
+	return bytesAllocated;
 }

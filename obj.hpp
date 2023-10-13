@@ -77,6 +77,8 @@ class objFunction : public obj {
     friend class memoryManager;
     friend class value;
 
+    objString* name;
+
     chunk* funChunk;
 
     objClass* klass;
@@ -99,7 +101,7 @@ public:
 
     objClass* getClass() const;
 
-    static objFunction* createObjFunction(chunk* ch, int arity);
+    static objFunction* createObjFunction(objString* name, chunk* ch, int arity);
 };
 
 class objNativeFunction : public obj {

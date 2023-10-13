@@ -855,7 +855,7 @@ void compiler::addLocal(token name, bool isConst) {
 void compiler::declareVariable(bool isConst) {
     if (scopeDepth == 0) return;
 
-    token *name = &prevToken;
+    token &name = prevToken;
 
     for (int i = locals.size() - 1; i >= 0; --i) {
         local *loc = &locals.at(i);
@@ -863,12 +863,12 @@ void compiler::declareVariable(bool isConst) {
             break;
         }
 
-        if (identifiersEqual(*name, loc->name)) {
+        if (identifiersEqual(name, loc->name)) {
             error("already a variable with this name in this scope");
         }
     }
 
-    addLocal(*name, isConst);
+    addLocal(name, isConst);
 }
 
 unsigned int compiler::parseVariable(const char *msg, bool isConst) {
@@ -959,6 +959,8 @@ void compiler::function() {
     chunk* prevChunk = currentChunk;
     currentChunk = new chunk();
 
+    objString* name = objString::copyString(prevToken.start, prevToken.len);
+
     int argc = 0;
 
     //auto *fun = objFunction::createObjFunction(0, 0);
@@ -986,12 +988,12 @@ void compiler::function() {
     endFunctionScope();
 
 
-    unsigned int fun = prevChunk->addConstantGetLine(value(objFunction::createObjFunction(currentChunk, argc)), prevToken.line);
+    unsigned int fun = prevChunk->addConstantGetLine(value(objFunction::createObjFunction(name,currentChunk, argc)), prevToken.line);
 
 #ifdef DEBUG_PRINT_CODE
-    std::cout << "<function code>\n";
+    std::cout << " == " << name->getChars() << " == " << std::endl;
     debug::disassembleChunk(currentChunk);
-    std::cout << "<end function code>\n";
+    std::cout << std::endl;
 #endif
 
     currentChunk = prevChunk;
@@ -1018,6 +1020,8 @@ void compiler::functionDeclaration() {
 
     currentPosition = prevPos;
 }
+
+
 
 void compiler::method() {
 
@@ -1073,7 +1077,6 @@ void compiler::classDeclaration() {
     }
 
     defineVariable(var);
-
 
     consume("expect '{' after class name", TOKEN_BRACE_OPEN);
 
@@ -1169,7 +1172,7 @@ objFunction* compiler::compiling(char *str) {
     debug::disassembleChunk(currentChunk);
 #endif
 
-    return objFunction::createObjFunction(currentChunk, 0);
+    return objFunction::createObjFunction(objString::copyString("script", 6), currentChunk, 0);
 }
 
 bool compiler::errorOccured() {

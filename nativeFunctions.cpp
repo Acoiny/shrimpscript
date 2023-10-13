@@ -10,6 +10,8 @@
 #include "VM.hpp"
 #include <ctime>
 
+//to allow initiating garbage collector
+extern memoryManager globalMemory;
 
 typedef value(nativeFunctionType)(obj* object);
 
@@ -213,6 +215,20 @@ static value native_Open(int arity, value* args, bool& success) {
 	return value(file);
 }
 
+static value native_GC(int arity, value* args, bool& success) {
+	if (arity != 0) {
+		nativeFunctions::erro("collectGarbage: expects 0 arguments");
+		return value();
+	}
+
+	size_t prevSize = globalMemory.getHeapSize();
+
+	globalMemory.collectGarbage();
+
+	size_t newSize = globalMemory.getHeapSize();
+
+	return value(double(prevSize - newSize));
+}
 
 void nativeFunctions::initNatives(VM& vm) {
 	vm.globals.insert_or_assign(objString::copyString("clock", 5), value(objNativeFunction::createNativeFunction(nativeClock)));
@@ -221,6 +237,7 @@ void nativeFunctions::initNatives(VM& vm) {
 	vm.globals.insert_or_assign(objString::copyString("print", 5), value(objNativeFunction::createNativeFunction(nativePrint)));
 	vm.globals.insert_or_assign(objString::copyString("input", 5), value(objNativeFunction::createNativeFunction(native_Input)));
 	vm.globals.insert_or_assign(objString::copyString("open", 4), value(objNativeFunction::createNativeFunction(native_Open)));
+	vm.globals.insert_or_assign(objString::copyString("collectGarbage", 15), value(objNativeFunction::createNativeFunction(native_GC)));
 
 
 	nativeStringFunctions(vm.globals, vm.stringFunctions);

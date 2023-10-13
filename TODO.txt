@@ -1,9 +1,9 @@
 Features to implement:
 
--string formatting when using double quotes ""
 -stack trace
--functions and classes knowing own names, and printing them
+-functions and classes knowing own names, and printing them -- IN TESTING
 
+-string formatting when using double quotes "" -- IN TESTING
 
 
 Fixes to do:

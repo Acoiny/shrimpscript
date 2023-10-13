@@ -45,13 +45,11 @@ class memoryManager {
     std::vector<obj*> grayStack;
     obj* allObjects = nullptr;
 
-    unsigned long long bytesAllocated = 0;
+    size_t bytesAllocated = 0;
 
-    unsigned long long nextGC = 1024 * 256;
+    size_t nextGC = 1024 * 256;
 
     void markRoots();
-
-    void collectGarbage();
 
     void markObject(obj *obj);
 
@@ -69,6 +67,10 @@ class memoryManager {
     void addToObjects(obj* o);
 
 public:
+
+    void collectGarbage();
+
+    size_t getHeapSize();
 
     std::unordered_map<const char*, objString*, Hash_Func, my_equal_to<const char*>> internedStrings;
 

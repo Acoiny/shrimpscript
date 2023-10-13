@@ -46,7 +46,8 @@ void commandHandler::printNativeFunctions()
 		"type(arg)\t\treturns the type of the argument as a string\n\n"
 		"input(arg)\t\tawaits user input in standard input after printing optional argument\n\n"
 		"open(arg, mode)\t\ttakes a path and returns the file object if succeeding in read(\"r\") or write(\"w\") mode, defaults to read\n\n"
-		"to_chr(arg)\t\treturns the character corresponding to the given ascii number\n" << endl;
+		"to_chr(arg)\t\treturns the character corresponding to the given ascii number\n\n"
+		"collectGarbage()\t\truns the garbage collector and returns the number of collected bytes\n" << endl;
 	
 	string tmp;
 	cout << "quit(q) or continue(any)";

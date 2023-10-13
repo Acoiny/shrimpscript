@@ -224,6 +224,7 @@ token scanner::identifierToken() {
             case 'l':
                 return confirmNext("lass", 4, TOKEN_CLASS, tk);
             case 'o': {
+                tk.len++;
                 advance();
                 if (peek(1) == 'n') {
                     advance();

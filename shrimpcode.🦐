@@ -1,9 +1,12 @@
-let a = 'a';
+let bytes = 0;
+{let a = ['', '', '', '', '', '', '', '', '', ''];
 
-let start = clock();
-
-for(let i = 0; i < 100; i++) {
-	a = a + "a";
+for(let i = 0; i < 1234; ++i) {
+	for(let j = 0; j < 10; ++j) {
+		a[j] = a[j] + 'asd';
+	}
+	
+	bytes = bytes + collectGarbage();
 }
-
-println(clock() - start);
+}
+println(bytes);

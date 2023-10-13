@@ -7,9 +7,11 @@ std::ostream& value::printObject(std::ostream& os) const {
 	case OBJ_STR:
 		os << ((objString*)as.object)->chars;
 		break;
-	case OBJ_FUN:
-		os << "<function>";
+	case OBJ_FUN: {
+		auto fn = (objFunction*)as.object;
+		os << "<function " << fn->name->getChars() << ">";
 		break;
+	}
 	case OBJ_NAT_FUN:
 		os << "<native fn>";
 		break;

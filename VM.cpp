@@ -794,6 +794,7 @@ exitCodes VM::run() {
             case OP_FUNCTION: {
                 int constIndex = readShort();
                 value fn = activeFunc->getChunkPtr()->getConstant(constIndex);
+
                 push(fn);
                 break;
             }

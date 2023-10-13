@@ -161,8 +161,9 @@ chunk* objFunction::getChunkPtr() {
 	return funChunk;
 }
 
-objFunction* objFunction::createObjFunction(chunk* ch, int arity) {
+objFunction* objFunction::createObjFunction(objString* name, chunk* ch, int arity) {
 	auto* fun = (objFunction*)globalMemory.allocateObject<objFunction>();
+	fun->name = name;
 	fun->funChunk = ch;
 	fun->arity = arity;
 	return fun;
