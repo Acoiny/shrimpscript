@@ -28,14 +28,15 @@ void memoryManager::addToObjects(obj* o) {
 void memoryManager::freeObject(obj* el) {
 	switch (el->getType()) {
 	case OBJ_STR: {
-		auto* str = (objString*)el;
+		auto str = (objString*)el;
+		const char* tmpArr = str->getChars();
 		bytesAllocated -= sizeof(objString);
 		freeArray(str->getChars(), str->getLen() + 1);
 		delete str;
 		break;
 	}
 	case OBJ_FUN: {
-		auto* fun = (objFunction*)el;
+		auto fun = (objFunction*)el;
 		delete fun->funChunk;
 		bytesAllocated -= sizeof(objFunction);
 		delete el;
@@ -49,7 +50,6 @@ void memoryManager::freeObject(obj* el) {
 	case OBJ_CLASS: {
 		bytesAllocated -= sizeof(objClass);
 		auto* object = (objClass*)el;
-		object->table.clear();
 		delete el;
 		break;
 	}
@@ -61,21 +61,18 @@ void memoryManager::freeObject(obj* el) {
 	case OBJ_INSTANCE: {
 		bytesAllocated -= sizeof(objInstance);
 		auto* object = (objInstance*)el;
-		object->table.clear();
 		delete el;
 		break;
 	}
 	case OBJ_NAT_INSTANCE: {
 		bytesAllocated -= sizeof(objNativeInstance);
 		auto* object = (objNativeInstance*)el;
-		object->table.clear();
 		delete el;
 		break;
 	}
 	case OBJ_LIST: {
 		bytesAllocated -= sizeof(objList);
 		auto* list = (objList*)el;
-		list->data.clear();
 		delete el;
 		break;
 	}
@@ -90,7 +87,6 @@ void memoryManager::freeObject(obj* el) {
 	case OBJ_MAP: {
 		bytesAllocated -= sizeof(objMap);
 		auto* map = (objMap*)el;
-		map->data.clear();
 		delete el;
 		break;
 	}
@@ -124,16 +120,27 @@ void memoryManager::markValue(const value& val) {
 }
 
 void memoryManager::markRoots() {
+	//marking the stack
 	for (int i = 0; i < vm->stackTop - vm->stack; ++i) {
 		markValue(vm->stack[i]);
 	}
+
+	//marking the callstack
+	for (size_t i = 0; i < vm->callDepth; ++i) {
+		markObject(vm->callFrames[i].func);
+	}
+
+	//marking all globals
 	for (auto& el : vm->globals) {
 		markObject(el.first);
 		markValue(el.second);
 	}
 
 	markObject(vm->activeFunc);
-	markObject(vm->scriptFunc);
+	
+	for (auto& el : vm->scriptFuncs) {
+		markObject(el);
+	}
 
 	for (auto& el : vm->stringFunctions) {
 		markObject(el.first);
@@ -250,6 +257,7 @@ void memoryManager::sweep() {
 	obj* previous = nullptr;
 	obj* object = allObjects;
 	while (object != nullptr) {
+		//std::cout << value(object) << std::endl;
 		if (object->isMark()) {
 			object->unmark();
 			previous = object;
@@ -266,7 +274,7 @@ void memoryManager::sweep() {
 			}
 
 #ifdef DEBUG_LOG_GC
-			std::cout << "freed:" << unreached << std::endl;
+			std::cout << "freed: " << value(unreached)<< std::endl;
 #endif
 
 			freeObject(unreached);

@@ -71,7 +71,7 @@ bool runImportFile(const char* path, VM& vm) {
     if (cont == nullptr)
         return false;
 
-    vm.interpretImportFile(cont);
+    vm.interpretImportFile(path, cont);
 
     delete[] cont;
 

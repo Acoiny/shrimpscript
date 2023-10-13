@@ -23,10 +23,6 @@ precFuncTableEntry *compiler::getRule(token tk) {
 
 compiler::compiler(VM &vm) : scanr(), currentChunk(nullptr), vm(vm) {}
 
-compiler::~compiler() {
-    delete currentChunk;
-}
-
 void compiler::errorAt(token tk, const char *msg) {
     if (tk.type == TOKEN_EOF) {
         std::cerr << "at end -> " << msg << std::endl;
@@ -1151,7 +1147,7 @@ void compiler::parsePrec(precedence prec) {
     }
 }
 
-objFunction* compiler::compiling(char *str) {
+objFunction* compiler::compiling(const char* name, char* str) {
 
     scanr.init(str);
 
@@ -1169,10 +1165,11 @@ objFunction* compiler::compiling(char *str) {
 
 #ifdef DEBUG_PRINT_CODE
     char* ptr = currentChunk->getInstructionPointer();
+    std::cout << " == " << name << " == " << std::endl;
     debug::disassembleChunk(currentChunk);
 #endif
 
-    return objFunction::createObjFunction(objString::copyString("script", 6), currentChunk, 0);
+    return objFunction::createObjFunction(objString::copyString(name, strlen(name)), currentChunk, 0);
 }
 
 bool compiler::errorOccured() {

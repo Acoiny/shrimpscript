@@ -100,11 +100,11 @@ template<typename T>
 obj *memoryManager::allocateObject() {
 #ifdef DEBUG_STRESS_GC
     collectGarbage();
-#endif
+#else
     if (bytesAllocated > nextGC) {
         collectGarbage();
     }
-
+#endif
     obj *res;
 
     res = new T;

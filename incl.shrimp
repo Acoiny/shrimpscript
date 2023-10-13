@@ -1,3 +1,38 @@
-fun test() {
-	println("test function");
+class hogwartsPeople {
+
+	school = "hogwarts";
+	
+	fun init(name, profession) {
+		this.name = name;
+		this.profession = profession;
+	}
+}
+
+class professor : hogwartsPeople {
+	init(name, subject) {
+		super.init(name, 'professor');
+		this.subject = subject;
+	}
+	
+	teach(student) {
+		student.knowledge.append(this.subject);
+	}
+}
+
+class student : hogwartsPeople {
+	init(name, year) {
+		super.init(name, 'student');
+		this.year = year;
+		this.knowledge = [];
+	}
+	
+	print() {
+		println("name: ", this.name);
+		println("year: ", this.year);
+		println("knows:");
+		
+		for(let i = 0; i < this.knowledge.len(); i = i + 1) {
+			println("-", this.knowledge[i]);
+		}
+	}
 }

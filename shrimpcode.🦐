@@ -1,12 +1,26 @@
-let bytes = 0;
-{let a = ['', '', '', '', '', '', '', '', '', ''];
+import 'incl.shrimp';
 
-for(let i = 0; i < 1234; ++i) {
-	for(let j = 0; j < 10; ++j) {
-		a[j] = a[j] + 'asd';
-	}
-	
-	bytes = bytes + collectGarbage();
+
+const profs = [
+				professor('Dumbledore', "Dumbledore's advice"),
+				professor('McGonagall', 'transmutation'),
+				professor('Snape', 'potions')
+				];
+				
+const students = [
+				student('Harry', 4),
+				student('Ron', 4),
+				student('Hermione', 4)
+				];
+
+for(let i = 0; i < profs.len(); ++i) {
+	profs[i].teach(students[0]);
+	if(profs[i].name == 'Dumbledore')
+		continue;
+	profs[i].teach(students[1]);
+	profs[i].teach(students[2]);
 }
+
+for(let i = 0; i < students.len(); ++i) {
+	students[i].print();
 }
-println(bytes);

@@ -1,9 +1,5 @@
 #include "chunk.hpp"
 
-void chunk::REPL_RETURN() {
-    code.pop_back();
-}
-
 void chunk::addByte(char byte, unsigned int line) {
     lines.push_back(line);
     code.push_back(byte);

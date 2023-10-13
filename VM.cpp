@@ -22,30 +22,35 @@ VM::VM() : ip(), activeFunc(nullptr), memory(globalMemory), callFrames() {
 }
 
 void VM::interpret(char *str) {
-    activeFunc = currentCompiler->compiling(str);
-    scriptFunc = activeFunc;
+    activeFunc = currentCompiler->compiling("script", str);
+    scriptFuncs.push_back(activeFunc);
     gcReady = true;
     if(!currentCompiler->errorOccured()) {
         run();
     }
 }
 
-void VM::interpretImportFile(char* str) {
-    objFunction* prevActiveFunc = activeFunc;
-    objFunction* prevScriptFunc = scriptFunc;
+void VM::interpretImportFile(const char* name, char* str) {
     compiler* prevCompiler = currentCompiler;
 
     currentCompiler = new compiler(*this);
 
-    activeFunc = currentCompiler->compiling(str);
-    scriptFunc = activeFunc;
+    //no GC when compiling
+    gcReady = false;
+    activeFunc = currentCompiler->compiling(name, str);
+    scriptFuncs.push_back(activeFunc);
+    currentScript++;
     gcReady = true;
+
     if (!currentCompiler->errorOccured()) {
         run();
     }
 
-    activeFunc = prevActiveFunc;
-    scriptFunc= prevScriptFunc;
+
+    //mustn't delete function here, because of linked list of all objects in GC
+    //globalMemory.freeObject(scriptFuncs.at(currentScript--));
+    activeFunc = scriptFuncs.at(--currentScript);
+    scriptFuncs.pop_back();
 
     delete currentCompiler;
     currentCompiler = prevCompiler;
@@ -60,8 +65,6 @@ VM::~VM() {
 }
 
 void VM::push(value val) {
-
-
     *stackTop = val;
     stackTop++;
 }
@@ -245,18 +248,22 @@ bool VM::callValue(value callee, int arity) {
         }
         case OBJ_CLASS: {
             auto* cl = (objClass*)peek(arity).as.object;
-            auto* instance = objInstance::createInstance(cl);
+            auto instance = objInstance::createInstance(cl);
+
             bool success = true;
             if (cl->hasInitFunction()) {
-                //push(value(instance));
+                //marking instance, so GC doesnt delete it
+                instance->mark();
                 peek(arity) = value(objThis::createObjThis(instance));
+                //popping instance again
+                instance->unmark();
                 success = call(instance->tableGet(globalMemory.initString), arity);
             }
             else {
                 if (arity > 0) {
                     return runtimeError("can't call default constructor with arguments");
                 }
-            pop();
+                pop();
                 push(value(instance));
             }
             return success;
@@ -676,7 +683,9 @@ exitCodes VM::run() {
                 break;
             }
             case OP_GET_GLOBAL: {
-                objString *name = (objString *)activeFunc->getChunkPtr()->getConstant(readShort()).as.object;
+                chunk* cPtr = activeFunc->getChunkPtr();
+                short index = readShort();
+                objString *name = (objString *)activeFunc->getChunkPtr()->getConstant(index).as.object;
 
                 if (!globals.count(name)) {
                     runtimeError("no variable with name '", name->getChars(), "'");

@@ -62,7 +62,7 @@ public:
 
     [[nodiscard]] unsigned int getLen() const;
 
-    char* getChars();
+    char* getChars() const;
 
     static objString* copyString(const char* chars, const unsigned int len);
     static objString* copyStringEscape(const char* chars, const unsigned int len);

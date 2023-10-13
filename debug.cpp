@@ -125,6 +125,8 @@ int debug::disassembleInstruction(char inst, chunk *ch, int offset) {
             return byteInstruction("OP_SET_LOCAL", ch, offset);
         case OP_POP:
             return simpleInstruction("OP_POP", ch, offset);
+        case OP_LIST:
+            return simpleInstruction("OP_LIST", ch, offset);
         case OP_JUMP:
             return jumpInstruction("OP_JUMP", 1, ch, offset);
         case OP_JUMP_IF_FALSE:
@@ -157,6 +159,8 @@ int debug::disassembleInstruction(char inst, chunk *ch, int offset) {
             return simpleInstruction("OP_THIS", ch, offset);
         case OP_SUPER:
             return constantInstruction("OP_SUPER", ch, offset);
+        case OP_INHERIT:
+            return simpleInstruction("OP_INHERIT", ch, offset);
         case OP_SUPER_INVOKE:
             return invokeInstruction("OP_SUPER_INVOKE", ch, offset);
         case OP_IMPORT:

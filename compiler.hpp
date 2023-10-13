@@ -270,9 +270,7 @@ class compiler {
 public:
 	explicit compiler(VM& vm);
 
-	~compiler();
-
-	objFunction* compiling(char* str);
+	objFunction* compiling(const char* name, char* str);
 
 	bool errorOccured();
 };

@@ -27,7 +27,6 @@ enum exitCodes {
     INTERPRET_RUNTIME_ERROR
 };
 
-
 struct callFrame{
     value* bottom;
     objFunction* func;
@@ -43,7 +42,9 @@ class VM {
     bool gcReady = false;
 
     objFunction* activeFunc;
-    objFunction* scriptFunc;
+    //all scripts are stored in vector, so GC can reach them when in import script
+    std::vector<objFunction*> scriptFuncs;
+    size_t currentScript = 0;
 
     //size_t stackSize = 0;
     value *stack;
@@ -54,7 +55,7 @@ class VM {
     callFrame callFrames[FRAMES_MAX];
     size_t callDepth = 0;
 
-    std::unordered_map<objString *, value> globals;
+    std::unordered_map<objString*, value> globals;
 
     //tables with methods for objects like lists & strings
     std::unordered_map<objString*, value> stringFunctions;
@@ -133,7 +134,7 @@ public:
 
     void interpret(char *str);
 
-    void interpretImportFile(char* str);
+    void interpretImportFile(const char* name, char* str);
 
     memoryManager &memory;
     compiler *currentCompiler;
