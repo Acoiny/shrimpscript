@@ -12,7 +12,7 @@ let a = "i am a variable";
 const b = "i can't be changed";  
 ```
 ## control flow similar to C
-###if-statement
+### if-statement
 ```
 if(condition) {  
   //do a  
@@ -20,7 +20,7 @@ if(condition) {
   //do b  
 }  
 ```
-###for-loop
+### for-loop
 ```
 for(let i = 0; i < 10; i = i + 1) {  
   //do something  
@@ -28,7 +28,7 @@ for(let i = 0; i < 10; i = i + 1) {
     break;  
 }  
 ```
-###while-loop
+### while-loop
 ```
 while(condition) {  
   //do another thing  
