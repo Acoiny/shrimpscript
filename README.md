@@ -3,9 +3,9 @@ My first attempt at creating my own interpreted language. It still borrows a lot
 though i tried my best to make it a bit original.
 
 # single line comments
-'''
+´´´
 //this is a comment
-'''
+´´´
 # variables:
 
 let a = "i am a variable";  
