@@ -1,5 +1,5 @@
 # shrimpp
-![shrimpscript icon](https://github.com/Acoiny/shrimpp/blob/master/shrimp.ico)
+![shrimpscript icon](/shrimp.ico)
 My first attempt at creating my own interpreted language. It still borrows a lot of stuff from "Crafting Interpreters" by Robert Nystrom,
 though I added a lot of stuff myself.
 
