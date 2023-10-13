@@ -2,11 +2,11 @@
 My first attempt at creating my own interpreted language. It still borrows a lot of stuff from "Crafting Interpreters" by Robert Nystrom,
 though i tried my best to make it a bit original.
 
-# single line comments
+## single line comments
 ```
 //this is a comment
 ```
-# variables:
+## variables:
 ```
 let a = "i am a variable";  
 const b = "i can't be changed";  
@@ -38,7 +38,7 @@ fun foo(num) {
   return result;  
 }
 ```
-(NOTE: functions are first class objects, but cannot be declared in blocks/other functions - also closures aren't supported (yet?))  
+**(NOTE: functions are first class objects, but cannot be declared in blocks/other functions - also closures aren't supported (yet?))**
 
 # classes:
 ```
