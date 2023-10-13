@@ -1,4 +1,5 @@
 # shrimpp
+<img src='figure/rstudio.png' width='25'>
 ![shrimpscript icon](/shrimp.ico =100x100)
 My first attempt at creating my own interpreted language. It still borrows a lot of stuff from "Crafting Interpreters" by Robert Nystrom,
 though I added a lot of stuff myself.
