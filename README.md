@@ -30,13 +30,15 @@ if(condition) {
 for(let i = 0; i < 10; i = i + 1) {  
   //do something  
   if(condition)  
-    break;  
+    break;  //break exits current loop
 }  
 ```
 ### while-loop
 ```
 while(condition) {  
-  //do another thing  
+  //do another thing
+  if(condition)
+    continue;  //continue jumps to start of current loop  
 }  
 ```
 ## functions:
