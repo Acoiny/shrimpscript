@@ -8,8 +8,8 @@ though I added a lot of stuff myself.
 ```
 ## variables:
 ```
-let a = "i am a changeable variable";  
-const b = "i can't be changed";  
+let a = "i am a changeable variable";
+const b = "i can't be changed";
 ```
 **NOTE: const variables currently don't work in repl, due to them being compile-time evaluated**
 ## control flow similar to C
