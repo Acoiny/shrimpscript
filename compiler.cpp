@@ -279,7 +279,7 @@ void compiler::checkConsts(bool isConst, opCodes setOP, token& checkNameGlobal) 
     }
 }
 
-void compiler::namedVariable(token &name, bool canAssign) {
+void compiler::namedVariable(token name, bool canAssign) {
     opCodes setOP, getOP, incOP, decOP;
 
     bool isConst = false;
@@ -893,43 +893,53 @@ void compiler::defineVariable(unsigned int global) {
 }
 
 void compiler::constDeclaration() {
-    unsigned int global = parseVariable("expect variable name", true);
+    
+multiDeclaration:
 
+    token constIdentifier = currentToken;
+
+    varDeclaration(true);
+    
     if (scopeDepth == 0) {
-        globalConsts.emplace_back(prevToken);
+        globalConsts.emplace_back(constIdentifier);
     }
 
-    if (match(TOKEN_EQUALS)) {
-        expression();
-    }
-    else {
-        error("cannot implicitly assign nil to const");
-        emitByte(OP_NIL);
-    }
+    if (match(TOKEN_COMMA))
+        goto multiDeclaration;
 
     consume("expect ';' after variable declaration", TOKEN_SEMICOLON);
-
-    defineVariable(global);
 }
 
 void compiler::letDeclaration() {
+
+multiDeclaration:
+
+    varDeclaration();
+    
+    if(match(TOKEN_COMMA))
+        goto multiDeclaration;
+    consume("expect ';' after variable declaration", TOKEN_SEMICOLON);
+}
+
+void compiler::varDeclaration(bool isConst) {
     unsigned int global = parseVariable("expect variable name", false);
 
     if (scopeDepth == 0) {
         for (auto& el : globalConsts) {
             if (identifiersEqual(prevToken, el)) {
-                error("cannot overwrite previously declared const");
+                error("cannot redeclare previously declared const");
             }
         }
     }
 
     if (match(TOKEN_EQUALS)) {
         expression();
-    } else {
+    }
+    else {
+        if (isConst)
+            error("can't implicitly initialize 'const' with nil");
         emitByte(OP_NIL);
     }
-
-    consume("expect ';' after variable declaration", TOKEN_SEMICOLON);
 
     defineVariable(global);
 }

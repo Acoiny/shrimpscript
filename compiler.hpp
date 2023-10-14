@@ -114,7 +114,7 @@ class compiler {
 
 	void checkConsts(bool isConst, opCodes setOP, token& checkNameGlobal);
 
-	void namedVariable(token& name, bool canAssign);
+	void namedVariable(token name, bool canAssign);
 
 	void addLocal(token name, bool isConst);
 
@@ -125,6 +125,8 @@ class compiler {
 	void constDeclaration();
 
 	void letDeclaration();
+
+	void varDeclaration(bool isConst = false);
 
 	int argumentList();
 
