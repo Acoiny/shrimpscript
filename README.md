@@ -10,6 +10,10 @@ though I added a lot of stuff myself.
 ```
 let a = "i am a changeable variable";
 const b = "i can't be changed";
+
+//multiple declarations
+let i = 1, j = 1;
+const n = 5, m = 10;
 ```
 **NOTE: const variables currently don't work in repl, due to them being compile-time evaluated**
 ## control flow similar to C
