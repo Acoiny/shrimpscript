@@ -8,8 +8,12 @@ though I added a lot of stuff myself.
 ```
 ## variables:
 ```
-let a = "i am a changeable variable";  
-const b = "i can't be changed";  
+let a = "i am a changeable variable";
+const b = "i can't be changed";
+
+//multiple declarations
+let i = 1, j = 1;
+const n = 5, m = 10;
 ```
 **NOTE: const variables currently don't work in repl, due to them being compile-time evaluated**
 ## control flow similar to C
@@ -26,13 +30,15 @@ if(condition) {
 for(let i = 0; i < 10; i = i + 1) {  
   //do something  
   if(condition)  
-    break;  
+    break;  //break exits current loop
 }  
 ```
 ### while-loop
 ```
 while(condition) {  
-  //do another thing  
+  //do another thing
+  if(condition)
+    continue;  //continue jumps to start of current loop  
 }  
 ```
 ## functions:
