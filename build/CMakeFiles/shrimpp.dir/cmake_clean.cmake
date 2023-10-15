@@ -1,0 +1,43 @@
+file(REMOVE_RECURSE
+  "CMakeFiles/shrimpp.dir/VM.cpp.obj"
+  "CMakeFiles/shrimpp.dir/VM.cpp.obj.d"
+  "CMakeFiles/shrimpp.dir/chunk.cpp.obj"
+  "CMakeFiles/shrimpp.dir/chunk.cpp.obj.d"
+  "CMakeFiles/shrimpp.dir/commandHandler.cpp.obj"
+  "CMakeFiles/shrimpp.dir/commandHandler.cpp.obj.d"
+  "CMakeFiles/shrimpp.dir/compiler.cpp.obj"
+  "CMakeFiles/shrimpp.dir/compiler.cpp.obj.d"
+  "CMakeFiles/shrimpp.dir/debug.cpp.obj"
+  "CMakeFiles/shrimpp.dir/debug.cpp.obj.d"
+  "CMakeFiles/shrimpp.dir/main.cpp.obj"
+  "CMakeFiles/shrimpp.dir/main.cpp.obj.d"
+  "CMakeFiles/shrimpp.dir/memoryManager.cpp.obj"
+  "CMakeFiles/shrimpp.dir/memoryManager.cpp.obj.d"
+  "CMakeFiles/shrimpp.dir/nativeArrayFunctions.cpp.obj"
+  "CMakeFiles/shrimpp.dir/nativeArrayFunctions.cpp.obj.d"
+  "CMakeFiles/shrimpp.dir/nativeFileFunctions.cpp.obj"
+  "CMakeFiles/shrimpp.dir/nativeFileFunctions.cpp.obj.d"
+  "CMakeFiles/shrimpp.dir/nativeFunctions.cpp.obj"
+  "CMakeFiles/shrimpp.dir/nativeFunctions.cpp.obj.d"
+  "CMakeFiles/shrimpp.dir/nativeMathFunctions.cpp.obj"
+  "CMakeFiles/shrimpp.dir/nativeMathFunctions.cpp.obj.d"
+  "CMakeFiles/shrimpp.dir/nativeStringFunctions.cpp.obj"
+  "CMakeFiles/shrimpp.dir/nativeStringFunctions.cpp.obj.d"
+  "CMakeFiles/shrimpp.dir/obj.cpp.obj"
+  "CMakeFiles/shrimpp.dir/obj.cpp.obj.d"
+  "CMakeFiles/shrimpp.dir/runFile.cpp.obj"
+  "CMakeFiles/shrimpp.dir/runFile.cpp.obj.d"
+  "CMakeFiles/shrimpp.dir/scanner.cpp.obj"
+  "CMakeFiles/shrimpp.dir/scanner.cpp.obj.d"
+  "CMakeFiles/shrimpp.dir/value.cpp.obj"
+  "CMakeFiles/shrimpp.dir/value.cpp.obj.d"
+  "libshrimpp.dll.a"
+  "shrimpp.exe"
+  "shrimpp.exe.manifest"
+  "shrimpp.pdb"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang CXX)
+  include(CMakeFiles/shrimpp.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()
