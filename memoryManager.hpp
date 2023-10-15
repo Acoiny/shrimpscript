@@ -5,6 +5,8 @@
 #include "defines.hpp"
 #include <iostream>
 #include <unordered_map>
+#include <cstring>
+#include <vector>
 
 #define GC_GROWTH_FACTOR 2
 
@@ -16,7 +18,7 @@ struct my_equal_to : public std::equal_to<Tp>
 {
     constexpr bool operator()(const Tp& _x, const Tp& _y) const
     {
-        return strcmp(_x, _y) == 0;
+        return std::strcmp(_x, _y) == 0;
     }
 };
 

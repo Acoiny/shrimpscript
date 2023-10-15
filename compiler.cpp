@@ -124,7 +124,7 @@ void compiler::number(bool canAssign, compiler &cmp) {
 void compiler::unary(bool canAssign, compiler &cmp) {
     token opType = cmp.prevToken;
     precFuncTableEntry *rule = cmp.getRule(opType);
-    cmp.parsePrec(precedence(rule->precedence + 1));
+    cmp.parsePrec(precedence(rule->prec + 1));
 
     switch (opType.type) {
         case TOKEN_MINUS:
@@ -139,7 +139,7 @@ void compiler::unary(bool canAssign, compiler &cmp) {
 void compiler::binary(bool canAssign, compiler &cmp) {
     token opType = cmp.prevToken;
     precFuncTableEntry *rule = cmp.getRule(opType);
-    cmp.parsePrec(precedence(rule->precedence + 1));
+    cmp.parsePrec(precedence(rule->prec + 1));
 
     switch (opType.type) {
         case TOKEN_PLUS:
@@ -845,7 +845,8 @@ int compiler::identifierConstant(token &name) {
 }
 
 void compiler::addLocal(token name, bool isConst) {
-    locals.emplace_back(-1, name, isConst);
+    local tmp{-1, name, isConst};
+    locals.push_back(tmp);
 }
 
 void compiler::declareVariable(bool isConst) {
@@ -1142,7 +1143,7 @@ void compiler::parsePrec(precedence prec) {
     bool canAssign = prec <= PREC_ASSIGN;
     prefixRule(canAssign, *this);
 
-    while (prec <= getRule(currentToken)->precedence) {
+    while (prec <= getRule(currentToken)->prec) {
         advance();
         parseFn infixRule = getRule(prevToken)->infix;
         if (infixRule == nullptr) {

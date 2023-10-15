@@ -3,6 +3,7 @@
 
 #include <unordered_map>
 #include <fstream>
+#include <vector>
 
 #include "value.hpp"
 

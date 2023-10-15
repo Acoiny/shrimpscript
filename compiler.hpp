@@ -36,7 +36,7 @@ typedef void (*parseFn)(bool, compiler&);
 struct precFuncTableEntry {
 	parseFn prefix;
 	parseFn infix;
-	precedence precedence;
+	precedence prec;
 };
 
 struct local {
