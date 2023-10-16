@@ -2,6 +2,12 @@
 
 #include "obj.hpp"
 
+#include <cstdint>
+
+#ifdef NAN_BOXING
+
+
+#else
 std::ostream& value::printObject(std::ostream& os) const {
 	switch (as.object->getType()) {
 	case OBJ_STR:
@@ -72,11 +78,11 @@ std::ostream& value::printObject(std::ostream& os) const {
 	}
 	return os;
 }
-
-valType value::getType() {
+/*
+const valType value::getType() const {
 	return type;
 }
-
+*/
 value::value(bool boolean) {
 	type = VAL_BOOL;
 	as.boolean = boolean;
@@ -126,3 +132,4 @@ std::ostream& operator<<(std::ostream& os, const value& val) {
 bool value::operator==(const value& rhs) const {
 	return this->type == rhs.type && this->as.address == rhs.as.address;
 }
+#endif

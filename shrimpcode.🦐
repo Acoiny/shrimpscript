@@ -1,1 +1,7 @@
-const i = 2, j = 4;
+fun fib(n) {
+	return n < 2 ? n : fib(n-1) + fib(n-2);
+}
+
+const start = clock();
+println(fib(40));
+println('time: ', clock() - start);

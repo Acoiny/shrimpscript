@@ -28,11 +28,6 @@ void chunk::writeConstant(value constant, unsigned int line) {
     addByte(char(index) & 0xff, line);
 }
 
-
-value chunk::getConstant(short index) {
-    return constants.at(index);
-}
-
 char& chunk::accessAt(size_t pos) {
     return code.at(pos);
 }

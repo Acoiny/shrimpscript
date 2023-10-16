@@ -89,10 +89,8 @@ class chunk {
 public:
     std::vector<value> constants;
     std::vector<unsigned int> lines;
-public:
-    chunk() = default;
 
-    void REPL_RETURN();
+    chunk() = default;
 
     void addByte(char byte, unsigned int line);
 
@@ -100,25 +98,25 @@ public:
 
     void writeConstant(value constant, unsigned int line);
 
-    inline char peekByte(int index) {
+    inline char peekByte(int index) const {
         return code.at(codePos + index);
     }
 
-    inline char *getInstructionPointer()  {
+    inline char *getInstructionPointer() {
         return code.data();
     }
 
-    inline unsigned int getLine(size_t index) {
+    inline unsigned int getLine(size_t index) const {
         return lines.at(index);
     }
 
-    inline size_t getSize() {
+    inline size_t getSize() const {
         return code.size();
     }
 
     char &accessAt(size_t pos);
 
-    value getConstant(short index);
+    inline value getConstant(short index) const { return constants.at(index); }
 };
 
 

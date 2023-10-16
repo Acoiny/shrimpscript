@@ -291,18 +291,6 @@ objThis* objThis::createObjThis(objInstance* ins) {
 	return th;
 }
 
-void objThis::setAddress(uintptr_t ad) {
-	retAddress = ad;
-}
-
-uintptr_t objThis::getAddress() {
-	return retAddress;
-}
-
-objInstance* objThis::getThis() {
-	return this_instance;
-}
-
 //objNativeInstance functions
 objNativeInstance::objNativeInstance() {
 	type = OBJ_NAT_INSTANCE;

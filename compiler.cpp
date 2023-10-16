@@ -221,12 +221,12 @@ void compiler::grouping(bool canAssign, compiler &cmp) {
 
 void compiler::string(bool canAssign, compiler &cmp) {
     auto *str = objString::copyString(cmp.prevToken.start, cmp.prevToken.len);
-    cmp.currentChunk->writeConstant(value(str), cmp.prevToken.line);
+    cmp.currentChunk->writeConstant(OBJ_VAL(str), cmp.prevToken.line);
 }
 
 void compiler::stringEscape(bool canAssign, compiler& cmp) {
     auto* str = objString::copyStringEscape(cmp.prevToken.start, cmp.prevToken.len);
-    cmp.currentChunk->writeConstant(value(str), cmp.prevToken.line);
+    cmp.currentChunk->writeConstant(OBJ_VAL(str), cmp.prevToken.line);
 }
 
 int compiler::resolveLocal(bool &isConst) {
@@ -402,7 +402,7 @@ void compiler::list(bool canAssign, compiler& cmp) {
 void compiler::map(bool canAssign, compiler& cmp) {
     size_t len = 0;
     
-    cmp.currentChunk->writeConstant(value(objMap::createMap()), cmp.prevToken.line);
+    cmp.currentChunk->writeConstant(OBJ_VAL(objMap::createMap()), cmp.prevToken.line);
 
     if (!cmp.check(TOKEN_BRACE_CLOSE)) {
         do {
@@ -840,7 +840,7 @@ void compiler::statement() {
 }
 
 int compiler::identifierConstant(token &name) {
-    return currentChunk->addConstantGetLine(value(objString::copyString(name.start, name.len)),
+    return currentChunk->addConstantGetLine(OBJ_VAL(objString::copyString(name.start, name.len)),
                                            name.line);
 }
 
@@ -995,7 +995,7 @@ void compiler::function() {
     endFunctionScope();
 
 
-    unsigned int fun = prevChunk->addConstantGetLine(value(objFunction::createObjFunction(name,currentChunk, argc)), prevToken.line);
+    unsigned int fun = prevChunk->addConstantGetLine(OBJ_VAL(objFunction::createObjFunction(name,currentChunk, argc)), prevToken.line);
 
 #ifdef DEBUG_PRINT_CODE
     std::cout << " == " << name->getChars() << " == " << std::endl;

@@ -76,13 +76,10 @@ value VM::pop() {
     return *stackTop;
 }
 
-value& VM::peek(int dist) {
-    return *(stackTop - 1 - dist);
-}
 
 void VM::concatenateTwoStrings() {
-    auto *b = (objString *) peek(0).as.object;
-    auto *a = (objString *) peek(1).as.object;
+    auto *b = (objString *) AS_OBJ(peek(0));
+    auto *a = (objString *) AS_OBJ(peek(1));
 
     unsigned int len = a->getLen() + b->getLen();
     char *res = memory.allocateArray<char>(len + 1);
@@ -91,18 +88,18 @@ void VM::concatenateTwoStrings() {
     res[len] = '\0';
 
     objString *strObj = nullptr;
-    push(value(strObj));
+    push(OBJ_VAL(strObj));
     strObj = objString::takeString(res, len);
     pop();
     pop();
     pop();
-    push(value(strObj));
+    push(OBJ_VAL(strObj));
 }
 
 bool VM::add() {
     value b = peek(0);
     value a = peek(1);
-    if (a.getType() == VAL_OBJ && b.getType() == VAL_OBJ) {
+    if (IS_OBJ(a) && b.getType() == VAL_OBJ) {
         if ((a.as.object)->getType() == OBJ_STR && (b.as.object)->getType() == OBJ_STR) {
             concatenateTwoStrings();
             return true;
@@ -217,11 +214,11 @@ bool VM::call(value callee, int arity) {
     //fun->retAddress = retAdr;
     value replacing = peek(arity);
     if (replacing.as.object->getType() == OBJ_THIS) {
-        ((objThis*)replacing.as.object)->setAddress(retAdr);
+        ((objThis*)replacing.as.object)->retAddress = retAdr;
     }
     else {
         value tmp = value(retAdr);
-        peek(arity) = tmp;
+        peek_set(arity, tmp);
     }
     activeCallFrameBottom = stackTop - arity;
     activeFunc = fun;
@@ -254,7 +251,7 @@ bool VM::callValue(value callee, int arity) {
             if (cl->hasInitFunction()) {
                 //marking instance, so GC doesnt delete it
                 instance->mark();
-                peek(arity) = value(objThis::createObjThis(instance));
+                peek_set(arity, value(objThis::createObjThis(instance)));
                 //popping instance again
                 instance->unmark();
                 success = call(instance->tableGet(globalMemory.initString), arity);
@@ -289,12 +286,12 @@ void VM::defineMethod() {
 bool VM::defineMemberVar() {
     value val = peek(0);
 
-    if (val.getType() == VAL_NIL)
+    if (IS_NIL(val))
         return runtimeError("cannot initialize member variables with 'nil'");
 
-    value tmp = peek(1);
-    objString* name = (objString*)activeFunc->getChunkPtr()->getConstant(readShort()).as.object;
-    objClass* cl = (objClass*)peek(1).as.object;
+    //value tmp = peek(1);
+    objString* name = (objString*)AS_OBJ(activeFunc->getChunkPtr()->getConstant(readShort()));
+    objClass* cl = (objClass*)AS_OBJ(peek(1));
 
     cl->tableSet(name, val);
     pop();
@@ -317,7 +314,7 @@ bool VM::invoke() {
 
         value method = instance->tableGet(name);
 
-        peek(argc) = value(objThis::createObjThis(instance));
+        peek_set(argc, value(objThis::createObjThis(instance)));
 
         if (method.getType() == VAL_OBJ && method.as.object->getType() == OBJ_FUN) {
             return call(method, argc);
@@ -420,7 +417,7 @@ bool VM::superInvoke() {
     value method = activeFunc->getClass()->superTableGet(name);
     //value method = ((objThis*)this_val.as.object)->accessSuperClassVariable(name);
 
-    peek(argc) = this_val;
+    peek_set(argc, this_val);
 
     if (method.getType() == VAL_OBJ && method.as.object->getType() == OBJ_FUN) {
         return call(method, argc);
@@ -776,10 +773,10 @@ exitCodes VM::run() {
 
                 objList* arr = ((objList*)itOver.as.object);
                 
-                peek(2) = value(0.0);
+                peek_set(2, value(0.0));
 
                 if (arr->getSize() > 0) {
-                    peek(1) = arr->getValueAt(0);
+                    peek_set(1, arr->getValueAt(0));
                 }
                 break;
             }
@@ -793,8 +790,8 @@ exitCodes VM::run() {
                 }
                 else {
                     counter.as.number++;
-                    peek(1) = arr->getValueAt(counter.as.number - 1);
-                    peek(2) = counter;
+                    peek_set(1, arr->getValueAt(counter.as.number - 1));
+                    peek_set(2, counter);
                     push(value(true));
                 }
 
@@ -916,7 +913,7 @@ exitCodes VM::run() {
                     runtimeError("no valid 'this' object");
                     return INTERPRET_RUNTIME_ERROR;
                 }
-                push(value(((objThis*)activeCallFrameBottom[-1].as.object)->getThis()));
+                push(value(((objThis*)activeCallFrameBottom[-1].as.object)->this_instance));
                 break;
             }
             case OP_SUPER: {
@@ -937,7 +934,7 @@ exitCodes VM::run() {
             }
             case OP_PULL_INSTANCE_FROM_THIS: {
                 objThis* th = (objThis*)(pop().as.object);
-                push(value(th->getThis()));
+                push(value(th->this_instance));
                 break;
             }
             case OP_IMPORT: {
@@ -970,7 +967,7 @@ exitCodes VM::run() {
                         returnAddress = tmpRetAdd.as.address;
                     }
                     else {
-                        returnAddress = ((objThis*)tmpRetAdd.as.object)->getAddress();
+                        returnAddress = ((objThis*)tmpRetAdd.as.object)->retAddress;
                     }
 
                     ip = reinterpret_cast<char *>(returnAddress);

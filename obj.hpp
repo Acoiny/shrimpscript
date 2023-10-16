@@ -175,19 +175,13 @@ class objThis : public obj {
     friend class memoryManager;
     friend class value;
 
+public:
     objInstance* this_instance;
     uintptr_t retAddress;
 
-public:
     objThis();
 
     static objThis* createObjThis(objInstance* ins);
-
-    void setAddress(uintptr_t ad);
-
-    uintptr_t getAddress();
-
-    objInstance* getThis();
 };
 
 
