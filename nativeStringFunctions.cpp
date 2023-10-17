@@ -14,7 +14,7 @@ static value nativeString_Len(int arity, value* args, bool& success) {
 
 	double len = ((objString*)(AS_OBJ((*args))))->getLen();
 
-	return value(len);
+	return NUM_VAL(len);
 }
 
 

@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "defines.hpp"
+
 using namespace std;
 
 /*
@@ -34,7 +36,12 @@ void commandHandler::printHelp()
 		"\t-help\t\tto print this help text\n"
 		"\t-h\t\tsame as -help\n"
 		"\t-functions\tprints native functions\n"
-		"\t-f\t\tsame as -functions\n" << endl;
+		"\t-f\t\tsame as -functions\n"
+#ifdef NAN_BOXING
+		RED"\nNaN-boxing enabled" << NONE << endl;
+#else
+		GREEN"\nNaN-boxing disabled" << NONE << endl;
+#endif
 }
 
 void commandHandler::printNativeFunctions()
@@ -76,6 +83,15 @@ void commandHandler::printNativeFunctions()
 	}
 
 	printNativeListFunctions();
+
+	cout << "quit(q) or continue(any)";
+	getline(cin, tmp);
+
+	if (tmp == "q") {
+		return;
+	}
+
+	printNativeFileFunctions();
 }
 
 void commandHandler::printNativeStringFunctions()

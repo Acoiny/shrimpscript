@@ -31,7 +31,7 @@ static value nativeMath_Sqrt(int arity, value* args, bool& success) {
 		return nativeFunctions::erro("Math.sqrt argument must be a number");
 	}
 
-	return OBJ_VAL(sqrt(AS_NUM((*args))));
+	return NUM_VAL(sqrt(AS_NUM((*args))));
 }
 
 static value nativeMath_Floor(int arity, value* args, bool& success) {
@@ -47,7 +47,7 @@ static value nativeMath_Floor(int arity, value* args, bool& success) {
 		return nativeFunctions::erro("Math.floor argument must be a number");
 	}
 
-	return OBJ_VAL(floor(AS_NUM((*args))));
+	return NUM_VAL(floor(AS_NUM((*args))));
 }
 
 static value nativeMath_Ceil(int arity, value* args, bool& success) {
@@ -63,7 +63,7 @@ static value nativeMath_Ceil(int arity, value* args, bool& success) {
 		return nativeFunctions::erro("Math.sqrt argument must be a number");
 	}
 
-	return OBJ_VAL(ceil(AS_NUM((*args))));
+	return NUM_VAL(ceil(AS_NUM((*args))));
 }
 
 void nativeMathFunctions(VM& vm, objNativeInstance* math)

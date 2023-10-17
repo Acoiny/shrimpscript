@@ -6,7 +6,7 @@
 * enables NaN - boxing, by making the value type an 8-byte sized
 * union with double for num values and uint64_t for encoding the type in differnent NaN values
 */
-//#define NAN_BOXING
+#define NAN_BOXING
 
 #define DEBUG_TESTFILE "shrimpcode.🦐"
 
