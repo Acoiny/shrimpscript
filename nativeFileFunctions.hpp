@@ -2,8 +2,10 @@
 
 #include <unordered_map>
 
+#include "value.hpp"
+
 class VM;
 class objString;
-class value;
+
 
 void nativeFileFunctions(VM& vm, std::unordered_map<objString*, value>& fileFunTable);

@@ -10,8 +10,6 @@
 
 #define GC_GROWTH_FACTOR 2
 
-class value;
-
 
 template<typename Tp>
 struct my_equal_to : public std::equal_to<Tp>
@@ -55,9 +53,10 @@ class memoryManager {
 
     void markObject(obj *obj);
 
-    void markValue(value& val);
+    void markValue(value val);
+#ifndef NAN_BOXING
     void markValue(const value &val);
-
+#endif
     void traceReferences();
 
     void blackenObject(obj *obj);

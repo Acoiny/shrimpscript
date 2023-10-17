@@ -4,11 +4,11 @@
 /*
 * UNFINISHED
 * enables NaN - boxing, by making the value type an 8-byte sized
-* uint64_t and encoding the type in differnent NaN values
+* union with double for num values and uint64_t for encoding the type in differnent NaN values
 */
 #define NAN_BOXING
 
-#define DEBUG_TESTFILE
+//#define DEBUG_TESTFILE
 
 //#define DEBUG_TRACE_EXECUTION
 //#define DEBUG_PRINT_CODE

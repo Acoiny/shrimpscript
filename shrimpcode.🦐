@@ -4,4 +4,4 @@ fun fib(n) {
 
 const start = clock();
 println(fib(40));
-println('time: ', clock() - start);
+println(clock() - start);

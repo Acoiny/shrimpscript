@@ -99,62 +99,78 @@ void VM::concatenateTwoStrings() {
 bool VM::add() {
     value b = peek(0);
     value a = peek(1);
-    if (IS_OBJ(a) && b.getType() == VAL_OBJ) {
-        if ((a.as.object)->getType() == OBJ_STR && (b.as.object)->getType() == OBJ_STR) {
+    if (IS_OBJ(a) && IS_OBJ(b)) {
+        if ((AS_OBJ(a))->getType() == OBJ_STR && (AS_OBJ(b))->getType() == OBJ_STR) {
             concatenateTwoStrings();
             return true;
         } else {
             return runtimeError("can't add '", a, "' and '", b, "'");
         }
     }
-    if (!(a.getType() == VAL_NUM && b.getType() == VAL_NUM))
+    if (!(IS_NUM(a) && IS_NUM(b)))
         return runtimeError("can't add '", a, "' and '", b, "'");
     b = pop();
     a = pop();
-    push(value(a.as.number + b.as.number));
+    push(NUM_VAL(AS_NUM(a) + AS_NUM(b)));
     return true;
 }
 
 bool VM::sub() {
     value b = pop();
     value a = pop();
-    if (!(a.getType() == VAL_NUM && b.getType() == VAL_NUM))
+    if (!(IS_NUM(a) && IS_NUM(b)))
         return runtimeError("can't subtract '", b, "' from '", a, "'");
-    push(value(a.as.number - b.as.number));
+    push(NUM_VAL(AS_NUM(a) - AS_NUM(b)));
     return true;
 }
 
 bool VM::mul() {
     value b = pop();
     value a = pop();
-    if (!(a.getType() == VAL_NUM && b.getType() == VAL_NUM))
+    if (!(IS_NUM(a) && IS_NUM(b)))
         return runtimeError("can't multiply '", a, "' and '", b, "'");
-    push(value(a.as.number * b.as.number));
+    push(NUM_VAL(AS_NUM(a) * AS_NUM(b)));
     return true;
 }
 
 bool VM::div() {
     value b = pop();
     value a = pop();
-    if (!(a.getType() == VAL_NUM && b.getType() == VAL_NUM))
+    if (!(IS_NUM(a) && IS_NUM(b)))
         return runtimeError("can't divide '", a, "' by '", b, "'");
-    push(value(a.as.number / b.as.number));
+    push(NUM_VAL(AS_NUM(a) / AS_NUM(b)));
     return true;
 }
 
 bool VM::modulo() {
     value b = pop();
     value a = pop();
-    if (!(a.getType() == VAL_NUM && b.getType() == VAL_NUM))
+    if (!(IS_NUM(a) && IS_NUM(b)))
         return runtimeError("can't get modulo of '", a, "' and '", b, "'");
 
-    long tmp = a.as.number / b.as.number;
+    long tmp = AS_NUM(a) / AS_NUM(b);
 
-    push(value(a.as.number - (tmp * b.as.number)));
+    push(NUM_VAL(double(AS_NUM(a) - (tmp * AS_NUM(b)))));
     return true;
 }
 
 bool VM::isFalsey(value a) {
+    if (IS_NIL(a))
+        return false;
+
+    if (IS_BOOL(a))
+        return AS_BOOL(a);
+    
+    if (IS_NUM(a))
+        return AS_NUM(a) != 0;
+
+    if (IS_OBJ(a)) {
+        if (AS_OBJ(a)->getType() == OBJ_STR) {
+            auto str = (objString*)AS_OBJ(a);
+            return str->getLen() != 0;
+        }
+    }
+    /*
     switch (a.getType())
     {
     case VAL_NUM:
@@ -166,17 +182,30 @@ bool VM::isFalsey(value a) {
     case VAL_OBJ: {
         if (a.as.object->getType() == OBJ_STR) {
             auto* str = (objString*)a.as.object;
-            return str->getLen() == 0;
+            return str->getLen() != 0;
         }
         break;
     }
     default:
         break;
-    }
+    }*/
     return false;
 }
 
 bool VM::areEqual(value b, value a) {
+    if (IS_NIL(a) && IS_NIL(b))
+        return true;
+
+    if (IS_NUM(a) && IS_NUM(b))
+        return AS_NUM(a) == AS_NUM(b);
+
+    if (IS_BOOL(a) && IS_BOOL(b))
+        return AS_BOOL(a) == AS_BOOL(b);
+
+    if (IS_OBJ(a) && IS_OBJ(b))
+        return AS_OBJ(a) == AS_OBJ(b);
+    
+    /*
     switch (a.getType()) {
     case VAL_NIL:
         return b.getType() == VAL_NIL;
@@ -193,12 +222,12 @@ bool VM::areEqual(value b, value a) {
     default:
         return a.as.object == b.as.object;
     }
-
+    */
     return false;
 }
 
 bool VM::call(value callee, int arity) {
-    auto *fun = (objFunction*)callee.as.object;
+    auto *fun = (objFunction*)AS_OBJ(callee);
     callFrames[callDepth].bottom = activeCallFrameBottom;
     callFrames[callDepth].func = activeFunc;
     callFrames[callDepth].top = stackTop - arity;
@@ -213,11 +242,11 @@ bool VM::call(value callee, int arity) {
     auto retAdr = reinterpret_cast<uintptr_t>(ip);
     //fun->retAddress = retAdr;
     value replacing = peek(arity);
-    if (replacing.as.object->getType() == OBJ_THIS) {
-        ((objThis*)replacing.as.object)->retAddress = retAdr;
+    if (AS_OBJ(replacing)->getType() == OBJ_THIS) {
+        ((objThis*)AS_OBJ(replacing))->retAddress = retAdr;
     }
     else {
-        value tmp = value(retAdr);
+        value tmp = RET_VAL(retAdr);
         peek_set(arity, tmp);
     }
     activeCallFrameBottom = stackTop - arity;
@@ -228,7 +257,46 @@ bool VM::call(value callee, int arity) {
 }
 
 bool VM::callValue(value callee, int arity) {
-    if(callee.getType() == VAL_OBJ) {
+    if(IS_OBJ(callee)) {
+        obj* cal = AS_OBJ(callee);
+
+        if (cal->getType() == OBJ_FUN)
+            return call(callee, arity);
+
+        if(cal->getType() == OBJ_NAT_FUN) {
+            bool success = true;
+            value result = ((objNativeFunction*)cal)->fun(arity, stackTop - arity, success);
+            stackTop -= arity + 1;
+            push(result);
+            if (success) {
+                return true;
+            }
+            return runtimeError(((objString*)AS_OBJ(result))->getChars());
+        }
+
+        if(cal->getType() == OBJ_CLASS) {
+            auto* cl = (objClass*)AS_OBJ(peek(arity));
+            auto instance = objInstance::createInstance(cl);
+
+            bool success = true;
+            if (cl->hasInitFunction()) {
+                //marking instance, so GC doesnt delete it
+                instance->mark();
+                peek_set(arity, OBJ_VAL(objThis::createObjThis(instance)));
+                //popping instance again
+                instance->unmark();
+                success = call(instance->tableGet(globalMemory.initString), arity);
+            }
+            else {
+                if (arity > 0) {
+                    return runtimeError("can't call default constructor with arguments");
+                }
+                pop();
+                push(OBJ_VAL(instance));
+            }
+            return success;
+        }
+        /*
         switch (callee.as.object->getType())
         {
         case OBJ_FUN:
@@ -267,17 +335,17 @@ bool VM::callValue(value callee, int arity) {
         }
         default:
             break;
-        }
+        }*/
     }
     return runtimeError("can only call functions or classes");
 }
 
 void VM::defineMethod() {
     value method = peek(0);
-    objString* name = (objString*)activeFunc->getChunkPtr()->getConstant(readShort()).as.object;
-    objClass* cl = (objClass*)peek(1).as.object;
+    objString* name = (objString*)AS_OBJ(activeFunc->getChunkPtr()->getConstant(readShort()));
+    objClass* cl = (objClass*)AS_OBJ(peek(1));
 
-    ((objFunction*)method.as.object)->setClass(cl);
+    ((objFunction*)AS_OBJ(method))->setClass(cl);
 
     cl->tableSet(name, method);
     pop();
@@ -300,53 +368,53 @@ bool VM::defineMemberVar() {
 }
 
 bool VM::invoke() {
-    objString* name = (objString*)activeFunc->getChunkPtr()->getConstant(readShort()).as.object;
+    objString* name = (objString*)AS_OBJ(activeFunc->getChunkPtr()->getConstant(readShort()));
     int argc = readByte();
     value callee = peek(argc);
     
-    if (callee.getType() != VAL_OBJ) {
+    if (!IS_OBJ(callee)) {
         return runtimeError("can only invoke methods on objects");
     }
 
-    switch (callee.as.object->getType()) {
+    switch (AS_OBJ(callee)->getType()) {
     case OBJ_INSTANCE: {
-        auto* instance = (objInstance*)callee.as.object;
+        auto* instance = (objInstance*)AS_OBJ(callee);
 
         value method = instance->tableGet(name);
 
-        peek_set(argc, value(objThis::createObjThis(instance)));
+        peek_set(argc, OBJ_VAL(objThis::createObjThis(instance)));
 
-        if (method.getType() == VAL_OBJ && method.as.object->getType() == OBJ_FUN) {
+        if (IS_OBJ(method) && AS_OBJ(method)->getType() == OBJ_FUN) {
             return call(method, argc);
         }
         return runtimeError("no function with name '", name->getChars(), "' on instance");
         break;
     }
     case OBJ_NAT_INSTANCE: {
-        auto* instance = (objNativeInstance*)callee.as.object;
+        auto* instance = (objNativeInstance*)AS_OBJ(callee);
 
         value method = instance->tableGet(name);
 
-        if (method.getType() == VAL_OBJ && method.as.object->getType() == OBJ_NAT_FUN) {
+        if (IS_OBJ(method) && AS_OBJ(method)->getType() == OBJ_NAT_FUN) {
             bool success = true;
-            value result = ((objNativeFunction*)method.as.object)->fun(argc, stackTop - argc, success);
+            value result = ((objNativeFunction*)AS_OBJ(method))->fun(argc, stackTop - argc, success);
             stackTop -= argc + 1;
             push(result);
             if (success) {
                 return true;
             }
-            return runtimeError(((objString*)result.as.object)->getChars());
+            return runtimeError(((objString*)AS_OBJ(result))->getChars());
         }
         break;
     }
     case OBJ_STR: {
         if (stringFunctions.find(name) != stringFunctions.end()) {
             bool success = true;
-            value result = ((objNativeFunction*)(stringFunctions.at(name).as.object))->fun(argc, stackTop - argc - 1, success);
+            value result = ((objNativeFunction*)(AS_OBJ(stringFunctions.at(name))))->fun(argc, stackTop - argc - 1, success);
             stackTop -= argc + 1;
             push(result);
             if(!success)
-                return runtimeError(((objString*)result.as.object)->getChars());
+                return runtimeError(((objString*)AS_OBJ(result))->getChars());
             return success;
         }
         else {
@@ -357,11 +425,11 @@ bool VM::invoke() {
     case OBJ_LIST: {
         if (arrayFunctions.find(name) != arrayFunctions.end()) {
             bool success = true;
-            value result = ((objNativeFunction*)(arrayFunctions.at(name).as.object))->fun(argc, stackTop - argc - 1, success);
+            value result = ((objNativeFunction*)(AS_OBJ(arrayFunctions.at(name))))->fun(argc, stackTop - argc - 1, success);
             stackTop -= argc + 1;
             push(result);
             if (!success)
-                return runtimeError(((objString*)result.as.object)->getChars());
+                return runtimeError(((objString*)AS_OBJ(result))->getChars());
             return success;
         }
         else {
@@ -373,11 +441,11 @@ bool VM::invoke() {
         if (fileFunctions.find(name) != fileFunctions.end()) {
             bool success = true;
             //objNativeFunction* funnn = (objNativeFunction*)fileFunctions.at(name).as.object;
-            value result = ((objNativeFunction*)(fileFunctions.at(name).as.object))->fun(argc, stackTop - argc - 1, success);
+            value result = ((objNativeFunction*)(AS_OBJ(fileFunctions.at(name))))->fun(argc, stackTop - argc - 1, success);
             stackTop -= argc + 1;
             push(result);
             if (!success)
-                return runtimeError(((objString*)result.as.object)->getChars());
+                return runtimeError(((objString*)AS_OBJ(result))->getChars());
             return success;
         }
         else {
@@ -386,11 +454,11 @@ bool VM::invoke() {
         break;
     }
     case OBJ_CLASS: {
-        auto klass = (objClass*)callee.as.object;
+        auto klass = (objClass*)AS_OBJ(callee);
 
         value method = klass->tableGet(name);
 
-        if (method.getType() == VAL_OBJ && method.as.object->getType() == OBJ_FUN) {
+        if (IS_OBJ(method) && AS_OBJ(method)->getType() == OBJ_FUN) {
             return call(method, argc);
         }
         return runtimeError("no function with name '", name->getChars(), "' on instance");
@@ -405,13 +473,13 @@ bool VM::invoke() {
 
 bool VM::superInvoke() {
     //TODO: profile super invoke (and normal super call)
-    objString* name = (objString*)activeFunc->getChunkPtr()->getConstant(readShort()).as.object;
+    objString* name = (objString*)AS_OBJ(activeFunc->getChunkPtr()->getConstant(readShort()));
     int argc = readByte();
     value callee = peek(argc);
 
-    auto* instance = (objInstance*)callee.as.object;
+    auto* instance = (objInstance*)AS_OBJ(callee);
 
-    value this_val = value(objThis::createObjThis(instance));
+    value this_val = OBJ_VAL(objThis::createObjThis(instance));
 
     //TODO: access activeFunc
     value method = activeFunc->getClass()->superTableGet(name);
@@ -419,7 +487,7 @@ bool VM::superInvoke() {
 
     peek_set(argc, this_val);
 
-    if (method.getType() == VAL_OBJ && method.as.object->getType() == OBJ_FUN) {
+    if (IS_OBJ(method) && AS_OBJ(method)->getType() == OBJ_FUN) {
         return call(method, argc);
     }
 
@@ -441,19 +509,19 @@ static bool validateIndex(double &index, size_t len) {
     return true;
 }
 
-bool VM::getObjectIndex(obj* object, value &index) {
+bool VM::getObjectIndex(obj* object, value index) {
     switch (object->getType()) {
     case OBJ_LIST: {
-        if (index.getType() != VAL_NUM)
+        if (!IS_NUM(index))
             return runtimeError("list index must be a number");
 
         auto* list = (objList*)object;
         size_t len = list->getSize();
-        if (!validateIndex(index.as.number, len)) {
+        if (!validateIndex(AS_NUM(index), len)) {
             return runtimeError("invalid index, list has size '", len, "'");
         }
         pop();
-        push(list->getValueAt(index.as.number));
+        push(list->getValueAt(AS_NUM(index)));
         return true;
         break;
     }
@@ -478,18 +546,18 @@ bool VM::getObjectIndex(obj* object, value &index) {
     return false;
 }
 
-bool VM::setObjectIndex(obj* object, value &index, value& val) {
+bool VM::setObjectIndex(obj* object, value index, value val) {
     switch (object->getType()) {
     case OBJ_LIST: {
-        if (index.getType() != VAL_NUM)
+        if (!IS_NUM(index))
             return runtimeError("list index must be a number");
 
         auto* list = (objList*)object;
         size_t len = list->getSize();
-        if (!validateIndex(index.as.number, len)) {
+        if (!validateIndex(AS_NUM(index), len)) {
             return runtimeError("invalid index, list has size '", len, "'");
         }
-        list->getValueAt(index.as.number) = val;
+        list->getValueAt(AS_NUM(index)) = val;
         return true;
     }
     case OBJ_MAP: {
@@ -526,7 +594,7 @@ exitCodes VM::run() {
                 break;
             }
             case OP_INCREMENT_GLOBAL: {
-                objString* name = (objString*)activeFunc->getChunkPtr()->getConstant(readShort()).as.object;
+                objString* name = (objString*)AS_OBJ(activeFunc->getChunkPtr()->getConstant(readShort()));
 
                 if (!globals.count(name)) {
                     runtimeError("no variable with name '", name->getChars(), "'");
@@ -535,17 +603,17 @@ exitCodes VM::run() {
 
                 value var = globals.at(name);
 
-                if (var.getType() != VAL_NUM) {
+                if (!IS_NUM(var)) {
                     runtimeError("can only increment numbers");
                     return INTERPRET_RUNTIME_ERROR;
                 }
 
-                var.as.number++;
+                AS_NUM(var)++;
                 globals.insert_or_assign(name, var);
                 break;
             }
             case OP_DECREMENT_GLOBAL: {
-                objString* name = (objString*)activeFunc->getChunkPtr()->getConstant(readShort()).as.object;
+                objString* name = (objString*)AS_OBJ(activeFunc->getChunkPtr()->getConstant(readShort()));
 
                 if (!globals.count(name)) {
                     runtimeError("no variable with name '", name->getChars(), "'");
@@ -554,31 +622,31 @@ exitCodes VM::run() {
 
                 value var = globals.at(name);
 
-                if (var.getType() != VAL_NUM) {
+                if (!IS_NUM(var)) {
                     runtimeError("can only increment numbers");
                     return INTERPRET_RUNTIME_ERROR;
                 }
 
-                var.as.number--;
+                AS_NUM(var)--;
                 globals.insert_or_assign(name, var);
                 break;
             }
             case OP_INCREMENT_LOCAL: {
                 int index = readShort();
-                if (activeCallFrameBottom[index].getType() != VAL_NUM) {
+                if (!IS_NUM(activeCallFrameBottom[index])) {
                     runtimeError("can only increment numbers");
                     return INTERPRET_RUNTIME_ERROR;
                 }
-                activeCallFrameBottom[index].as.number++;
+                AS_NUM(activeCallFrameBottom[index])++;
                 break;
             }
             case OP_DECREMENT_LOCAL: {
                 int index = readShort();
-                if (activeCallFrameBottom[index].getType() != VAL_NUM) {
+                if (!IS_NUM(activeCallFrameBottom[index])) {
                     runtimeError("can only increment numbers");
                     return INTERPRET_RUNTIME_ERROR;
                 }
-                activeCallFrameBottom[index].as.number++;
+                AS_NUM(activeCallFrameBottom[index])++;
                 break;
             }
             case OP_ADD:
@@ -604,36 +672,48 @@ exitCodes VM::run() {
                 break;
             }
             case OP_TRUE:
-                push(value(true));
+                push(TRUE_VAL);
                 break;
             case OP_FALSE:
-                push(value(false));
+                push(FALSE_VAL);
                 break;
             case OP_NIL:
-                push(value());
+                push(NIL_VAL);
                 break;
             case OP_NEGATE: {
-                if ((stackTop - 1)->getType() != VAL_NUM) {
+                if (!IS_NUM((*(stackTop - 1)))) {
                     runtimeError("can't negate ", *(stackTop - 1));
                     return INTERPRET_RUNTIME_ERROR;
                 }
-                (stackTop - 1)->as.number *= -1;
+                AS_NUM((*(stackTop - 1))) *= -1;
                 break;
             }
             case OP_NOT:
-                push(value(!isFalsey(pop())));
+                if (isFalsey(pop()))
+                    push(FALSE_VAL);
+                else
+                    push(TRUE_VAL);
                 break;
             case OP_EQUALS:
-                push(value(areEqual(pop(), pop())));
+                if(areEqual(pop(), pop()))
+                    push(TRUE_VAL);
+                else
+                    push(FALSE_VAL);
                 break;
             case OP_NOT_EQUALS:
-                push(value(!areEqual(pop(), pop())));
+                if (areEqual(pop(), pop()))
+                    push(FALSE_VAL);
+                else
+                    push(TRUE_VAL);
                 break;
             case OP_LESSER: {
-                if (peek(0).getType() == VAL_NUM && peek(1).getType() == VAL_NUM) {
-                    double b = pop().as.number;
-                    double a = pop().as.number;
-                    push(value(a < b));
+                if (IS_NUM(peek(0)) && IS_NUM(peek(1))) {
+                    double b = AS_NUM(pop());
+                    double a = AS_NUM(pop());
+                    if (a < b)
+                        push(TRUE_VAL);
+                    else
+                        push(FALSE_VAL);
                 } else {
                     runtimeError("can only use '<' on numbers");
                     return INTERPRET_RUNTIME_ERROR;
@@ -641,10 +721,13 @@ exitCodes VM::run() {
                 break;
             }
             case OP_LESSER_OR_EQUALS: {
-                if (peek(0).getType() == VAL_NUM && peek(1).getType() == VAL_NUM) {
-                    double b = pop().as.number;
-                    double a = pop().as.number;
-                    push(value(a <= b));
+                if (IS_NUM(peek(0)) && IS_NUM(peek(1))) {
+                    double b = AS_NUM(pop());
+                    double a = AS_NUM(pop());
+                    if (a <= b)
+                        push(TRUE_VAL);
+                    else
+                        push(FALSE_VAL);
                 } else {
                     runtimeError("can only use '<=' on numbers");
                     return INTERPRET_RUNTIME_ERROR;
@@ -652,10 +735,13 @@ exitCodes VM::run() {
                 break;
             }
             case OP_GREATER: {
-                if (peek(0).getType() == VAL_NUM && peek(1).getType() == VAL_NUM) {
-                    double b = pop().as.number;
-                    double a = pop().as.number;
-                    push(value(a > b));
+                if (IS_NUM(peek(0)) && IS_NUM(peek(1))) {
+                    double b = AS_NUM(pop());
+                    double a = AS_NUM(pop());
+                    if (a > b)
+                        push(TRUE_VAL);
+                    else
+                        push(FALSE_VAL);
                 } else {
                     runtimeError("can only use '>' on numbers");
                     return INTERPRET_RUNTIME_ERROR;
@@ -663,10 +749,13 @@ exitCodes VM::run() {
                 break;
             }
             case OP_GREATER_OR_EQUALS: {
-                if (peek(0).getType() == VAL_NUM && peek(1).getType() == VAL_NUM) {
-                    double b = pop().as.number;
-                    double a = pop().as.number;
-                    push(value(a >= b));
+                if (IS_NUM(peek(0)) && IS_NUM(peek(1))) {
+                    double b = AS_NUM(pop());
+                    double a = AS_NUM(pop());
+                    if (a >= b)
+                        push(TRUE_VAL);
+                    else
+                        push(FALSE_VAL);
                 } else {
                     runtimeError("can only use '>=' on numbers");
                     return INTERPRET_RUNTIME_ERROR;
@@ -674,7 +763,7 @@ exitCodes VM::run() {
                 break;
             }
             case OP_DEFINE_GLOBAL: {
-                objString *name = (objString *)activeFunc->getChunkPtr()->getConstant(readShort()).as.object;
+                objString *name = (objString *)AS_OBJ(activeFunc->getChunkPtr()->getConstant(readShort()));
                 globals.insert_or_assign(name, peek(0));
                 pop();
                 break;
@@ -682,7 +771,7 @@ exitCodes VM::run() {
             case OP_GET_GLOBAL: {
                 chunk* cPtr = activeFunc->getChunkPtr();
                 short index = readShort();
-                objString *name = (objString *)activeFunc->getChunkPtr()->getConstant(index).as.object;
+                objString *name = (objString *)AS_OBJ(activeFunc->getChunkPtr()->getConstant(index));
 
                 if (!globals.count(name)) {
                     runtimeError("no variable with name '", name->getChars(), "'");
@@ -693,7 +782,7 @@ exitCodes VM::run() {
                 break;
             }
             case OP_SET_GLOBAL: {
-                objString *name = (objString *)activeFunc->getChunkPtr()->getConstant(readShort()).as.object;
+                objString *name = (objString *)AS_OBJ(activeFunc->getChunkPtr()->getConstant(readShort()));
                 if (!globals.count(name)) {
                     runtimeError("no global variable with name '", name->getChars(), "'");
                     return INTERPRET_RUNTIME_ERROR;
@@ -711,11 +800,11 @@ exitCodes VM::run() {
             }
             case OP_SET_PROPERTY: {
                 short ind = readShort();
-                if(peek(1).getType() == VAL_OBJ && peek(1).as.object->getType() == OBJ_INSTANCE) {
-                    auto* instance = (objInstance*)peek(1).as.object;
-                    auto* name = (objString*)activeFunc->getChunkPtr()->getConstant(ind).as.object;
+                if(IS_OBJ(peek(1)) && AS_OBJ(peek(1))->getType() == OBJ_INSTANCE) {
+                    auto* instance = (objInstance*)AS_OBJ(peek(1));
+                    auto* name = (objString*)AS_OBJ(activeFunc->getChunkPtr()->getConstant(ind));
                     value val = pop();
-                    if(val.getType() == VAL_NIL) {
+                    if(IS_NIL(val)) {
                         instance->tableDelete(name);
                     } else {
                         instance->tableSet(name, val);
@@ -728,11 +817,11 @@ exitCodes VM::run() {
             }
             case OP_GET_PROPERTY: {
                 short ind = readShort();
-                if(peek(0).getType() == VAL_OBJ && peek(0).as.object->getType() == OBJ_INSTANCE) {
-                    auto* instance = (objInstance*)peek(0).as.object;
-                    auto* name = (objString*)activeFunc->getChunkPtr()->getConstant(ind).as.object;
+                if (IS_OBJ(peek(1)) && AS_OBJ(peek(1))->getType() == OBJ_INSTANCE) {
+                    auto* instance = (objInstance*)AS_OBJ(peek(1));
+                    auto* name = (objString*)AS_OBJ(activeFunc->getChunkPtr()->getConstant(ind));
                     value val = instance->tableGet(name);
-                    if(val.getType() == VAL_NIL) {
+                    if(IS_NIL(val)) {
                         runtimeError("no property of name ", name->getChars(), " on instance");
                         return INTERPRET_RUNTIME_ERROR;
                     }
@@ -766,14 +855,14 @@ exitCodes VM::run() {
                 //value var = peek(1);
                 value itOver = peek(0);
 
-                if (!(itOver.getType() == VAL_OBJ && itOver.as.object->getType() == OBJ_LIST)) {
+                if (!(IS_OBJ(itOver) && AS_OBJ(itOver)->getType() == OBJ_LIST)) {
                     runtimeError("cannot iterate over variable");
                     return INTERPRET_RUNTIME_ERROR;
                 }
 
-                objList* arr = ((objList*)itOver.as.object);
+                objList* arr = ((objList*)AS_OBJ(itOver));
                 
-                peek_set(2, value(0.0));
+                peek_set(2, NUM_VAL(0.0));
 
                 if (arr->getSize() > 0) {
                     peek_set(1, arr->getValueAt(0));
@@ -783,16 +872,16 @@ exitCodes VM::run() {
             case OP_FOR_ITER: {
                 value counter = peek(2);
                 //value x_in = peek(1);
-                objList* arr = (objList*)(peek(0).as.object);
+                objList* arr = (objList*)AS_OBJ(peek(0));
 
-                if (counter.as.number >= arr->getSize()) {
-                    push(value(false));
+                if (AS_NUM(counter) >= arr->getSize()) {
+                    push(FALSE_VAL);
                 }
                 else {
-                    counter.as.number++;
-                    peek_set(1, arr->getValueAt(counter.as.number - 1));
+                    AS_NUM(counter)++;
+                    peek_set(1, arr->getValueAt(AS_NUM(counter) - 1));
                     peek_set(2, counter);
-                    push(value(true));
+                    push(TRUE_VAL);
                 }
 
                 break;
@@ -812,19 +901,19 @@ exitCodes VM::run() {
                 break;
             }
             case OP_CLASS: {
-                objString* klassName = (objString*)(activeFunc->getChunkPtr()->getConstant(readShort()).as.object);
+                objString* klassName = (objString*)AS_OBJ(activeFunc->getChunkPtr()->getConstant(readShort()));
                 objClass* klass = objClass::createObjClass(klassName);
-                push(value(klass));
+                push(OBJ_VAL(klass));
                 break;
             }
             case OP_INHERIT: {
                 value superKlass = pop();
-                if (!(superKlass.getType() == VAL_OBJ && superKlass.as.object->getType() == OBJ_CLASS)) {
+                if (!(IS_OBJ(superKlass) && AS_OBJ(superKlass)->getType() == OBJ_CLASS)) {
                     runtimeError("can only inherit from other classes");
                     return INTERPRET_RUNTIME_ERROR;
                 }
                 value klass = peek(0);
-                ((objClass*)(klass.as.object))->setSuperClass((objClass*)superKlass.as.object);
+                ((objClass*)AS_OBJ(klass))->setSuperClass((objClass*)AS_OBJ(superKlass));
                 break;
             }
             case OP_MEMBER_VARIABLE:
@@ -844,12 +933,12 @@ exitCodes VM::run() {
                 break;
             }
             case OP_LIST: {
-                push(value(objList::createList()));
+                push(OBJ_VAL(objList::createList()));
                 break;
             }
             case OP_APPEND: {
                 size_t len = readSizeT();
-                objList* list = (objList*)peek(len).as.object;
+                objList* list = (objList*)AS_OBJ(peek(len));
 
                 for (size_t i = 1; i <= len; i++)
                 {
@@ -865,7 +954,7 @@ exitCodes VM::run() {
             }
             case OP_MAP_APPEND: {
                 size_t len = readSizeT();
-                objMap* map = (objMap*)peek(len * 2).as.object;
+                objMap* map = (objMap*)AS_OBJ(peek(len * 2));
 
                 for (size_t i = 1; i <= len * 2; i+=2)
                 {
@@ -886,11 +975,11 @@ exitCodes VM::run() {
             case OP_GET_INDEX: {
                 value index = pop();
                 value list = peek(0);
-                if (!(list.getType() == VAL_OBJ)) {
+                if (!(IS_OBJ(list))) {
                     runtimeError("can only index '", list,"'");
                     return INTERPRET_RUNTIME_ERROR;
                 }
-                if (!getObjectIndex(list.as.object, index))
+                if (!getObjectIndex(AS_OBJ(list), index))
                     return INTERPRET_RUNTIME_ERROR;
                 break;
             }
@@ -899,32 +988,32 @@ exitCodes VM::run() {
                 value val = pop();
                 value index = pop();
                 value list = peek(0);
-                if (!(list.getType() == VAL_OBJ)) {
+                if (!(IS_OBJ(list))) {
                     runtimeError("can only index list and string objects");
                     return INTERPRET_RUNTIME_ERROR;
                 }
-                if (!setObjectIndex(list.as.object, index, val))
+                if (!setObjectIndex(AS_OBJ(list), index, val))
                     return INTERPRET_RUNTIME_ERROR;
                 break;
             }
             case OP_THIS: {
                 value this_val = activeCallFrameBottom[-1];
-                if (!(this_val.getType() == VAL_OBJ && this_val.as.object->getType() == OBJ_THIS)) {
+                if (!(IS_OBJ(this_val) && AS_OBJ(this_val)->getType() == OBJ_THIS)) {
                     runtimeError("no valid 'this' object");
                     return INTERPRET_RUNTIME_ERROR;
                 }
-                push(value(((objThis*)activeCallFrameBottom[-1].as.object)->this_instance));
+                push(OBJ_VAL(((objThis*)AS_OBJ(activeCallFrameBottom[-1]))->this_instance));
                 break;
             }
             case OP_SUPER: {
-                auto name = (objString*)activeFunc->getChunkPtr()->getConstant(readShort()).as.object;
+                auto name =(objString*)AS_OBJ(activeFunc->getChunkPtr()->getConstant(readShort()));
 
                 //TODO: access activeFuncs superclass -- add class to methods
                 if (!activeFunc->isMethod()) {
                     runtimeError("no superclass");
                     return INTERPRET_RUNTIME_ERROR;
                 }
-                push(value(activeFunc->getClass()->superTableGet(name)));
+                push(activeFunc->getClass()->superTableGet(name));
                 break;
             }
             case OP_SUPER_INVOKE: {
@@ -933,17 +1022,17 @@ exitCodes VM::run() {
                 break;
             }
             case OP_PULL_INSTANCE_FROM_THIS: {
-                objThis* th = (objThis*)(pop().as.object);
-                push(value(th->this_instance));
+                objThis* th = (objThis*)(AS_OBJ(pop()));
+                push(OBJ_VAL(th->this_instance));
                 break;
             }
             case OP_IMPORT: {
                 value fileName = pop();
-                if (!(fileName.getType() == VAL_OBJ && fileName.as.object->getType() == OBJ_STR)) {
+                if (!(IS_OBJ(fileName) && AS_OBJ(fileName)->getType() == OBJ_STR)) {
                     runtimeError("importname must be a string");
                     return INTERPRET_RUNTIME_ERROR;
                 }
-                auto fileNameStr = (objString*)fileName.as.object;
+                auto fileNameStr = (objString*)AS_OBJ(fileName);
                 auto prevIP = ip;
                 if (!importFile(fileNameStr->getChars()))
                     return INTERPRET_RUNTIME_ERROR;
@@ -963,11 +1052,11 @@ exitCodes VM::run() {
                     value tmpRetAdd = pop();
                     //uintptr_t returnAddress = ((objFunction*)(tmpRetAdd.as.object))->retAddress;
                     uintptr_t returnAddress;
-                    if (tmpRetAdd.getType() == VAL_ADDRESS) {
-                        returnAddress = tmpRetAdd.as.address;
+                    if (IS_RET(tmpRetAdd)) {
+                        returnAddress = AS_RET(tmpRetAdd);
                     }
                     else {
-                        returnAddress = ((objThis*)tmpRetAdd.as.object)->retAddress;
+                        returnAddress = ((objThis*)AS_OBJ(tmpRetAdd))->retAddress;
                     }
 
                     ip = reinterpret_cast<char *>(returnAddress);

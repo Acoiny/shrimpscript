@@ -118,7 +118,7 @@ void compiler::emitLoop(size_t loopStart) {
 
 void compiler::number(bool canAssign, compiler &cmp) {
     double num = std::strtod(cmp.prevToken.start, nullptr);
-    cmp.currentChunk->writeConstant(value(num), cmp.prevToken.line);
+    cmp.currentChunk->writeConstant(NUM_VAL(num), cmp.prevToken.line);
 }
 
 void compiler::unary(bool canAssign, compiler &cmp) {

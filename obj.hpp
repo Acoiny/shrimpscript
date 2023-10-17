@@ -46,8 +46,8 @@ public:
 };
 
 class objString : public obj {
+public:
     friend class memoryManager;
-    friend class value;
 
     char* chars;
     unsigned int len;
@@ -55,7 +55,6 @@ class objString : public obj {
 
     void init(const char* ch, unsigned int strlen);
 
-public:
     objString();
 
     ~objString() override;
@@ -75,8 +74,8 @@ public:
 class objClass;
 
 class objFunction : public obj {
+public:
     friend class memoryManager;
-    friend class value;
 
     objString* name;
 
@@ -86,15 +85,13 @@ class objFunction : public obj {
 
     unsigned char arity;
 
-public:
-
     objFunction();
 
     ~objFunction() override = default;
 
-    chunk* getChunkPtr();
+    inline chunk* getChunkPtr() const { return funChunk; }
 
-    int getArity() const;
+    inline int getArity() const { return arity; };
 
     void setClass(objClass* cl);
 
@@ -107,7 +104,6 @@ public:
 
 class objNativeFunction : public obj {
     friend class memoryManager;
-    friend class value;
 
 public:
 
@@ -121,8 +117,8 @@ public:
 };
 
 class objClass : public obj {
+public:
     friend class memoryManager;
-    friend class value;
 
     friend class objThis;
 
@@ -132,12 +128,11 @@ class objClass : public obj {
 
     std::unordered_map<objString *, value> table;
 
-public:
     objClass();
 
     objString* getName() const;
 
-    void tableSet(objString* n, value &val);
+    void tableSet(objString* n, value val);
 
     value tableGet(objString* k);
 
@@ -151,8 +146,8 @@ public:
 };
 
 class objInstance : public obj {
+public:
     friend class memoryManager;
-    friend class value;
 
     friend class objThis;
 
@@ -160,7 +155,6 @@ class objInstance : public obj {
 
     std::unordered_map<objString *, value> table;
 
-public:
     objInstance();
 
     void tableSet(objString* n, value val);
@@ -173,7 +167,6 @@ public:
 //return this-object
 class objThis : public obj {
     friend class memoryManager;
-    friend class value;
 
 public:
     objInstance* this_instance;
@@ -189,7 +182,6 @@ public:
 //native object instance
 class objNativeInstance : public obj {
     friend class memoryManager;
-    friend class value;
 
     std::unordered_map<objString*, value> table;
 
@@ -205,32 +197,30 @@ public:
 
 class objList : public obj {
     friend class memoryManager;
-    friend class value;
 
 public:
     std::vector<value> data;
     
     objList();
 
-    size_t getSize();
+    inline size_t getSize() { return data.size(); }
 
-    value& getValueAt(size_t index);
+    inline value getValueAt(size_t index) { return data.at(index); }
 
-    void appendValue(value& val);
+    void appendValue(value val);
 
     static objList* createList();
 };
 
 struct myMapHash {
     size_t operator()(const value& rhs) const {
-        return rhs.as.address;
+        return AS_RET(rhs);
     }
 };
 
 
 class objMap : public obj{
     friend class memoryManager;
-    friend class value;
 
 public:
     std::unordered_map<value, value, myMapHash> data;
@@ -239,17 +229,15 @@ public:
 
     size_t getSize();
 
-    value getValueAt(const value& key);
+    value getValueAt(const value key);
 
-    void insertElement(const value& key, const value& val);
+    void insertElement(const value key, const value val);
 
     static objMap* createMap();
 };
 
 class objFile : public obj {
     friend class memoryManager;
-    friend class value;
-
 
 public:
     size_t fileSize;

@@ -157,20 +157,12 @@ objFunction::objFunction() : funChunk(nullptr), arity(0), klass(nullptr) {
 	type = OBJ_FUN;
 }
 
-chunk* objFunction::getChunkPtr() {
-	return funChunk;
-}
-
 objFunction* objFunction::createObjFunction(objString* name, chunk* ch, int arity) {
 	auto* fun = (objFunction*)globalMemory.allocateObject<objFunction>();
 	fun->name = name;
 	fun->funChunk = ch;
 	fun->arity = arity;
 	return fun;
-}
-
-int objFunction::getArity() const {
-	return arity;
 }
 
 void objFunction::setClass(objClass* cl) {
@@ -207,7 +199,7 @@ objString* objClass::getName() const {
 	return name;
 }
 
-void objClass::tableSet(objString* name, value& val) {
+void objClass::tableSet(objString* name, value val) {
 	table.insert_or_assign(name, val);
 }
 
@@ -217,7 +209,7 @@ value objClass::tableGet(objString* k) {
 			return superClass->tableGet(k);
 		}
 
-		return value();
+		return NIL_VAL;
 	}
 
 	return table.at(k);
@@ -242,7 +234,7 @@ bool objClass::hasInitFunction() {
 	
 	auto el = tableGet(name);
 
-	if (el.getType() == VAL_OBJ && el.as.object->getType() == OBJ_FUN)
+	if (IS_OBJ(el) && AS_OBJ(el)->getType() == OBJ_FUN)
 		return true;
 
 	return false;
@@ -302,7 +294,7 @@ void objNativeInstance::tableSet(objString* name, value val) {
 
 value objNativeInstance::tableGet(objString* k) {
 	if (table.find(k) == table.end()) {
-		return value();
+		return NIL_VAL;
 	}
 	return table.at(k);
 }
@@ -317,15 +309,9 @@ objList::objList() {
 	type = OBJ_LIST;
 }
 
-size_t objList::getSize() {
-	return data.size();
-}
 
-value& objList::getValueAt(size_t index) {
-	return data.at(index);
-}
 
-void objList::appendValue(value& val) {
+void objList::appendValue(value val) {
 	data.push_back(val);
 }
 
@@ -343,14 +329,14 @@ size_t objMap::getSize() {
 	return data.size();
 }
 
-value objMap::getValueAt(const value& key) {
+value objMap::getValueAt(const value key) {
 	if (data.count(key) == 0)
-		return value();
+		return NIL_VAL;
 
 	return data.at(key);
 }
 
-void objMap::insertElement(const value& key, const value& val) {
+void objMap::insertElement(const value key, const value val) {
 	data.insert_or_assign(key, val);
 }
 

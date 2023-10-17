@@ -91,9 +91,9 @@ class VM {
 
     value pop();
 
-    inline const value& peek(int dist) const { return *(stackTop - 1 - dist); }
+    inline const value peek(int dist) const { return *(stackTop - 1 - dist); }
 
-    inline void peek_set(int dist, const value& val) { *(stackTop - 1 - dist) = val; }
+    inline void peek_set(int dist, const value val) { *(stackTop - 1 - dist) = val; }
 
     ///The functions responsible for executing OP-codes
     void concatenateTwoStrings();
@@ -123,9 +123,9 @@ class VM {
 
     bool superInvoke();
 
-    bool getObjectIndex(obj* object, value &index);
+    bool getObjectIndex(obj* object, value index);
 
-    bool setObjectIndex(obj* object, value &index, value& val);
+    bool setObjectIndex(obj* object, value index, value val);
 
     bool importFile(const char* filename);
 

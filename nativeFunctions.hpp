@@ -1,7 +1,8 @@
 #pragma once
 
+#include "value.hpp"
+
 class VM;
-class value;
 
 class nativeFunctions {
 public:

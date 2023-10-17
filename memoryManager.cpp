@@ -104,21 +104,22 @@ void memoryManager::markObject(obj* obj) {
 #endif
 }
 
-void memoryManager::markValue(value& val) {
-	if (val.getType() == VAL_OBJ) {
-		markObject(val.as.object);
+void memoryManager::markValue(value val) {
+	if (IS_OBJ(val)) {
+		markObject(AS_OBJ(val));
 	}
 }
 
+#ifndef NAN_BOXING
 /*
 * this overload is only necessary because of the dictionary object
 */
 void memoryManager::markValue(const value& val) {
-	if (val.type == VAL_OBJ) {
-		markObject(val.as.object);
+	if (IS_OBJ(val)) {
+		markObject(AS_OBJ(val));
 	}
 }
-
+#endif
 void memoryManager::markRoots() {
 	//marking the stack
 	for (int i = 0; i < vm->stackTop - vm->stack; ++i) {

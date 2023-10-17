@@ -30,26 +30,51 @@ union value {
 //macros for creating the different values
 #define OBJ_VAL(ptr) value{(uint64_t)(ptr) | OBJ_MASK}
 #define RET_VAL(ptr) value{(uintptr_t)(ptr) | RET_MASK}
+#define NUM_VAL(num) value{ .as_double{num}}
 
 //TODO: add return address thingy
 
 //macros for checking type of values
-#define IS_NUMBER(val) ((val.as_uint64 & QNAN) != QNAN)
+#define IS_NUM(val) (((val.as_uint64) & QNAN) != QNAN)
 
 #define IS_NIL(val) (val.as_uint64 == 0x7ffe000000000000)
 #define IS_BOOL(val) ((val.as_uint64 & BOOL_MASK) == BOOL_MASK)
 
-#define IS_OBJ(val) ((val.as_uint64 & QNAN) == OBJ_MASK)
-#define IS_RET(val) ((val.as_uint64 & QNAN) == RET_MASK)
+#define IS_OBJ(val) ((val.as_uint64 & NANISH_MASK) ==  OBJ_MASK)
+#define IS_RET(val) ((val.as_uint64 & NANISH_MASK) == RET_MASK)
 
 //macros for pulling data out of values
-#define AS_NUMBER(val) (v.as_double)
-#define AS_BOOL(val) ((bool)(v.as_uint64 & 0x1))
+#define AS_NUM(val) (val.as_double)
+#define AS_BOOL(val) ((bool)(val.as_uint64 & 0x1))
 #define AS_OBJ(val) ((obj*)(val.as_uint64 & 0xFFFFFFFFFFFF))
 #define AS_RET(val) ((uintptr_t)(val.as_uint64 & 0xFFFFFFFFFFFF))
 
+std::ostream& operator<<(std::ostream& os, const value val);
+
+bool operator==(const value a, const value b);
 
 #else
+#define TRUE_VAL value(true)
+#define FALSE_VAL value(false)
+#define NIL_VAL value()
+#define OBJ_VAL(ptr) value(ptr)
+#define RET_VAL(ptr) value(ptr)
+#define NUM_VAL(num) value(num)
+
+//macros for checking type of values
+#define IS_NUM(val) (val.getType() == VAL_NUM)
+
+#define IS_NIL(val) (val.getType() == VAL_NIL)
+#define IS_BOOL(val) (val.getType() == VAL_BOOL)
+
+#define IS_OBJ(val) (val.getType() == VAL_OBJ)
+#define IS_RET(val) (val.getType() == VAL_ADDRESS)
+
+#define AS_NUM(val) (val.as.number)
+#define AS_BOOL(val) (val.as.boolean)
+#define AS_OBJ(val) (val.as.object)
+#define AS_RET(val) (val.as.address)
+
 class obj;
 
 enum valType{
