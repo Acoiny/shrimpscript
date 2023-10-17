@@ -16,6 +16,12 @@ let i = 1, j = 1;
 const n = 5, m = 10;
 ```
 **NOTE: const variables currently don't work in repl, due to them being compile-time evaluated**
+### strings
+```
+let str1 = "hello\tworld";  //contains "hello  world"
+let str2 = 'hello\tworld';  //contains 'hello\tworld'
+```
+**double quoted strings allow basic escape sequences, single quote strings are taken as is**
 ## control flow similar to C
 ### if-statement
 ```
@@ -104,4 +110,4 @@ let boss = dict["boss"]; //boss = "jeffrey"
 let empty = dict['hello']; //empty = nil
 dict['new'] = 42; //sets new field
 ```
-**dictionaries allow the storing two value pairs, with the first being used as the key to access the second**
+**dictionaries allow the storing value pairs, with the first being used as the key to access the second**
