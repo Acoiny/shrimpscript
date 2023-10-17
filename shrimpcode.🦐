@@ -1,1 +1,12 @@
-println(Math.floor(2.3));
+class A {
+	init() {
+		this.a = 123;
+	}
+}
+
+const a = A();
+
+const map = {};
+map['lion'] = true;
+map[a] = 'hello';
+println(map[a]);

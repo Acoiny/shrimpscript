@@ -95,7 +95,7 @@ std::ostream& operator<<(std::ostream& os, const value val) {
 }
 
 bool operator==(const value a, const value b) {
-	return a.as_double == b.as_double;
+	return a.as_uint64 == b.as_uint64;
 }
 
 #else
