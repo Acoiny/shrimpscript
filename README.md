@@ -112,7 +112,7 @@ dict['new'] = 42; //sets new field
 ```
 **dictionaries allow the storing value pairs, with the first being used as the key to access the second**
 
-# Technicalities
+# Flags
 ## NAN_BOXING
 When set (default) the values are represented by a union
 ```
