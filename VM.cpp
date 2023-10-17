@@ -646,7 +646,7 @@ exitCodes VM::run() {
                     runtimeError("can only increment numbers");
                     return INTERPRET_RUNTIME_ERROR;
                 }
-                AS_NUM(activeCallFrameBottom[index])++;
+                AS_NUM(activeCallFrameBottom[index])--;
                 break;
             }
             case OP_ADD:
