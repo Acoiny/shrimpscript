@@ -817,8 +817,8 @@ exitCodes VM::run() {
             }
             case OP_GET_PROPERTY: {
                 short ind = readShort();
-                if (IS_OBJ(peek(1)) && AS_OBJ(peek(1))->getType() == OBJ_INSTANCE) {
-                    auto* instance = (objInstance*)AS_OBJ(peek(1));
+                if (IS_OBJ(peek(0)) && AS_OBJ(peek(0))->getType() == OBJ_INSTANCE) {
+                    auto* instance = (objInstance*)AS_OBJ(peek(0));
                     auto* name = (objString*)AS_OBJ(activeFunc->getChunkPtr()->getConstant(ind));
                     value val = instance->tableGet(name);
                     if(IS_NIL(val)) {

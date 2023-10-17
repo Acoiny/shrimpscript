@@ -189,7 +189,7 @@ static value native_Input(int arity, value* args, bool& success) {
 	}
 
 	if (isNum) {
-		return value(strtod(tmp.data(), nullptr));
+		return NUM_VAL(strtod(tmp.data(), nullptr));
 	}
 
 	if(tmp.at(0) == '"' && tmp.at(tmp.size()-1) == '"')
@@ -256,7 +256,7 @@ static value native_GC(int arity, value* args, bool& success) {
 
 	size_t newSize = globalMemory.getHeapSize();
 
-	return value(double(prevSize - newSize));
+	return NUM_VAL(double(prevSize - newSize));
 }
 
 void nativeFunctions::initNatives(VM& vm) {

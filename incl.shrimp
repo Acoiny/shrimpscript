@@ -2,7 +2,7 @@ class hogwartsPeople {
 
 	school = "hogwarts";
 	
-	fun init(name, profession) {
+	init(name, profession) {
 		this.name = name;
 		this.profession = profession;
 	}

@@ -40,7 +40,7 @@ int main(int argc, char** argv) {
 
     if(argc == 1) {
 #ifdef DEBUG_TESTFILE
-        runFile("shrimpcode.🦐");
+        runFile(DEBUG_TESTFILE);
 #else
         repl();
 #endif

@@ -110,16 +110,7 @@ void memoryManager::markValue(value val) {
 	}
 }
 
-#ifndef NAN_BOXING
-/*
-* this overload is only necessary because of the dictionary object
-*/
-void memoryManager::markValue(const value& val) {
-	if (IS_OBJ(val)) {
-		markObject(AS_OBJ(val));
-	}
-}
-#endif
+
 void memoryManager::markRoots() {
 	//marking the stack
 	for (int i = 0; i < vm->stackTop - vm->stack; ++i) {

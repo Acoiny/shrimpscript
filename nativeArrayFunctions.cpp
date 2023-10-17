@@ -11,7 +11,7 @@ static value nativeArray_Len(int arity, value* args, bool& success) {
 
 	double len = ((objList*)AS_OBJ((*args)))->getSize();
 
-	return value(len);
+	return NUM_VAL(len);
 }
 
 static value nativeArray_Append(int arity, value* args, bool& success) {
@@ -24,7 +24,7 @@ static value nativeArray_Append(int arity, value* args, bool& success) {
 	auto *arr = ((objList*)AS_OBJ(args[0]));
 	arr->appendValue(args[1]);
 
-	return value(arr->getSize());
+	return NUM_VAL(double(arr->getSize()));
 }
 
 static value nativeArray_Insert(int arity, value* args, bool& success) {
@@ -52,7 +52,7 @@ static value nativeArray_Insert(int arity, value* args, bool& success) {
 	value element = args[2];
 	arr->data.insert(it, element);
 
-	return value(arr->getSize());
+	return NUM_VAL(double(arr->getSize()));
 }
 
 void nativeArrayFunctions(VM& vm, std::unordered_map<objString*, value>& arrayFunTable)

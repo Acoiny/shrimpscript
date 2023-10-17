@@ -142,7 +142,7 @@ int debug::disassembleInstruction(char inst, chunk *ch, int offset) {
         case OP_CALL:
             return callInstruction("OP_CALL", ch, offset);
         case OP_CLASS:
-            return simpleInstruction("OP_CLASS", ch, offset);
+            return constantInstruction("OP_CLASS", ch, offset);
         case OP_METHOD:
             return constantInstruction("OP_METHOD", ch, offset);
         case OP_MEMBER_VARIABLE:
@@ -173,6 +173,8 @@ int debug::disassembleInstruction(char inst, chunk *ch, int offset) {
             return constantInstruction("OP_INCREMENT_LOCAL", ch, offset);
         case OP_DECREMENT_LOCAL:
             return constantInstruction("OP_DECREMENT_LOCAL", ch, offset);
+        case OP_PULL_INSTANCE_FROM_THIS:
+            return simpleInstruction("OP_THIS_TO_INSTANCE", ch, offset);
         case OP_RETURN:
             return simpleInstruction("OP_RETURN", ch, offset);
         default: {

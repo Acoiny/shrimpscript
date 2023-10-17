@@ -54,9 +54,7 @@ class memoryManager {
     void markObject(obj *obj);
 
     void markValue(value val);
-#ifndef NAN_BOXING
-    void markValue(const value &val);
-#endif
+
     void traceReferences();
 
     void blackenObject(obj *obj);

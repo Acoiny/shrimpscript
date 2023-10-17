@@ -15,7 +15,7 @@ static value nativeMath_Rand(int arity, value* args, bool& success) {
 		firstUse = false;
 		srand(time(NULL));
 	}
-	return value(((double)rand() / (double)RAND_MAX));
+	return NUM_VAL(((double)rand() / (double)RAND_MAX));
 }
 
 static value nativeMath_Sqrt(int arity, value* args, bool& success) {

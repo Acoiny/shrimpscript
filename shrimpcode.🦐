@@ -1,7 +1,26 @@
-fun fib(n) {
-	return n < 2 ? n : fib(n-1) + fib(n-2);
+import 'incl.shrimp';
+
+const profs = [
+				professor('Dumbledore', "Dumbledore's advice"),
+				professor('McGonagall', 'transmutation'),
+				professor('Snape', 'potions')
+				];
+				
+const students = [
+				student('Harry', 4),
+				student('Ron', 4),
+				student('Hermione', 4),
+				student('Draco', 4)
+				];
+
+for(let i = 0; i < profs.len(); ++i) {
+	profs[i].teach(students[0]);
+	if(profs[i].name == 'Dumbledore')
+		continue;
+	profs[i].teach(students[1]);
+	profs[i].teach(students[2]);
 }
 
-const start = clock();
-println(fib(40));
-println(clock() - start);
+for(let i = 0; i < students.len(); ++i) {
+	students[i].print();
+}
