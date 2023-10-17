@@ -76,13 +76,13 @@ class VM {
     }
 
     inline size_t readSizeT() {
-        size_t res = *(ip++) << 56;
-        res |= *(ip++) << 48;
-        res |= *(ip++) << 40;
-        res |= *(ip++) << 32;
-        res |= *(ip++) << 24;
-        res |= *(ip++) << 16;
-        res |= *(ip++) << 8;
+        size_t res = size_t(*(ip++)) << 56;
+        res |= size_t(*(ip++)) << 48;
+        res |= size_t(*(ip++)) << 40;
+        res |= size_t(*(ip++)) << 32;
+        res |= size_t(*(ip++)) << 24;
+        res |= size_t(*(ip++)) << 16;
+        res |= size_t(*(ip++)) << 8;
         res |= *(ip++);
         return res;
     }

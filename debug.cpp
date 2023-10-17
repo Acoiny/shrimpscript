@@ -15,14 +15,15 @@ int debug::constantInstruction(const char *name, chunk *ch, int offset) {
 }
 
 int debug::appendInstruction(const char* name, chunk* ch, int offset) {
-    size_t numElements = (ch->peekByte(offset + 1) << 56) | (ch->peekByte(offset + 2) << 48) | (ch->peekByte(offset + 3) << 40) |
-        (ch->peekByte(offset + 4) << 32) | (ch->peekByte(offset + 5) << 24) | (ch->peekByte(offset + 6) << 16) |
-        (ch->peekByte(offset + 7) << 8) | ch->peekByte(offset + 8);
+    size_t numElements = ((size_t(ch->peekByte(offset + 1)) << 56) | (size_t(ch->peekByte(offset + 2)) << 48) |
+        (size_t(ch->peekByte(offset + 3)) << 40) | (size_t(ch->peekByte(offset + 4)) << 32) |
+        (size_t(ch->peekByte(offset + 5)) << 24) | (size_t(ch->peekByte(offset + 6)) << 16) |
+        (size_t(ch->peekByte(offset + 7)) << 8) | size_t(ch->peekByte(offset + 8)));
     cout.width(4);
     cout << offset;
     cout.width(20);
-    cout << name << " '";
-    cout << numElements << "'" << endl;
+    cout << name;
+    cout << numElements << endl;
     return offset + 9;
 }
 

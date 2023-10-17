@@ -128,7 +128,7 @@ unsigned int objString::getLen() const {
 	return len;
 }
 
-char* objString::getChars() const {
+const char* objString::getChars() const {
 	return chars;
 }
 
