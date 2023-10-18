@@ -111,7 +111,7 @@ void compiler::emitLoop(size_t loopStart) {
     if (dest > UINT16_MAX)
         error("loop body too big");
 
-    emitBytes((dest >> 8) & 0xff, (dest) & 0xff);
+    emitBytes((short(dest >> 8)) & 0xff, (dest) & 0xff);
 }
 
 //expression parsing functions
@@ -577,8 +577,8 @@ void compiler::patchJump(size_t offset) {
     if (jump > UINT16_MAX)
         error("loop body too big");
 
-    currentChunk->accessAt(offset) = (jump >> 8) & 0xff;
-    currentChunk->accessAt(offset + 1) = (jump) & 0xff;
+    currentChunk->accessAt(offset) = char(short(jump >> 8)) & 0xff;
+    currentChunk->accessAt(offset + 1) = char(jump) & 0xff;
 }
 
 void compiler::whileStatement() {

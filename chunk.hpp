@@ -98,7 +98,7 @@ public:
 
     void writeConstant(value constant, unsigned int line);
 
-    inline char peekByte(int index) const {
+    inline unsigned char peekByte(int index) const {
         return code.at(codePos + index);
     }
 

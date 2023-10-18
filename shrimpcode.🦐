@@ -1,5 +1,77 @@
-const str = "
-";
-const str2 = "\n";
-println(str.len());
-println(str != str2);
+const txt =
+"1000
+2000
+3000
+
+4000
+
+5000
+6000
+
+7000
+8000
+9000
+
+10000";
+
+//print(txt);
+const len = txt.len();
+let EOF = false;
+let i = 0;
+
+fun skip() {
+	if(i >= len - 1) {
+		EOF = true;
+		return;
+	}
+	
+	let curr = txt.at(i);
+	
+	while(curr == "\r" or curr == "\n" or curr == " ") {
+		i++;
+		if(i >= len - 1) {
+			EOF = true;
+			return;
+		}
+		curr = txt.at(i);
+	}
+}
+
+fun readSingleNumber() {
+	let numStr = '';
+	while(txt.at(i) != "\n" and !EOF) {
+		//println('-',txt.at(i));
+		numStr = numStr + txt.at(i++);
+		
+		if(i >= len - 1)
+			EOF = true;
+	}
+	//println(numStr);
+	return numStr.number();
+}
+
+fun readOneElf() {
+	
+	let amount = 0;
+	
+	while(!EOF) {
+		skip();
+		if(EOF) break;
+		amount = amount + readSingleNumber();
+		println(txt.at(i) + txt.at(i+1));
+		//println(amount);
+		if(EOF) break;
+		if((i + 1) >= len - 1)
+			break;
+		if(txt.at(i) == "\n" and txt.at(i + 1) == "\n") break;
+		if(txt.at(i) == "\r" and txt.at(i + 1) == "\n") break;
+	}
+	
+	return amount;
+}
+
+println(to_chr(60));
+println('\n:', "\n".chr());
+println('\r:', "\r".chr());
+
+println(readOneElf());
