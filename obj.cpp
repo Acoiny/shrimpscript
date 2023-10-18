@@ -99,7 +99,7 @@ objString* objString::copyStringEscape(const char* chars, const unsigned int len
 
 	auto* str = (objString*)globalMemory.allocateObject<objString>();
 	str->mark();
-	str->init(tmp, len);
+	str->init(tmp, newLen);
 	globalMemory.internedStrings.insert_or_assign(str->chars, str);
 	str->unmark();
 

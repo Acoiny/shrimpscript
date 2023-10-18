@@ -3,6 +3,8 @@
 #include "nativeFunctions.hpp"
 
 #include <unordered_map>
+#include <string>
+
 #include "VM.hpp"
 
 static value nativeString_Len(int arity, value* args, bool& success) {
@@ -92,6 +94,34 @@ static value nativeString_Chr(int arity, value* args, bool& success) {
 	return NUM_VAL(double(res));
 }
 
+static value nativeString_To_String(int arity, value* args, bool& success) {
+	if (arity != 1) {
+		success = false;
+		return nativeFunctions::erro("to_string: expects 1 argument");
+	}
+
+	if (IS_NUM((*args))) {
+		std::string result;
+		if (AS_NUM((*args)) == long(AS_NUM((*args)))) {
+			result = std::to_string(long(AS_NUM((*args))));
+		}
+		else {
+			result = std::to_string(AS_NUM((*args)));
+		}
+		return OBJ_VAL(objString::copyString(result.data(), result.size()));
+	}
+	if(IS_NIL((*args))) {
+		return OBJ_VAL(objString::copyString("nil", 3));
+	}
+	if (IS_BOOL((*args))) {
+		if (AS_BOOL((*args))) {
+			return OBJ_VAL(objString::copyString("true", 4));
+		}
+		return OBJ_VAL(objString::copyString("false", 5));
+	}
+
+	return nativeFunctions::erro("to_string: invalid type");
+}
 
 static value nativeString_To_Chr(int arity, value* args, bool& success) {
 	if (arity != 1) {
@@ -142,14 +172,35 @@ static value nativeString_At(int arity, value* args, bool& success) {
 	return OBJ_VAL(objString::copyString(atChar, 1));
 }
 
+static value nativeString_Number(int arity, value* args, bool& success) {
+	if (arity != 0) {
+		success = false;
+		return nativeFunctions::erro("number: expects 1 argument");
+	}
+
+	auto str = (objString*)AS_OBJ((*args));
+	
+	const char* start = str->getChars();
+
+	if (start[0] >= '0' && start[0] <= '9') {
+		double res = strtod(start, nullptr);
+		return NUM_VAL(res);
+	}
+
+	return NIL_VAL;
+}
+
 void nativeStringFunctions(std::unordered_map<objString*, value>& globals, std::unordered_map<objString*, value>& stringFunTable)
 {
 	//standalone
 	globals.insert_or_assign(objString::copyString("to_chr", 6), OBJ_VAL(objNativeFunction::createNativeFunction(nativeString_To_Chr)));
+	globals.insert_or_assign(objString::copyString("to_string", 9), OBJ_VAL(objNativeFunction::createNativeFunction(nativeString_To_String)));
+
 
 	//tied to string objects
 	stringFunTable.insert_or_assign(objString::copyString("len", 3), OBJ_VAL(objNativeFunction::createNativeFunction(nativeString_Len)));
 	stringFunTable.insert_or_assign(objString::copyString("slice", 5), OBJ_VAL(objNativeFunction::createNativeFunction(nativeString_Slice)));
 	stringFunTable.insert_or_assign(objString::copyString("chr", 3), OBJ_VAL(objNativeFunction::createNativeFunction(nativeString_Chr)));
 	stringFunTable.insert_or_assign(objString::copyString("at", 2), OBJ_VAL(objNativeFunction::createNativeFunction(nativeString_At)));
+	stringFunTable.insert_or_assign(objString::copyString("number", 6), OBJ_VAL(objNativeFunction::createNativeFunction(nativeString_Number)));
 }

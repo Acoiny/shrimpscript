@@ -1,5 +1,5 @@
-for(let i = 10; i > 0; --i) {
-	if(i > 1000)
-		break;
-	println(i);
-}
+const str = "
+";
+const str2 = "\n";
+println(str.len());
+println(str != str2);

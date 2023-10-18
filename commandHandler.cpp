@@ -54,7 +54,8 @@ void commandHandler::printNativeFunctions()
 		"input(arg)\t\tawaits user input in standard input after printing optional argument\n\n"
 		"open(arg, mode)\t\ttakes a path and returns the file object if succeeding in read(\"r\") or write(\"w\") mode, defaults to read\n\n"
 		"to_chr(arg)\t\treturns the character corresponding to the given ascii number\n\n"
-		"collectGarbage()\t\truns the garbage collector and returns the number of collected bytes\n" << endl;
+		"to_string(arg)\t\ttries to convert a value to a string\n\n"
+		"collectGarbage()\truns the garbage collector and returns the number of collected bytes\n" << endl;
 	
 	string tmp;
 	cout << "quit(q) or continue(any)";
@@ -102,7 +103,8 @@ void commandHandler::printNativeStringFunctions()
 		"len()\t\t\treturns the length of the string\n\n"
 		"slice(index, index)\ttakes two indices and returns a substring from these positions\n\n"
 		"chr(index)\t\treturns the ascii number of the character at given index, defaults to first character\n\n"
-		"at(index)\t\treturns the character at the given index\n" << endl;
+		"at(index)\t\treturns the character at the given index\n\n"
+		"number()\t\ttries to convert string to number and returns result or nil if failed\n" << endl;
 }
 
 void commandHandler::printNativeListFunctions()
