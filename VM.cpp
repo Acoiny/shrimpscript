@@ -1022,7 +1022,8 @@ exitCodes VM::run() {
                 break;
             }
             case OP_PULL_INSTANCE_FROM_THIS: {
-                objThis* th = (objThis*)(AS_OBJ(pop()));
+                value val = activeCallFrameBottom[-1];
+                objThis* th = (objThis*)(AS_OBJ(val));
                 push(OBJ_VAL(th->this_instance));
                 break;
             }

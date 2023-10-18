@@ -67,7 +67,7 @@ class VM {
     template<typename ...Ts>
     bool runtimeError(const char *msg, Ts... args);
 
-    inline char readByte() { return *(ip++); }
+    inline unsigned char readByte() { return *(ip++); }
 
     inline short readShort() {
         short res = readByte() << 8;

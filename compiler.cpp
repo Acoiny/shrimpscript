@@ -984,8 +984,6 @@ void compiler::function() {
     consume("expected '{' before function body", TOKEN_BRACE_OPEN);
     block();
     if (currentPosition == TYPE_INIT) {
-        emitByte(OP_GET_LOCAL);
-        emitBytes(0, -1);
         emitByte(OP_PULL_INSTANCE_FROM_THIS);
     }
     else {
