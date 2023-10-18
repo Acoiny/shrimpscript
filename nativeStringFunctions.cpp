@@ -89,7 +89,7 @@ static value nativeString_Chr(int arity, value* args, bool& success) {
 
 	unsigned char res = str->getChars()[index];
 
-	return OBJ_VAL(double(res));
+	return NUM_VAL(double(res));
 }
 
 
