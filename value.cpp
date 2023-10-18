@@ -24,7 +24,10 @@ static std::ostream& printObject(std::ostream& os, obj* object) {
 		os << "<class " << cl->name->getChars() << ">";
 		break;
 	}
-	case OBJ_NAT_INSTANCE:
+	case OBJ_NAT_INSTANCE: {
+		os << "<native instance>";
+		break;
+	}
 	case OBJ_INSTANCE: {
 		auto* cl = (objInstance*)object;
 		os << "<" << cl->klass->getName()->getChars() << " instance>";
