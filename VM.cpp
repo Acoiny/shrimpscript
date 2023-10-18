@@ -557,7 +557,7 @@ bool VM::setObjectIndex(obj* object, value index, value val) {
         if (!validateIndex(AS_NUM(index), len)) {
             return runtimeError("invalid index, list has size '", len, "'");
         }
-        list->getValueAt(AS_NUM(index)) = val;
+        list->setValueAt(AS_NUM(index), val);
         return true;
     }
     case OBJ_MAP: {

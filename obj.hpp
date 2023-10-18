@@ -206,6 +206,7 @@ public:
     inline size_t getSize() { return data.size(); }
 
     inline value getValueAt(size_t index) { return data.at(index); }
+    inline void setValueAt(size_t index, value val) { data.at(index) = val; }
 
     void appendValue(value val);
 

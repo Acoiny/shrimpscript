@@ -39,7 +39,7 @@ fun skip() {
 
 fun readSingleNumber() {
 	let numStr = '';
-	while(txt.at(i) != "\n" and !EOF) {
+	while((txt.at(i) != "\n" and txt.at(i) != "\r") and !EOF) {
 		//println('-',txt.at(i));
 		numStr = numStr + txt.at(i++);
 		
@@ -58,11 +58,12 @@ fun readOneElf() {
 		skip();
 		if(EOF) break;
 		amount = amount + readSingleNumber();
-		println(txt.at(i) + txt.at(i+1));
 		//println(amount);
 		if(EOF) break;
-		if((i + 1) >= len - 1)
+		if((i + 1) >= (len - 1)) {
 			break;
+		}
+		println(txt.at(i), " - ", txt.at(i).chr(), " -- ", txt.at(i+1), " - " , txt.at(i+1).chr());
 		if(txt.at(i) == "\n" and txt.at(i + 1) == "\n") break;
 		if(txt.at(i) == "\r" and txt.at(i + 1) == "\n") break;
 	}
