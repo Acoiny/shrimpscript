@@ -1,7 +1,8 @@
 Features to implement:
 
 -stack trace
-
+-improve error reporting
+-make global const checking runtime?
 
 
 -NaN boxing -- IN TESTING
