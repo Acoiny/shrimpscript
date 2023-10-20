@@ -6,7 +6,7 @@ static value nativeArray_Len(int arity, value* args, bool& success) {
 	if (arity != 0) {
 		
 		success = false;
-		return nativeFunctions::erro("len: expected 0 arguments");
+		return nativeFunctions::error("len: expected 0 arguments");
 	}
 
 	double len = ((objList*)AS_OBJ((*args)))->getSize();
@@ -18,7 +18,7 @@ static value nativeArray_Append(int arity, value* args, bool& success) {
 	if (arity != 1) {
 		
 		success = false;
-		return nativeFunctions::erro("append: expected 1 argument");
+		return nativeFunctions::error("append: expected 1 argument");
 	}
 
 	auto *arr = ((objList*)AS_OBJ(args[0]));
@@ -31,13 +31,13 @@ static value nativeArray_Insert(int arity, value* args, bool& success) {
 	if (arity != 2) {
 		
 		success = false;
-		return nativeFunctions::erro("insert: expected 2 arguments");
+		return nativeFunctions::error("insert: expected 2 arguments");
 	}
 
 	if (!IS_NUM(args[1])) {
 		
 		success = false;
-		return nativeFunctions::erro("insert: expected index as first argument");
+		return nativeFunctions::error("insert: expected index as first argument");
 	}
 
 	auto* arr = ((objList*)AS_OBJ(args[0]));
@@ -45,7 +45,7 @@ static value nativeArray_Insert(int arity, value* args, bool& success) {
 	if (AS_NUM(args[1]) > arr->getSize() || AS_NUM(args[1]) < 0) {
 		
 		success = false;
-		return nativeFunctions::erro("insert: invalid index");
+		return nativeFunctions::error("insert: invalid index");
 	}
 
 	auto it = arr->data.begin() + AS_NUM(args[1]);

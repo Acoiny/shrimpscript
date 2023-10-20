@@ -9,7 +9,7 @@ static value nativeMath_Rand(int arity, value* args, bool& success) {
 	if (arity != 0) {
 		
 		success = false;
-		return nativeFunctions::erro("Math.rand expects 0 arguments");
+		return nativeFunctions::error("Math.rand expects 0 arguments");
 	}
 	if (firstUse) {
 		firstUse = false;
@@ -22,13 +22,13 @@ static value nativeMath_Sqrt(int arity, value* args, bool& success) {
 	if (arity != 1) {
 		
 		success = false;
-		return nativeFunctions::erro("Math.sqrt expects 1 argument");
+		return nativeFunctions::error("Math.sqrt expects 1 argument");
 	}
 
 	if (!IS_NUM((*args))) {
 		
 		success = false;
-		return nativeFunctions::erro("Math.sqrt argument must be a number");
+		return nativeFunctions::error("Math.sqrt argument must be a number");
 	}
 
 	return NUM_VAL(sqrt(AS_NUM((*args))));
@@ -38,13 +38,13 @@ static value nativeMath_Floor(int arity, value* args, bool& success) {
 	if (arity != 1) {
 		
 		success = false;
-		return nativeFunctions::erro("Math.floor expects 1 argument");
+		return nativeFunctions::error("Math.floor expects 1 argument");
 	}
 
 	if (!IS_NUM((*args))) {
 		
 		success = false;
-		return nativeFunctions::erro("Math.floor argument must be a number");
+		return nativeFunctions::error("Math.floor argument must be a number");
 	}
 
 	return NUM_VAL(floor(AS_NUM((*args))));
@@ -54,13 +54,13 @@ static value nativeMath_Ceil(int arity, value* args, bool& success) {
 	if (arity != 1) {
 		
 		success = false;
-		return nativeFunctions::erro("Math.sqrt expects 1 argument");
+		return nativeFunctions::error("Math.sqrt expects 1 argument");
 	}
 
 	if (!IS_NUM((*args))) {
 		
 		success = false;
-		return nativeFunctions::erro("Math.sqrt argument must be a number");
+		return nativeFunctions::error("Math.sqrt argument must be a number");
 	}
 
 	return NUM_VAL(ceil(AS_NUM((*args))));

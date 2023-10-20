@@ -19,7 +19,7 @@ typedef value(nativeFunctionType)(obj* object);
 static value nativeClock(int arity, value* args, bool& success) {
 	if (arity != 0) {
 		success = false;
-		return nativeFunctions::erro("clock: expect 0 arguments");
+		return nativeFunctions::error("clock: expect 0 arguments");
 	}
 
 	double time = double(std::clock()) / CLOCKS_PER_SEC;
@@ -30,7 +30,7 @@ static value nativeClock(int arity, value* args, bool& success) {
 static value nativePrint(int arity, value* args, bool& success) {
 	if (arity < 1) {
 		success = false;
-		return nativeFunctions::erro("print: expects at least 1 argument");
+		return nativeFunctions::error("print: expects at least 1 argument");
 	}
 
 	for (int i = 0; i < arity; ++i) {
@@ -42,7 +42,7 @@ static value nativePrint(int arity, value* args, bool& success) {
 static value nativePrintLine(int arity, value* args, bool& success) {
 	if (arity < 1) {
 		success = false;
-		return nativeFunctions::erro("println: expects at least 1 argument");
+		return nativeFunctions::error("println: expects at least 1 argument");
 	}
 
 	for (int i = 0; i < arity; ++i) {
@@ -55,7 +55,7 @@ static value nativePrintLine(int arity, value* args, bool& success) {
 static value native_Type(int argc, value* args, bool& success) {
 	if (argc != 1) {
 		success = false;
-		return nativeFunctions::erro("type: expects 1 argument");
+		return nativeFunctions::error("type: expects 1 argument");
 	}
 
 	if(IS_NIL((*args)))
@@ -141,7 +141,7 @@ static value native_Type(int argc, value* args, bool& success) {
 static value native_Input(int arity, value* args, bool& success) {
 	if (arity > 1) {
 		success = false;
-		return nativeFunctions::erro("input: 1 or less arguments");
+		return nativeFunctions::error("input: 1 or less arguments");
 	}
 
 	if (arity == 1) {
@@ -201,25 +201,25 @@ static value native_Input(int arity, value* args, bool& success) {
 static value native_Open(int arity, value* args, bool& success) {
 	value a = args[0];
 	value b = args[1];
-	if (arity > 2) {
+	if (arity > 2 || arity < 1) {
 		success = false;
-		return nativeFunctions::erro("open: expects 1 or 2 arguments");
+		return nativeFunctions::error("open: expects 1 or 2 arguments");
 	}
 	if (!(IS_OBJ(args[0]) && AS_OBJ(args[0])->getType() == OBJ_STR)) {
 		success = false;
-		return nativeFunctions::erro("open: expects filename");
+		return nativeFunctions::error("open: expects filename");
 	}
 	objFile* file;
 	if (arity == 2) {
 		if (!(IS_OBJ(args[1]) && AS_OBJ(args[1])->getType() == OBJ_STR)) {
 			success = false;
-			return nativeFunctions::erro("open: mode must be a string");
+			return nativeFunctions::error("open: mode must be a string");
 		}
 
 		objString* mode = (objString*)(AS_OBJ(args[1]));
 		if (mode->getLen() != 1) {
 			success = false;
-			return nativeFunctions::erro("open: invalid mode");
+			return nativeFunctions::error("open: invalid mode");
 		}
 		if (mode->getChars()[0] == 'r') {
 			file = objFile::createReadFile((objString*)AS_OBJ(args[0]));
@@ -229,7 +229,7 @@ static value native_Open(int arity, value* args, bool& success) {
 		}
 		else {
 			success = false;
-			return nativeFunctions::erro("open: invalid mode");
+			return nativeFunctions::error("open: invalid mode");
 		}
 	}
 	else {
@@ -238,7 +238,7 @@ static value native_Open(int arity, value* args, bool& success) {
 
 	if (!file->isOpen()) {
 		success = false;
-		return nativeFunctions::erro("open: error opening file");
+		return nativeFunctions::error("open: error opening file");
 	}
 
 	return OBJ_VAL(file);
@@ -246,7 +246,7 @@ static value native_Open(int arity, value* args, bool& success) {
 
 static value native_GC(int arity, value* args, bool& success) {
 	if (arity != 0) {
-		nativeFunctions::erro("collectGarbage: expects 0 arguments");
+		nativeFunctions::error("collectGarbage: expects 0 arguments");
 		return NIL_VAL;
 	}
 
@@ -278,7 +278,7 @@ void nativeFunctions::initNatives(VM& vm) {
 	vm.globals.insert_or_assign(objString::copyString("Math", 4), OBJ_VAL(math));
 }
 
-value nativeFunctions::erro(const char* msg)
+value nativeFunctions::error(const char* msg)
 {
 	return OBJ_VAL(objString::copyString(msg, strlen(msg)));
 }

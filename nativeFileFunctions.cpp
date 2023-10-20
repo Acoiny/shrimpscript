@@ -8,7 +8,7 @@ static value nativeFile_read(int arity, value* args, bool& success) {
 	if (arity != 0) {
 		
 		success = false;
-		return nativeFunctions::erro("read: expected 0 arguments");
+		return nativeFunctions::error("read: expected 0 arguments");
 	}
 
 	auto* file = (objFile*)AS_OBJ((*args));
@@ -16,7 +16,7 @@ static value nativeFile_read(int arity, value* args, bool& success) {
 	if (!file->isOpen()) {
 		
 		success = false;
-		return nativeFunctions::erro("read: file is closed");
+		return nativeFunctions::error("read: file is closed");
 	}
 
 	char* tmp = new char[file->fileSize];
@@ -29,7 +29,7 @@ static value nativeFile_close(int arity, value* args, bool& success) {
 	if (arity != 0) {
 		
 		success = false;
-		return nativeFunctions::erro("close: expected 0 arguments");
+		return nativeFunctions::error("close: expected 0 arguments");
 	}
 
 	auto* file = (objFile*)AS_OBJ((*args));
@@ -41,7 +41,7 @@ static value nativeFile_close(int arity, value* args, bool& success) {
 	else {
 		
 		success = false;
-		return nativeFunctions::erro("close: file is already closed");
+		return nativeFunctions::error("close: file is already closed");
 	}
 }
 
@@ -49,12 +49,12 @@ static value nativeFile_write(int arity, value* args, bool& success) {
 	if (arity != 1) {
 		
 		success = false;
-		return nativeFunctions::erro("write: expected 1 argument");
+		return nativeFunctions::error("write: expected 1 argument");
 	}
 	if (!(IS_OBJ(args[1]) && AS_OBJ(args[1])->getType() == OBJ_STR)) {
 		
 		success = false;
-		return nativeFunctions::erro("write: can only write strings");
+		return nativeFunctions::error("write: can only write strings");
 	}
 
 	auto* file = (objFile*)AS_OBJ(args[0]);
@@ -63,10 +63,11 @@ static value nativeFile_write(int arity, value* args, bool& success) {
 	if (!file->isOpen()) {
 		
 		success = false;
-		return nativeFunctions::erro("write: file is closed");
+		return nativeFunctions::error("write: file is closed");
 	}
 
-	file->file.write(str->getChars(), str->getLen());
+	
+	file->file << str->getChars();
 
 	return NIL_VAL;
 }

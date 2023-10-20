@@ -8,5 +8,5 @@ class nativeFunctions {
 public:
     static void initNatives(VM &vm);
 
-    static value erro(const char* msg);
+    static value error(const char* msg);
 };

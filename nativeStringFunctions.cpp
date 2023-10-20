@@ -11,7 +11,7 @@ static value nativeString_Len(int arity, value* args, bool& success) {
 	if (arity != 0) {
 		
 		success = false;
-		return nativeFunctions::erro("len: expects 0 arguments");
+		return nativeFunctions::error("len: expects 0 arguments");
 	}
 
 	double len = ((objString*)(AS_OBJ((*args))))->getLen();
@@ -24,18 +24,18 @@ static value nativeString_Slice(int arity, value* args, bool& success) {
 	if (arity < 1 || arity > 2) {
 		
 		success = false;
-		return nativeFunctions::erro("cut: expects 1 or 2 arguments");
+		return nativeFunctions::error("cut: expects 1 or 2 arguments");
 	}
 
 	if (!IS_NUM(args[1])) {
 		
 		success = false;
-		return nativeFunctions::erro("cut: arguments must be numbers");
+		return nativeFunctions::error("cut: arguments must be numbers");
 	}
 	if (arity == 2 && IS_NUM(args[2])) {
 		
 		success = false;
-		return nativeFunctions::erro("cut: arguments must be numbers");
+		return nativeFunctions::error("cut: arguments must be numbers");
 	}
 	objString* str = ((objString*)(AS_OBJ(args[0])));
 	double len = str->getLen();
@@ -52,19 +52,19 @@ static value nativeString_Slice(int arity, value* args, bool& success) {
 	if (indexOne < 0 || indexTwo < 0) {
 		
 		success = false;
-		return nativeFunctions::erro("slice: substring can't be created with negativ indices");
+		return nativeFunctions::error("slice: substring can't be created with negativ indices");
 	}
 
 	if (indexTwo >= len) {
 		
 		success = false;
-		return nativeFunctions::erro("slice: second index must be lesser than string length");
+		return nativeFunctions::error("slice: second index must be lesser than string length");
 	}
 
 	if (indexOne > indexTwo) {
 		
 		success = false;
-		return nativeFunctions::erro("slice: first index must be lesser than second index");
+		return nativeFunctions::error("slice: first index must be lesser than second index");
 	}
 
 
@@ -75,7 +75,7 @@ static value nativeString_Chr(int arity, value* args, bool& success) {
 	if (arity > 1) {
 		
 		success = false;
-		return nativeFunctions::erro("chr: expects 1 argument");
+		return nativeFunctions::error("chr: expects 1 argument");
 	}
 	objString* str = (objString*)AS_OBJ(args[0]);
 	unsigned int index = 0;
@@ -84,7 +84,7 @@ static value nativeString_Chr(int arity, value* args, bool& success) {
 		if (!IS_NUM(args[1]) || AS_NUM(args[1]) >= (str->getLen())) {
 			
 			success = false;
-			return nativeFunctions::erro("chr: invalid index");
+			return nativeFunctions::error("chr: invalid index");
 		}
 		index = AS_NUM(args[1]);
 	}
@@ -97,7 +97,7 @@ static value nativeString_Chr(int arity, value* args, bool& success) {
 static value nativeString_To_String(int arity, value* args, bool& success) {
 	if (arity != 1) {
 		success = false;
-		return nativeFunctions::erro("to_string: expects 1 argument");
+		return nativeFunctions::error("to_string: expects 1 argument");
 	}
 
 	if (IS_NUM((*args))) {
@@ -120,20 +120,20 @@ static value nativeString_To_String(int arity, value* args, bool& success) {
 		return OBJ_VAL(objString::copyString("false", 5));
 	}
 
-	return nativeFunctions::erro("to_string: invalid type");
+	return nativeFunctions::error("to_string: invalid type");
 }
 
 static value nativeString_To_Chr(int arity, value* args, bool& success) {
 	if (arity != 1) {
 		
 		success = false;
-		return nativeFunctions::erro("to_chr: expects 1 argument");
+		return nativeFunctions::error("to_chr: expects 1 argument");
 	}
 
 	if (!IS_NUM((*args))) {
 		
 		success = false;
-		return nativeFunctions::erro("to_chr: argument must be a number");
+		return nativeFunctions::error("to_chr: argument must be a number");
 	}
 
 	char chr[1];
@@ -145,12 +145,12 @@ static value nativeString_To_Chr(int arity, value* args, bool& success) {
 static value nativeString_At(int arity, value* args, bool& success) {
 	if (arity != 1) {
 		success = false;
-		return nativeFunctions::erro("at: expects 1 argument");
+		return nativeFunctions::error("at: expects 1 argument");
 	}
 	if (!IS_NUM(args[1])) {
 		
 		success = false;
-		return nativeFunctions::erro("at: index must be a number");
+		return nativeFunctions::error("at: index must be a number");
 	}
 
 	int index = AS_NUM(args[1]);
@@ -160,7 +160,7 @@ static value nativeString_At(int arity, value* args, bool& success) {
 	if (index >= (int)str->getLen()) {
 		
 		success = false;
-		return nativeFunctions::erro("at: invalid index");
+		return nativeFunctions::error("at: invalid index");
 	}
 
 	while (index < 0) {
@@ -175,7 +175,7 @@ static value nativeString_At(int arity, value* args, bool& success) {
 static value nativeString_Number(int arity, value* args, bool& success) {
 	if (arity != 0) {
 		success = false;
-		return nativeFunctions::erro("number: expects 1 argument");
+		return nativeFunctions::error("number: expects 1 argument");
 	}
 
 	auto str = (objString*)AS_OBJ((*args));

@@ -160,5 +160,6 @@
     <Text Include="TODO.txt">
       <Filter>Text</Filter>
     </Text>
+    <Text Include="test.txt" />
   </ItemGroup>
 </Project>
