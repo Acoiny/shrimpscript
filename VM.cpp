@@ -952,6 +952,10 @@ exitCodes VM::run() {
 
                 break;
             }
+            case OP_MAP: {
+                push(OBJ_VAL(objMap::createMap()));
+                break;
+            }
             case OP_MAP_APPEND: {
                 size_t len = readSizeT();
                 objMap* map = (objMap*)AS_OBJ(peek(len * 2));

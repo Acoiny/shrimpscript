@@ -73,6 +73,7 @@ enum opCodes : char {
     OP_GET_INDEX,
     OP_SET_INDEX,
 
+    OP_MAP,
     OP_MAP_APPEND,
 
     OP_THIS,

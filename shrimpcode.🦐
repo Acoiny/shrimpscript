@@ -1,5 +1,9 @@
-const str = "hello world";
+fun test() {
+	let arr = {};
+	
+	return arr;
+}
 
-const sub = str.slice(0,0);
-
-println(sub);
+let a = test();
+a[0] = 123;
+println(test());

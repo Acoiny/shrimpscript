@@ -402,7 +402,7 @@ void compiler::list(bool canAssign, compiler& cmp) {
 void compiler::map(bool canAssign, compiler& cmp) {
     size_t len = 0;
     
-    cmp.currentChunk->writeConstant(OBJ_VAL(objMap::createMap()), cmp.prevToken.line);
+    cmp.emitByte(OP_MAP);
 
     if (!cmp.check(TOKEN_BRACE_CLOSE)) {
         do {
