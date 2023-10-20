@@ -46,7 +46,7 @@ static value nativeString_Slice(int arity, value* args, bool& success) {
 		indexTwo = AS_NUM(args[2]);
 	}
 	else {
-		indexTwo = len;
+		indexTwo = len - 1;
 	}
 
 	if (indexOne < 0 || indexTwo < 0) {
@@ -68,7 +68,7 @@ static value nativeString_Slice(int arity, value* args, bool& success) {
 	}
 
 
-	return OBJ_VAL(objString::copyString(str->getChars() + uint64_t(indexOne), uint64_t(indexTwo)));
+	return OBJ_VAL(objString::copyString(str->getChars() + uint64_t(indexOne), uint64_t(indexTwo - indexOne + 1)));
 }
 
 static value nativeString_Chr(int arity, value* args, bool& success) {
