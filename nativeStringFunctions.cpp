@@ -32,7 +32,7 @@ static value nativeString_Slice(int arity, value* args, bool& success) {
 		success = false;
 		return nativeFunctions::error("cut: arguments must be numbers");
 	}
-	if (arity == 2 && IS_NUM(args[2])) {
+	if (arity == 2 && !IS_NUM(args[2])) {
 		
 		success = false;
 		return nativeFunctions::error("cut: arguments must be numbers");
