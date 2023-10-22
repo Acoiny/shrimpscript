@@ -4,6 +4,8 @@
 #include "value.hpp"
 #include "nativeFunctions.hpp"
 
+#include <string>
+
 static value nativeFile_read(int arity, value* args, bool& success) {
 	if (arity != 0) {
 		
@@ -23,6 +25,28 @@ static value nativeFile_read(int arity, value* args, bool& success) {
 	file->file.read(tmp, file->fileSize);
 
 	return OBJ_VAL(objString::copyString(tmp, file->fileSize));
+}
+
+static value nativeFile_getline(int arity, value* args, bool& success) {
+	if (arity != 0) {
+		success = false;
+		return nativeFunctions::error("getline: expected 0 arguments");
+	}
+
+	auto* file = (objFile*)AS_OBJ((*args));
+
+	if (!file->isOpen()) {
+
+		success = false;
+		return nativeFunctions::error("read: file is closed");
+	}
+
+	std::string tmp;
+	if (!std::getline(file->file, tmp)) {
+		return NIL_VAL;
+	}
+
+	return OBJ_VAL(objString::copyString(tmp.data(), tmp.size()));
 }
 
 static value nativeFile_close(int arity, value* args, bool& success) {
@@ -77,5 +101,6 @@ void nativeFileFunctions(VM& vm, std::unordered_map<objString*, value>& fileFunT
 	fileFunTable.insert_or_assign(objString::copyString("read", 4), OBJ_VAL(objNativeFunction::createNativeFunction(nativeFile_read)));
 	fileFunTable.insert_or_assign(objString::copyString("close", 5), OBJ_VAL(objNativeFunction::createNativeFunction(nativeFile_close)));
 	fileFunTable.insert_or_assign(objString::copyString("write", 5), OBJ_VAL(objNativeFunction::createNativeFunction(nativeFile_write)));
+	fileFunTable.insert_or_assign(objString::copyString("getline", 7), OBJ_VAL(objNativeFunction::createNativeFunction(nativeFile_getline)));
 
 }

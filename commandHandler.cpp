@@ -123,6 +123,7 @@ void commandHandler::printNativeFileFunctions()
 		"File Functions:\n" << NONE <<
 		"these functions can only be used on file objects, returned by the open() function\n\n"
 		"read()\t\treturns the contents of the file as a string\n\n"
+		"getline()\t\treturns a string, or nil if end of file is reached\n\n"
 		"write(msg)\t\twrites a string to the file, must be opened in write-mode\n\n"
 		"close()\t\tcloses a file, note that the garbage collector eventually automatically closes files, but at an undetermined time\n" << endl;
 }
