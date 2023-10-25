@@ -2,7 +2,6 @@
 
 #include "obj.hpp"
 
-#include <cstdint>
 
 #ifdef NAN_BOXING
 

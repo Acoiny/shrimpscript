@@ -1,8 +1,9 @@
-const file = open('test.txt');
-
-let line = file.getline();
-
-while(line) {
-	println(line);
-	line = file.getline();
+fun a() {
+	"" + 1;
 }
+
+fun b() {
+	a();
+}
+
+b();

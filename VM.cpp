@@ -1076,8 +1076,16 @@ template<typename... Ts>
 bool VM::runtimeError(const char *msg, Ts... args) {
 
     unsigned int line = activeFunc->getChunkPtr()->getLine((ip - activeFunc->getChunkPtr()->getInstructionPointer()));
+
     std::cerr << "[line " << line << "] -> " << msg;
     (std::cerr << ... << args);
     std::cerr << std::endl;
+
+    //simple stack traceback
+    if (callDepth > 0) {
+        for (size_t i = callDepth - 1; i > 0; i--) {
+            std::cerr << "[in function] -> " << callFrames[i].func->name->getChars() << std::endl;
+        }
+    }
     return false;
 }

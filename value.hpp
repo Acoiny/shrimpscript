@@ -4,6 +4,8 @@
 #include <iostream>
 #include <cstring>
 
+#include <cstdint>
+
 #include "defines.hpp"
 
 #ifdef NAN_BOXING
