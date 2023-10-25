@@ -1,9 +1,5 @@
-fun a() {
-	"" + 1;
-}
+const arr = ["a", "b", "c"];
 
-fun b() {
-	a();
-}
+arr.pop(3);
 
-b();
+println(arr);
