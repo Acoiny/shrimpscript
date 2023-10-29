@@ -6,7 +6,7 @@
 
 #include <cstdint>
 
-#include "defines.hpp"
+#include "../defines.hpp"
 
 #ifdef NAN_BOXING
 

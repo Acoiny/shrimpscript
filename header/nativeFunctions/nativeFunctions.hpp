@@ -1,6 +1,6 @@
 #pragma once
 
-#include "value.hpp"
+#include "../virtualMachine/value.hpp"
 
 class VM;
 

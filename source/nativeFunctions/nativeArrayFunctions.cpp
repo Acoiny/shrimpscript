@@ -1,6 +1,6 @@
-#include "nativeArrayFunctions.hpp"
+#include "../../header/nativeFunctions/nativeArrayFunctions.hpp"
 
-#include "nativeFunctions.hpp"
+#include "../../header/nativeFunctions/nativeFunctions.hpp"
 
 static value nativeArray_Len(int arity, value* args, bool& success) {
 	if (arity != 0) {

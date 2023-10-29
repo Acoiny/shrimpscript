@@ -1,5 +1,5 @@
 #pragma once
 
-#include "VM.hpp"
+#include "../virtualMachine/VM.hpp"
 
 void nativeMathFunctions(VM& vm, objNativeInstance* math);

@@ -1,13 +1,14 @@
-#include "nativeFunctions.hpp"
+#include "../../header/nativeFunctions/nativeFunctions.hpp"
 
-#include "nativeStringFunctions.hpp"
-#include "nativeArrayFunctions.hpp"
-#include "nativeMathFunctions.hpp"
-#include "nativeFileFunctions.hpp"
+#include "../../header/nativeFunctions/nativeStringFunctions.hpp"
+#include "../../header/nativeFunctions/nativeArrayFunctions.hpp"
+#include "../../header/nativeFunctions/nativeMathFunctions.hpp"
+#include "../../header/nativeFunctions/nativeFileFunctions.hpp"
 
-#include "value.hpp"
-#include "obj.hpp"
-#include "VM.hpp"
+#include "../../header/virtualMachine/value.hpp"
+#include "../../header/virtualMachine/obj.hpp"
+#include "../../header/virtualMachine/VM.hpp"
+
 #include <ctime>
 
 //to allow initiating garbage collector

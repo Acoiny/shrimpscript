@@ -2,7 +2,7 @@
 
 #include <unordered_map>
 
-#include "value.hpp"
+#include "../virtualMachine/value.hpp"
 
 class VM;
 class objString;

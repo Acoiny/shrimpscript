@@ -1,8 +1,8 @@
-#include "nativeFileFunctions.hpp"
+#include "../../header/nativeFunctions/nativeFileFunctions.hpp"
 
-#include "obj.hpp"
-#include "value.hpp"
-#include "nativeFunctions.hpp"
+#include "../../header/virtualMachine/obj.hpp"
+#include "../../header/virtualMachine/value.hpp"
+#include "../../header/nativeFunctions/nativeFunctions.hpp"
 
 #include <string>
 

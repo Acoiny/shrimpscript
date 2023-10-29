@@ -1,4 +1,4 @@
-#include "chunk.hpp"
+#include "../../header/virtualMachine/chunk.hpp"
 
 void chunk::addByte(char byte, unsigned int line) {
     lines.push_back(line);

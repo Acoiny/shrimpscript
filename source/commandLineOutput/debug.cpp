@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "debug.hpp"
+#include "../../header/commandLineOutput/debug.hpp"
 
 using namespace std;
 

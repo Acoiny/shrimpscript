@@ -1,6 +1,6 @@
-#include "nativeMathFunctions.hpp"
+#include "../../header/nativeFunctions/nativeMathFunctions.hpp"
 
-#include "nativeFunctions.hpp"
+#include "../../header/nativeFunctions/nativeFunctions.hpp"
 
 #include <cmath>
 

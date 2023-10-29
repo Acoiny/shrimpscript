@@ -1,11 +1,11 @@
-#include "compiler.hpp"
+#include "../header/compiler.hpp"
 
 #include <iostream>
 #include <cstring>
 
-#include "defines.hpp"
-#include "debug.hpp"
-#include "VM.hpp"
+#include "../header/defines.hpp"
+
+#include "../header/virtualMachine/VM.hpp"
 
 #ifdef DEBUG_PRINT_CODE
 #include "debug.hpp"

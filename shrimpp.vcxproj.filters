@@ -36,53 +36,53 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="compiler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="memoryManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="scanner.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="nativeFunctions.cpp">
-      <Filter>Source Files\Native Functions</Filter>
-    </ClCompile>
-    <ClCompile Include="nativeStringFunctions.cpp">
-      <Filter>Source Files\Native Functions</Filter>
-    </ClCompile>
-    <ClCompile Include="nativeArrayFunctions.cpp">
-      <Filter>Source Files\Native Functions</Filter>
-    </ClCompile>
-    <ClCompile Include="nativeMathFunctions.cpp">
-      <Filter>Source Files\Native Functions</Filter>
-    </ClCompile>
-    <ClCompile Include="nativeFileFunctions.cpp">
-      <Filter>Source Files\Native Functions</Filter>
-    </ClCompile>
-    <ClCompile Include="runFile.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="chunk.cpp">
+    <ClCompile Include="source\virtualMachine\chunk.cpp">
       <Filter>Source Files\Virtual Machine</Filter>
     </ClCompile>
-    <ClCompile Include="obj.cpp">
+    <ClCompile Include="source\virtualMachine\memoryManager.cpp">
       <Filter>Source Files\Virtual Machine</Filter>
     </ClCompile>
-    <ClCompile Include="value.cpp">
+    <ClCompile Include="source\virtualMachine\obj.cpp">
       <Filter>Source Files\Virtual Machine</Filter>
     </ClCompile>
-    <ClCompile Include="VM.cpp">
+    <ClCompile Include="source\virtualMachine\value.cpp">
       <Filter>Source Files\Virtual Machine</Filter>
     </ClCompile>
-    <ClCompile Include="debug.cpp">
+    <ClCompile Include="source\virtualMachine\VM.cpp">
+      <Filter>Source Files\Virtual Machine</Filter>
+    </ClCompile>
+    <ClCompile Include="source\commandLineOutput\commandHandler.cpp">
       <Filter>Source Files\Output</Filter>
     </ClCompile>
-    <ClCompile Include="commandHandler.cpp">
+    <ClCompile Include="source\commandLineOutput\debug.cpp">
       <Filter>Source Files\Output</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nativeFunctions\nativeArrayFunctions.cpp">
+      <Filter>Source Files\Native Functions</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nativeFunctions\nativeFileFunctions.cpp">
+      <Filter>Source Files\Native Functions</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nativeFunctions\nativeFunctions.cpp">
+      <Filter>Source Files\Native Functions</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nativeFunctions\nativeMathFunctions.cpp">
+      <Filter>Source Files\Native Functions</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nativeFunctions\nativeStringFunctions.cpp">
+      <Filter>Source Files\Native Functions</Filter>
+    </ClCompile>
+    <ClCompile Include="source\compiler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\runFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\scanner.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -94,62 +94,62 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="defines.hpp">
+    <ClInclude Include="header\compiler.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="compiler.hpp">
+    <ClInclude Include="header\defines.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="memoryManager.hpp">
+    <ClInclude Include="header\runFile.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="nativeStringFunctions.hpp">
-      <Filter>Header Files\Native Functions</Filter>
-    </ClInclude>
-    <ClInclude Include="nativeFunctions.hpp">
-      <Filter>Header Files\Native Functions</Filter>
-    </ClInclude>
-    <ClInclude Include="nativeMathFunctions.hpp">
-      <Filter>Header Files\Native Functions</Filter>
-    </ClInclude>
-    <ClInclude Include="nativeArrayFunctions.hpp">
-      <Filter>Header Files\Native Functions</Filter>
-    </ClInclude>
-    <ClInclude Include="nativeFileFunctions.hpp">
-      <Filter>Header Files\Native Functions</Filter>
-    </ClInclude>
-    <ClInclude Include="runFile.hpp">
+    <ClInclude Include="header\scanner.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VM.hpp">
-      <Filter>Header Files\Virtual Machine</Filter>
-    </ClInclude>
-    <ClInclude Include="scanner.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="chunk.hpp">
-      <Filter>Header Files\Virtual Machine</Filter>
-    </ClInclude>
-    <ClInclude Include="obj.hpp">
-      <Filter>Header Files\Virtual Machine</Filter>
-    </ClInclude>
-    <ClInclude Include="value.hpp">
-      <Filter>Header Files\Virtual Machine</Filter>
-    </ClInclude>
-    <ClInclude Include="debug.hpp">
+    <ClInclude Include="header\commandLineOutput\commandHandler.hpp">
       <Filter>Header Files\Output</Filter>
     </ClInclude>
-    <ClInclude Include="commandHandler.hpp">
+    <ClInclude Include="header\commandLineOutput\debug.hpp">
       <Filter>Header Files\Output</Filter>
+    </ClInclude>
+    <ClInclude Include="header\nativeFunctions\nativeArrayFunctions.hpp">
+      <Filter>Header Files\Native Functions</Filter>
+    </ClInclude>
+    <ClInclude Include="header\nativeFunctions\nativeFileFunctions.hpp">
+      <Filter>Header Files\Native Functions</Filter>
+    </ClInclude>
+    <ClInclude Include="header\nativeFunctions\nativeFunctions.hpp">
+      <Filter>Header Files\Native Functions</Filter>
+    </ClInclude>
+    <ClInclude Include="header\nativeFunctions\nativeMathFunctions.hpp">
+      <Filter>Header Files\Native Functions</Filter>
+    </ClInclude>
+    <ClInclude Include="header\nativeFunctions\nativeStringFunctions.hpp">
+      <Filter>Header Files\Native Functions</Filter>
+    </ClInclude>
+    <ClInclude Include="header\virtualMachine\memoryManager.hpp">
+      <Filter>Header Files\Virtual Machine</Filter>
+    </ClInclude>
+    <ClInclude Include="header\virtualMachine\chunk.hpp">
+      <Filter>Header Files\Virtual Machine</Filter>
+    </ClInclude>
+    <ClInclude Include="header\virtualMachine\obj.hpp">
+      <Filter>Header Files\Virtual Machine</Filter>
+    </ClInclude>
+    <ClInclude Include="header\virtualMachine\value.hpp">
+      <Filter>Header Files\Virtual Machine</Filter>
+    </ClInclude>
+    <ClInclude Include="header\virtualMachine\VM.hpp">
+      <Filter>Header Files\Virtual Machine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="shrimpp.rc">
+    <ResourceCompile Include="ressource\shrimpp.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="shrimp.ico">
+    <Image Include="ressource\shrimp.ico">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

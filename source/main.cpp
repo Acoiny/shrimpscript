@@ -2,11 +2,11 @@
 
 #include <fstream>
 
-#include "runFile.hpp"
-#include "commandHandler.hpp"
+#include "../header/runFile.hpp"
+#include "../header/commandLineOutput/commandHandler.hpp"
 
-#include "VM.hpp"
-#include "defines.hpp"
+#include "../header/virtualMachine/VM.hpp"
+#include "../header/defines.hpp"
 
 static void repl() {
     VM vm;

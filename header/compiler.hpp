@@ -2,7 +2,7 @@
 #define SHRIMPP_COMPILER_HPP
 
 #include "scanner.hpp"
-#include "chunk.hpp"
+#include "./virtualMachine/chunk.hpp"
 
 class compiler;
 class VM;

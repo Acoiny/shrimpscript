@@ -1,9 +1,9 @@
-#include "runFile.hpp"
+#include "../header/runFile.hpp"
 
 #include <iostream>
 #include <fstream>
 
-#include "VM.hpp"
+#include "../header/virtualMachine/VM.hpp"
 
 static char* getFileContents(const char* path) {
     std::ifstream file(path, std::ios::ate | std::ios::binary);

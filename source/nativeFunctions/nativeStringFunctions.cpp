@@ -1,11 +1,11 @@
-#include "nativeStringFunctions.hpp"
+#include "../../header/nativeFunctions/nativeStringFunctions.hpp"
 
-#include "nativeFunctions.hpp"
+#include "../../header/nativeFunctions/nativeFunctions.hpp"
 
 #include <unordered_map>
 #include <string>
 
-#include "VM.hpp"
+#include "../../header/virtualMachine/VM.hpp"
 
 static value nativeString_Len(int arity, value* args, bool& success) {
 	if (arity != 0) {

@@ -1,8 +1,8 @@
-#include "VM.hpp"
+#include "../../header/virtualMachine/VM.hpp"
 
-#include "nativeFunctions.hpp"
+#include "../../header/nativeFunctions/nativeFunctions.hpp"
 
-#include "runFile.hpp"
+#include "../../header/runFile.hpp"
 
 #ifdef DEBUG_TRACE_EXECUTION
 #include <iomanip>

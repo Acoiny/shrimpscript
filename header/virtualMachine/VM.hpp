@@ -5,15 +5,15 @@
 #include <unordered_map>
 #include <cstring>
 
-#include "defines.hpp"
+#include "../defines.hpp"
 #include "chunk.hpp"
-#include "compiler.hpp"
+#include "../compiler.hpp"
 
 #include "memoryManager.hpp"
 
 #ifdef DEBUG_TRACE_EXECUTION
 
-#include "debug.hpp"
+#include "../commandLineOutput/debug.hpp"
 
 #endif
 

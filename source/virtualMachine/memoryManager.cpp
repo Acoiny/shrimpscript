@@ -1,6 +1,6 @@
-#include "memoryManager.hpp"
+#include "../../header/virtualMachine/memoryManager.hpp"
 
-#include "VM.hpp"
+#include "../../header/virtualMachine/VM.hpp"
 
 
 memoryManager::memoryManager(VM& v) : vm(&v), initString(objString::copyString("init",4)) {}

@@ -1,6 +1,6 @@
-#include "value.hpp"
+#include "../../header/virtualMachine/value.hpp"
 
-#include "obj.hpp"
+#include "../../header/virtualMachine/obj.hpp"
 
 
 #ifdef NAN_BOXING

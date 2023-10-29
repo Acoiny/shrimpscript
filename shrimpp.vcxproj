@@ -19,40 +19,40 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="chunk.cpp" />
-    <ClCompile Include="compiler.cpp" />
-    <ClCompile Include="debug.cpp" />
-    <ClCompile Include="commandHandler.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="memoryManager.cpp" />
-    <ClCompile Include="nativeArrayFunctions.cpp" />
-    <ClCompile Include="nativeFileFunctions.cpp" />
-    <ClCompile Include="nativeFunctions.cpp" />
-    <ClCompile Include="nativeMathFunctions.cpp" />
-    <ClCompile Include="nativeStringFunctions.cpp" />
-    <ClCompile Include="obj.cpp" />
-    <ClCompile Include="runFile.cpp" />
-    <ClCompile Include="scanner.cpp" />
-    <ClCompile Include="value.cpp" />
-    <ClCompile Include="VM.cpp" />
+    <ClCompile Include="source\commandLineOutput\commandHandler.cpp" />
+    <ClCompile Include="source\commandLineOutput\debug.cpp" />
+    <ClCompile Include="source\compiler.cpp" />
+    <ClCompile Include="source\main.cpp" />
+    <ClCompile Include="source\nativeFunctions\nativeArrayFunctions.cpp" />
+    <ClCompile Include="source\nativeFunctions\nativeFileFunctions.cpp" />
+    <ClCompile Include="source\nativeFunctions\nativeFunctions.cpp" />
+    <ClCompile Include="source\nativeFunctions\nativeMathFunctions.cpp" />
+    <ClCompile Include="source\nativeFunctions\nativeStringFunctions.cpp" />
+    <ClCompile Include="source\runFile.cpp" />
+    <ClCompile Include="source\scanner.cpp" />
+    <ClCompile Include="source\virtualMachine\chunk.cpp" />
+    <ClCompile Include="source\virtualMachine\memoryManager.cpp" />
+    <ClCompile Include="source\virtualMachine\obj.cpp" />
+    <ClCompile Include="source\virtualMachine\value.cpp" />
+    <ClCompile Include="source\virtualMachine\VM.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="chunk.hpp" />
-    <ClInclude Include="compiler.hpp" />
-    <ClInclude Include="debug.hpp" />
-    <ClInclude Include="defines.hpp" />
-    <ClInclude Include="commandHandler.hpp" />
-    <ClInclude Include="memoryManager.hpp" />
-    <ClInclude Include="nativeArrayFunctions.hpp" />
-    <ClInclude Include="nativeFileFunctions.hpp" />
-    <ClInclude Include="nativeFunctions.hpp" />
-    <ClInclude Include="nativeMathFunctions.hpp" />
-    <ClInclude Include="nativeStringFunctions.hpp" />
-    <ClInclude Include="obj.hpp" />
-    <ClInclude Include="runFile.hpp" />
-    <ClInclude Include="scanner.hpp" />
-    <ClInclude Include="value.hpp" />
-    <ClInclude Include="VM.hpp" />
+    <ClInclude Include="header\commandLineOutput\commandHandler.hpp" />
+    <ClInclude Include="header\commandLineOutput\debug.hpp" />
+    <ClInclude Include="header\compiler.hpp" />
+    <ClInclude Include="header\defines.hpp" />
+    <ClInclude Include="header\nativeFunctions\nativeArrayFunctions.hpp" />
+    <ClInclude Include="header\nativeFunctions\nativeFileFunctions.hpp" />
+    <ClInclude Include="header\nativeFunctions\nativeFunctions.hpp" />
+    <ClInclude Include="header\nativeFunctions\nativeMathFunctions.hpp" />
+    <ClInclude Include="header\nativeFunctions\nativeStringFunctions.hpp" />
+    <ClInclude Include="header\runFile.hpp" />
+    <ClInclude Include="header\scanner.hpp" />
+    <ClInclude Include="header\virtualMachine\chunk.hpp" />
+    <ClInclude Include="header\virtualMachine\memoryManager.hpp" />
+    <ClInclude Include="header\virtualMachine\obj.hpp" />
+    <ClInclude Include="header\virtualMachine\value.hpp" />
+    <ClInclude Include="header\virtualMachine\VM.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="incl.shrimp" />
@@ -64,10 +64,10 @@
     <Text Include="TODO.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="shrimpp.rc" />
+    <ResourceCompile Include="ressource\shrimpp.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="shrimp.ico" />
+    <Image Include="ressource\shrimp.ico" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

@@ -2,7 +2,7 @@
 #define SHRIMPP_MEMORYMANAGER_HPP
 
 #include "obj.hpp"
-#include "defines.hpp"
+#include "../defines.hpp"
 #include <iostream>
 #include <unordered_map>
 #include <cstring>

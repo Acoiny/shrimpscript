@@ -1,8 +1,8 @@
-#include "commandHandler.hpp"
+#include "../../header/commandLineOutput/commandHandler.hpp"
 
 #include <iostream>
 
-#include "defines.hpp"
+#include "../../header/defines.hpp"
 
 using namespace std;
 

@@ -1,7 +1,7 @@
 #ifndef SHRIMPP_DEBUG_HPP
 #define SHRIMPP_DEBUG_HPP
 
-#include "chunk.hpp"
+#include "../virtualMachine/chunk.hpp"
 
 namespace debug {
     int constantInstruction(const char* name, chunk* ch, int offset);

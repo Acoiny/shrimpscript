@@ -1,7 +1,7 @@
-#include "obj.hpp"
+#include "../../header/virtualMachine/obj.hpp"
 
-#include "VM.hpp"
-#include "memoryManager.hpp"
+#include "../../header/virtualMachine/VM.hpp"
+#include "../../header/virtualMachine/memoryManager.hpp"
 
 extern memoryManager globalMemory;
 
