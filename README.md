@@ -1,4 +1,4 @@
-# shrimpscript <img src='/shrimp.ico' width='25'>
+# shrimpscript <img src='/ressource/shrimp.ico' width='25'>
 My first attempt at creating my own interpreted language. It still borrows a lot of stuff from "Crafting Interpreters" by Robert Nystrom,
 though I added a lot of stuff myself.
 
