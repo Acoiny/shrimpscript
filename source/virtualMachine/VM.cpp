@@ -494,7 +494,7 @@ bool VM::superInvoke() {
     return runtimeError("no function with name '", name->getChars(), "' on superclass");
 }
 
-static bool validateIndex(double &index, size_t len) {
+static inline bool validateIndex(double &index, size_t len) {
     if (index >= len) {
         return false;
     }

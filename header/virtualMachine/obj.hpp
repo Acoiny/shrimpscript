@@ -134,7 +134,17 @@ public:
 
     void tableSet(objString* n, value val);
 
-    value tableGet(objString* k);
+    inline value objClass::tableGet(objString* k) {
+        if (table.count(k) == 0) {
+            if (superClass != nullptr) {
+                return superClass->tableGet(k);
+            }
+
+            return NIL_VAL;
+        }
+
+        return table.at(k);
+    }
 
     value superTableGet(objString* k);
 
@@ -157,9 +167,20 @@ public:
 
     objInstance();
 
-    void tableSet(objString* n, value val);
-    value tableGet(objString* k);
-    void tableDelete(objString* k);
+    inline void tableSet(objString* n, value val) {
+        table.insert_or_assign(n, val);
+    }
+
+    inline value tableGet(objString* k) {
+        if (table.count(k) == 0) {
+            return klass->tableGet(k);
+        }
+        return table.at(k);
+    }
+
+    inline void tableDelete(objString* k) {
+        table.erase(k);
+    }
 
     static objInstance* createInstance(objClass* kl);
 };

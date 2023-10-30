@@ -203,18 +203,6 @@ void objClass::tableSet(objString* name, value val) {
 	table.insert_or_assign(name, val);
 }
 
-value objClass::tableGet(objString* k) {
-	if (table.count(k) == 0) {
-		if (superClass != nullptr) {
-			return superClass->tableGet(k);
-		}
-
-		return NIL_VAL;
-	}
-
-	return table.at(k);
-}
-
 value objClass::superTableGet(objString* k) {
 	return superClass->tableGet(k);
 }
@@ -252,21 +240,6 @@ objInstance* objInstance::createInstance(objClass* kl) {
 	//ins->table = kl->getTable();
 
 	return ins;
-}
-
-void objInstance::tableSet(objString* n, value val) {
-	table.insert_or_assign(n, val);
-}
-
-value objInstance::tableGet(objString* k) {
-	if (table.count(k) == 0) {
-		return klass->tableGet(k);
-	}
-	return table.at(k);
-}
-
-void objInstance::tableDelete(objString* k) {
-	table.erase(k);
 }
 
 
