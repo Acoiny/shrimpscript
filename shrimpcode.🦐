@@ -162,14 +162,6 @@ const file = open('test.txt');
 let line = file.getline();
 
 const start = clock();
+const num = 462314211235135;
 
-while(line) {
-	rope.exeCommand(line);
-	line = file.getline();
-}
-
-rope.print();
-
-collectGarbage();
-
-println("time: ", clock() - start);
+println(num % 23);

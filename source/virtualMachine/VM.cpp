@@ -148,9 +148,13 @@ bool VM::modulo() {
     if (!(IS_NUM(a) && IS_NUM(b)))
         return runtimeError("can't get modulo of '", a, "' and '", b, "'");
 
-    double tmp = floor(AS_NUM(a) / AS_NUM(b));
+    long double tmp = floor(AS_NUM(a) / AS_NUM(b));
 
-    push(NUM_VAL(double(AS_NUM(a) - (tmp * AS_NUM(b)))));
+    long double stepMul = tmp * (long double)AS_NUM(b);
+
+    double res = AS_NUM(a) - stepMul;
+
+    push(NUM_VAL(res));
     return true;
 }
 
