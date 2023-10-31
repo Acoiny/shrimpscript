@@ -134,7 +134,7 @@ public:
 
     void tableSet(objString* n, value val);
 
-    inline value objClass::tableGet(objString* k) {
+    inline value tableGet(objString* k) {
         if (table.count(k) == 0) {
             if (superClass != nullptr) {
                 return superClass->tableGet(k);
