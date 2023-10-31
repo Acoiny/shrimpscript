@@ -182,7 +182,7 @@ static value nativeString_Number(int arity, value* args, bool& success) {
 	
 	const char* start = str->getChars();
 
-	if (start[0] >= '0' && start[0] <= '9') {
+	if ((start[0] >= '0' && start[0] <= '9') || start[0] == '-') {
 		double res = strtod(start, nullptr);
 		return NUM_VAL(res);
 	}
