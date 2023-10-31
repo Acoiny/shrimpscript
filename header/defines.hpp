@@ -8,7 +8,7 @@
 */
 #define NAN_BOXING
 
-//#define DEBUG_TESTFILE "shrimpcode.🦐"
+#define DEBUG_TESTFILE "shrimpcode.🦐"
 
 //#define DEBUG_TRACE_EXECUTION
 //#define DEBUG_PRINT_CODE
