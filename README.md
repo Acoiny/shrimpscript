@@ -122,7 +122,7 @@ union {
 } value;
 ```
 Doubles are read as is, all other values are encoded in the lower bits of NaN values
-This serves the purpose of only taking up 8 bytes instead of 9 (16 with padding!!!) and improves performance this way. If the flag is not set, value will be a tagged union
+This serves the purpose of only taking up 8 bytes instead of 9 (16 with padding!!!) and improves performance this way. If the flag is not set, value will be represented as a tagged union:
 ```
 class value {
   valType type;
