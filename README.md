@@ -110,9 +110,9 @@ let boss = dict["boss"]; //boss = "jeffrey"
 let empty = dict['hello']; //empty = nil
 dict['new'] = 42; //sets new field
 ```
-**dictionaries allow the storing value pairs, with the first being used as the key to access the second**
+**dictionaries allow the storing of value pairs, with the first being used as the key to access the second**
 
-# Flags
+# Flags when compiling
 ## NAN_BOXING
 When set (default) the values are represented by a union
 ```
