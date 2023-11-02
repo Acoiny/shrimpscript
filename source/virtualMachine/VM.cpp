@@ -457,7 +457,8 @@ bool VM::invoke() {
 
         if (IS_OBJ(method) && AS_OBJ(method)->getType() == OBJ_NAT_FUN) {
             bool success = true;
-            value result = ((objNativeFunction*)AS_OBJ(method))->fun(argc, stackTop - argc - 1, success);
+            //popping class
+            value result = ((objNativeFunction*)AS_OBJ(method))->fun(argc, stackTop - argc, success);
             stackTop -= argc + 1;
             push(result);
             if (!success)

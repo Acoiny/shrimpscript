@@ -1,7 +1,2 @@
-let count = 0;
-
-while(clock() < 10) {
-	count++;
-}
-
-println(count);
+const i = Math.floor(1.2);
+println(i);
