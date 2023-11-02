@@ -33,7 +33,7 @@ if(condition) {
 ```
 ### for-loop
 ```
-for(let i = 0; i < 10; i = i + 1) {  
+for(let i = 0; i < 10; i++) {  
   //do something  
   if(condition)  
     break;  //break exits current loop
@@ -64,7 +64,7 @@ this can be used to import functions/classes and more**
 ## classes:
 ### class declaration
 ```
-class bar{  
+class Bar{  
   variable = 23;  
 
   //init function gets called when creating objects (optional)
@@ -78,7 +78,7 @@ class bar{
 ```
 ### inheritance
 ```
-class foo : bar{
+class Foo : Bar{
   init() {
     //super keyword calls superclass function
     super.init('foo');
@@ -89,7 +89,7 @@ class foo : bar{
 ```
 ### creating class instance
 ```
-let instance = bar("jeff");
+let instance = Bar("jeff");
 ```
 ### getting and setting instance properties
 ```
@@ -110,9 +110,9 @@ let boss = dict["boss"]; //boss = "jeffrey"
 let empty = dict['hello']; //empty = nil
 dict['new'] = 42; //sets new field
 ```
-**dictionaries allow the storing value pairs, with the first being used as the key to access the second**
+**dictionaries allow the storing of value pairs, with the first being used as the key to access the second**
 
-# Flags
+# Flags when compiling
 ## NAN_BOXING
 When set (default) the values are represented by a union
 ```
@@ -122,7 +122,7 @@ union {
 } value;
 ```
 Doubles are read as is, all other values are encoded in the lower bits of NaN values
-This serves the purpose of only taking up 8 bytes instead of 9 (16 with padding!!!) and improves performance this way. If the flag is not set, value will be represented as a tagged union:
+This serves the purpose of only taking up 8 bytes instead of 9 (16 with padding) and improves performance this way. If the flag is not set, value will be represented as a tagged union:
 ```
 class value {
   valType type;
@@ -137,8 +137,8 @@ class value {
 ```
 It is recommended to remove the flag when using 32-bit architecture
 ## debug flags in "defines.hpp"
-### DEBUG_TESTFILE <FILE>
-If set, the compiler always compiles <FILE> when being executed without arguments
+### DEBUG_TESTFILE <FILENAME>
+If set, the compiler always compiles <FILENAME> when being executed without arguments
 
 ### DEBUG_PRINT_CODE
 The bytecode is disassembled and printed to the screen after compiling
