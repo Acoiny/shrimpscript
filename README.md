@@ -64,7 +64,7 @@ this can be used to import functions/classes and more**
 ## classes:
 ### class declaration
 ```
-class bar{  
+class Bar{  
   variable = 23;  
 
   //init function gets called when creating objects (optional)
@@ -78,7 +78,7 @@ class bar{
 ```
 ### inheritance
 ```
-class foo : bar{
+class Foo : Bar{
   init() {
     //super keyword calls superclass function
     super.init('foo');
@@ -89,7 +89,7 @@ class foo : bar{
 ```
 ### creating class instance
 ```
-let instance = bar("jeff");
+let instance = Bar("jeff");
 ```
 ### getting and setting instance properties
 ```
