@@ -59,84 +59,55 @@ static value native_Type(int argc, value* args, bool& success) {
 		return nativeFunctions::error("type: expects 1 argument");
 	}
 
-	if(IS_NIL((*args)))
-		return OBJ_VAL(objString::copyString("nil", 3));
-	if(IS_NUM((*args)))
-		return OBJ_VAL(objString::copyString("number", 6));
-	if(IS_BOOL((*args)))
-		return OBJ_VAL(objString::copyString("bool", 4));
-	if(IS_OBJ((*args))) {
+	std::string str;
+
+	if (IS_NUM((*args))) {
+		str = "number";
+	}
+	else if (IS_BOOL((*args))) {
+		str = "bool";
+	}
+	else if (IS_NIL((*args))) {
+		str = "nil";
+	}
+	else if (IS_RET((*args))) {
+		str = "retAdd";
+	}
+	else if (IS_OBJ((*args))) {
 		switch (AS_OBJ((*args))->getType()) {
 		case OBJ_STR:
-			return OBJ_VAL(objString::copyString("string", 6));
-		case OBJ_NAT_FUN:
+			str = "string";
+			break;
 		case OBJ_FUN:
-			return OBJ_VAL(objString::copyString("function", 8));
+		case OBJ_NAT_FUN:
+			str = "function";
+			break;
 		case OBJ_CLASS:
-			return OBJ_VAL(objString::copyString("class", 5));
+			str = "class";
+			break;
 		case OBJ_THIS:
-		case OBJ_NAT_INSTANCE:
 		case OBJ_INSTANCE:
-			return OBJ_VAL(objString::copyString("instance", 8));
+			str = "object";
+			break;
 		case OBJ_LIST:
-			return OBJ_VAL(objString::copyString("list", 4));
+			str = "list";
+			break;
 		case OBJ_MAP:
-			return OBJ_VAL(objString::copyString("dictionary", 10));
+			str = "dict";
+			break;
+		case OBJ_FILE:
+			str = "file";
+			break;
+		default:
+			str = "unknown";
+			break;
 		}
 	}
-	return OBJ_VAL(objString::copyString("unknown", 7));
-
-	/*
-	switch (args->getType()) {
-	case VAL_NIL:
-		return value(objString::copyString("nil", 3));
-	case VAL_NUM:
-		return value(objString::copyString("number", 6));
-	case VAL_BOOL:
-		return value(objString::copyString("bool", 4));
-	case VAL_OBJ: {
-		switch (args->as.object->getType()) {
-		case OBJ_STR:
-			return value(objString::copyString("string", 6));
-		case OBJ_NAT_FUN:
-		case OBJ_FUN:
-			return value(objString::copyString("function", 8));
-		case OBJ_CLASS:
-			return value(objString::copyString("class", 5));
-		case OBJ_THIS:
-		case OBJ_NAT_INSTANCE:
-		case OBJ_INSTANCE:
-			return value(objString::copyString("instance", 8));
-		case OBJ_LIST:
-			return value(objString::copyString("list", 4));
-		case OBJ_MAP:
-			return value(objString::copyString("dictionary", 10));
-		}
-		break;
-	}
-	default:
-		return value(objString::copyString("unknown", 7));
+	else {
+		str = "unknown";
 	}
 
-	switch (args->as.object->getType()) {
-	case OBJ_STR:
-		return value(objString::copyString("string", 6));
-	case OBJ_FUN:
-		return value(objString::copyString("function", 8));
-	case OBJ_CLASS:
-		return value(objString::copyString("class", 5));
-	case OBJ_INSTANCE:
-		return value(objString::copyString("object", 6));
-	case OBJ_LIST:
-		return value(objString::copyString("list", 4));
-	case OBJ_NAT_FUN:
-		return value(objString::copyString("native function", 15));
-	case OBJ_NAT_INSTANCE:
-		return value(objString::copyString("native object", 13));
-	default:
-		return value(objString::copyString("unknown", 7));
-	}
-	*/
+	return OBJ_VAL(objString::copyString(str.data(), str.size()));
 }
 
 static value native_Input(int arity, value* args, bool& success) {

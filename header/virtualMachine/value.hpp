@@ -55,6 +55,8 @@ std::ostream& operator<<(std::ostream& os, const value val);
 
 bool operator==(const value a, const value b);
 
+const std::string stringify(value val);
+
 #else
 #define TRUE_VAL value(true)
 #define FALSE_VAL value(false)
@@ -76,6 +78,7 @@ bool operator==(const value a, const value b);
 #define AS_BOOL(val) (val.as.boolean)
 #define AS_OBJ(val) (val.as.object)
 #define AS_RET(val) (val.as.address)
+
 
 class obj;
 
@@ -101,8 +104,6 @@ class value {
 
     friend std::ostream &operator<<(std::ostream& os, const value& val);
 
-    std::ostream &printObject(std::ostream& os) const;
-
 public:
     trueVal as{};
 
@@ -115,6 +116,12 @@ public:
 
     bool operator==(const value& rhs) const;
 };
+
+
+//for printing and type function
+const std::string stringify(value val);
+
+//nanbox define endif
 #endif
 
 #endif //SHRIMPP_VALUE_HPP

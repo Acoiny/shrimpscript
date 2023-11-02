@@ -16,7 +16,6 @@ enum objType {
     OBJ_STR,
     OBJ_FUN,
     OBJ_NAT_FUN,
-    OBJ_NAT_INSTANCE,
     OBJ_CLASS,
     OBJ_INSTANCE,
     OBJ_LIST,
