@@ -256,26 +256,6 @@ objThis* objThis::createObjThis(objInstance* ins) {
 	return th;
 }
 
-//objNativeInstance functions
-objNativeInstance::objNativeInstance() {
-	type = OBJ_NAT_INSTANCE;
-}
-
-void objNativeInstance::tableSet(objString* name, value val) {
-	table.insert_or_assign(name, val);
-}
-
-value objNativeInstance::tableGet(objString* k) {
-	if (table.find(k) == table.end()) {
-		return NIL_VAL;
-	}
-	return table.at(k);
-}
-
-objNativeInstance* objNativeInstance::createNativeInstance() {
-	auto* ins = (objNativeInstance*)globalMemory.allocateObject<objNativeInstance>();
-	return ins;
-}
 
 ///objList methods
 objList::objList() {

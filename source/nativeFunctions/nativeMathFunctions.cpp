@@ -66,7 +66,7 @@ static value nativeMath_Ceil(int arity, value* args, bool& success) {
 	return NUM_VAL(ceil(AS_NUM((*args))));
 }
 
-void nativeMathFunctions(VM& vm, objNativeInstance* math)
+void nativeMathFunctions(VM& vm, objClass* math)
 {
 	math->tableSet(objString::copyString("sqrt", 4), OBJ_VAL(objNativeFunction::createNativeFunction(nativeMath_Sqrt)));
 	math->tableSet(objString::copyString("floor", 5), OBJ_VAL(objNativeFunction::createNativeFunction(nativeMath_Floor)));

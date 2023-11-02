@@ -274,7 +274,7 @@ void nativeFunctions::initNatives(VM& vm) {
 	nativeArrayFunctions(vm, vm.arrayFunctions);
 	nativeFileFunctions(vm, vm.fileFunctions);
 
-	auto math = objNativeInstance::createNativeInstance();
+	auto math = objClass::createObjClass(objString::copyString("Math", 4));
 	nativeMathFunctions(vm, math);
 	vm.globals.insert_or_assign(objString::copyString("Math", 4), OBJ_VAL(math));
 }

@@ -404,23 +404,6 @@ bool VM::invoke() {
         return runtimeError("no function with name '", name->getChars(), "' on instance");
         break;
     }
-    case OBJ_NAT_INSTANCE: {
-        auto* instance = (objNativeInstance*)AS_OBJ(callee);
-
-        value method = instance->tableGet(name);
-
-        if (IS_OBJ(method) && AS_OBJ(method)->getType() == OBJ_NAT_FUN) {
-            bool success = true;
-            value result = ((objNativeFunction*)AS_OBJ(method))->fun(argc, stackTop - argc, success);
-            stackTop -= argc + 1;
-            push(result);
-            if (success) {
-                return true;
-            }
-            return runtimeError(((objString*)AS_OBJ(result))->getChars());
-        }
-        break;
-    }
     case OBJ_STR: {
         if (stringFunctions.find(name) != stringFunctions.end()) {
             bool success = true;
@@ -472,10 +455,20 @@ bool VM::invoke() {
 
         value method = klass->tableGet(name);
 
+        if (IS_OBJ(method) && AS_OBJ(method)->getType() == OBJ_NAT_FUN) {
+            bool success = true;
+            value result = ((objNativeFunction*)AS_OBJ(method))->fun(argc, stackTop - argc - 1, success);
+            stackTop -= argc + 1;
+            push(result);
+            if (!success)
+                return runtimeError(((objString*)AS_OBJ(result))->getChars());
+            return success;
+        }
+
         if (IS_OBJ(method) && AS_OBJ(method)->getType() == OBJ_FUN) {
             return call(method, argc);
         }
-        return runtimeError("no function with name '", name->getChars(), "' on instance");
+        return runtimeError("no function with name '", name->getChars(), "' on class");
         break;
         break;
     }

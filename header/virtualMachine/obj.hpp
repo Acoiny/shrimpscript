@@ -199,7 +199,7 @@ public:
 };
 
 
-
+/*
 //native object instance
 class objNativeInstance : public obj {
     friend class memoryManager;
@@ -215,7 +215,7 @@ public:
 
     static objNativeInstance* createNativeInstance();
 };
-
+*/
 class objList : public obj {
     friend class memoryManager;
 

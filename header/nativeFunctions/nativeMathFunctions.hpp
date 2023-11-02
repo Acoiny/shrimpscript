@@ -2,4 +2,4 @@
 
 #include "../virtualMachine/VM.hpp"
 
-void nativeMathFunctions(VM& vm, objNativeInstance* math);
+void nativeMathFunctions(VM& vm, objClass* math);

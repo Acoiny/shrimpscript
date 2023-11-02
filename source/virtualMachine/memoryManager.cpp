@@ -64,12 +64,6 @@ void memoryManager::freeObject(obj* el) {
 		delete el;
 		break;
 	}
-	case OBJ_NAT_INSTANCE: {
-		bytesAllocated -= sizeof(objNativeInstance);
-		auto* object = (objNativeInstance*)el;
-		delete el;
-		break;
-	}
 	case OBJ_LIST: {
 		bytesAllocated -= sizeof(objList);
 		auto* list = (objList*)el;
@@ -177,14 +171,6 @@ void memoryManager::blackenObject(obj* obj) {
 		auto* cl = (objInstance*)obj;
 		markObject(cl->klass);
 		for (auto& el : cl->table) {
-			markObject(el.first);
-			markValue(el.second);
-		}
-		break;
-	}
-	case OBJ_NAT_INSTANCE: {
-		auto* ins = (objNativeInstance*)obj;
-		for (auto& el : ins->table) {
 			markObject(el.first);
 			markValue(el.second);
 		}
