@@ -33,7 +33,7 @@ if(condition) {
 ```
 ### for-loop
 ```
-for(let i = 0; i < 10; i = i + 1) {  
+for(let i = 0; i < 10; i++) {  
   //do something  
   if(condition)  
     break;  //break exits current loop
