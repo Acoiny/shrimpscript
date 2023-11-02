@@ -122,7 +122,7 @@ union {
 } value;
 ```
 Doubles are read as is, all other values are encoded in the lower bits of NaN values
-This serves the purpose of only taking up 8 bytes instead of 9 (16 with padding!!!) and improves performance this way. If the flag is not set, value will be represented as a tagged union:
+This serves the purpose of only taking up 8 bytes instead of 9 (16 with padding) and improves performance this way. If the flag is not set, value will be represented as a tagged union:
 ```
 class value {
   valType type;
@@ -137,8 +137,8 @@ class value {
 ```
 It is recommended to remove the flag when using 32-bit architecture
 ## debug flags in "defines.hpp"
-### DEBUG_TESTFILE <FILE>
-If set, the compiler always compiles <FILE> when being executed without arguments
+### DEBUG_TESTFILE <FILENAME>
+If set, the compiler always compiles <FILENAME> when being executed without arguments
 
 ### DEBUG_PRINT_CODE
 The bytecode is disassembled and printed to the screen after compiling
