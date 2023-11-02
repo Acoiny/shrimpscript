@@ -46,6 +46,10 @@ token scanner::scanToken() {
                 advance();
                 return makeToken(TOKEN_PLUS_PLUS);
             }
+            if (peek(1) == '=') {
+                advance();
+                return makeToken(TOKEN_PLUS_EQUALS);
+            }
             return makeToken(TOKEN_PLUS);
         }
         case '-': {
@@ -53,14 +57,33 @@ token scanner::scanToken() {
                 advance();
                 return makeToken(TOKEN_MINUS_MINUS);
             }
+            if (peek(1) == '=') {
+                advance();
+                return makeToken(TOKEN_MINUS_EQUALS);
+            }
             return makeToken(TOKEN_MINUS);
         }
-        case '*':
+        case '*': {
+            if (peek(1) == '=') {
+                advance();
+                return makeToken(TOKEN_TIMES_EQUALS);
+            }
             return makeToken(TOKEN_TIMES);
-        case '/':
+        }
+        case '/': {
+            if (peek(1) == '=') {
+                advance();
+                return makeToken(TOKEN_DIVIDE_EQUALS);
+            }
             return makeToken(TOKEN_DIVIDE);
-        case '%':
+        }
+        case '%': {
+            if (peek(1) == '=') {
+                advance();
+                return makeToken(TOKEN_MODULO_EQUALS);
+            }
             return makeToken(TOKEN_MODULO);
+        }
         case '&': {
             if (peek(1) == '&') {
                 advance();

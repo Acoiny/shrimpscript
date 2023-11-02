@@ -1,7 +1,7 @@
 #ifndef SHRIMPP_SCANNER_HPP
 #define SHRIMPP_SCANNER_HPP
 
-enum tokenType{
+enum tokenType {
     TOKEN_ERROR,
     TOKEN_SEMICOLON,
     TOKEN_DOT,
@@ -42,7 +42,13 @@ enum tokenType{
     TOKEN_SQUARE_OPEN,
     TOKEN_SQUARE_CLOSE,
 
+    //assign tokens
     TOKEN_EQUALS,
+    TOKEN_PLUS_EQUALS,
+    TOKEN_MINUS_EQUALS,
+    TOKEN_TIMES_EQUALS,
+    TOKEN_DIVIDE_EQUALS,
+    TOKEN_MODULO_EQUALS,
 
     TOKEN_IDENTIFIER,
     TOKEN_LET,

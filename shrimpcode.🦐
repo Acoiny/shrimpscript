@@ -1,2 +1,3 @@
-const i = Math.floor(1.2);
-println(i);
+let i = "asd";
+
+i += "f";

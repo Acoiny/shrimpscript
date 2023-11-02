@@ -320,7 +320,70 @@ void compiler::namedVariable(token name, bool canAssign) {
         expression();
         emitByte(setOP);
         emitBytes((arg >> 8) & 0xff, arg & 0xff);
-    } else {
+    }
+    else if (canAssign && match(TOKEN_PLUS_EQUALS)) {
+        checkConsts(isConst, setOP, name);
+
+        //loading variable onto stack
+        emitByte(getOP);
+        emitBytes((arg >> 8) & 0xff, arg & 0xff);
+
+        //parsing number
+        expression();
+        //adding number and variable
+        emitByte(OP_ADD);
+        //setting variable to addition result
+        emitByte(setOP);
+        emitBytes((arg >> 8) & 0xff, arg & 0xff);
+    } else if (canAssign && match(TOKEN_MINUS_EQUALS)) {
+        checkConsts(isConst, setOP, name);
+
+        //same principle as with adding
+        emitByte(getOP);
+        emitBytes((arg >> 8) & 0xff, arg & 0xff);
+
+        expression();
+        emitByte(OP_SUB);
+        emitByte(setOP);
+        emitBytes((arg >> 8) & 0xff, arg & 0xff);
+    }
+    else if (canAssign && match(TOKEN_TIMES_EQUALS)) {
+        checkConsts(isConst, setOP, name);
+
+        //same principle as with adding
+        emitByte(getOP);
+        emitBytes((arg >> 8) & 0xff, arg & 0xff);
+
+        expression();
+        emitByte(OP_MUL);
+        emitByte(setOP);
+        emitBytes((arg >> 8) & 0xff, arg & 0xff);
+    }
+    else if (canAssign && match(TOKEN_DIVIDE_EQUALS)) {
+        checkConsts(isConst, setOP, name);
+
+        //same principle as with adding
+        emitByte(getOP);
+        emitBytes((arg >> 8) & 0xff, arg & 0xff);
+
+        expression();
+        emitByte(OP_DIV);
+        emitByte(setOP);
+        emitBytes((arg >> 8) & 0xff, arg & 0xff);
+    }
+    else if (canAssign && match(TOKEN_MODULO_EQUALS)) {
+        checkConsts(isConst, setOP, name);
+
+        //same principle as with adding
+        emitByte(getOP);
+        emitBytes((arg >> 8) & 0xff, arg & 0xff);
+
+        expression();
+        emitByte(OP_MODULO);
+        emitByte(setOP);
+        emitBytes((arg >> 8) & 0xff, arg & 0xff);
+    }
+    else {
         emitByte(getOP);
         emitBytes((arg >> 8) & 0xff, arg & 0xff);
     }
