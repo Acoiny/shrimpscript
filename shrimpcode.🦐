@@ -1,1 +1,7 @@
-println(124241251231.2123);
+let count = 0;
+
+while(clock() < 10) {
+	count++;
+}
+
+println(count);

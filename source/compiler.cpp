@@ -1160,9 +1160,6 @@ objFunction* compiler::compiling(const char* name, char* str) {
 
     scanr.init(str);
 
-    if (currentChunk != nullptr)
-        delete currentChunk;
-
     currentChunk = new chunk();
 
     currentToken = scanr.scanToken();

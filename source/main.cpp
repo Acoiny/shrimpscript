@@ -11,8 +11,12 @@
 static void repl() {
     VM vm;
     std::string input;
+
+    std::cout << "Shrimpscript (pre-release) - created by Acoiny (https:\\github.com\\Acoiny)\n";
+
     std::cout << ">";
     while(std::getline(std::cin, input)) {
+
         vm.interpret(input.data());
         
         std::cout << ">";
