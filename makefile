@@ -1,4 +1,4 @@
-CC = g++
+CC = clang++
 
 OPT = -O2
 
@@ -16,10 +16,12 @@ OBJECTS=$(patsubst %.cpp, %.o, $(CXXFILES))
 all=$(BINARY)
 
 $(BINARY): $(OBJECTS)
-	$(CC) $^ -o $@
+	@echo compiling $@
+	@$(CC) $^ -o $@
 
-%.o: %.c
-	$(CC) $(CXXFLAGS) -c -o $@ $<
+%.o: %.cpp
+	@echo compiling $<
+	@$(CC) $(CXXFLAGS) -c -o $@ $<
 
 clean:
 	@rm -rf $(BINARY) $(OBJECTS)
