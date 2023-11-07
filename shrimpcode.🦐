@@ -1,3 +1,2 @@
-let i = "asd";
-
-i += "f";
+let i = 2 + 1 << 1 * 2;
+println(i);

@@ -31,6 +31,14 @@ enum opCodes : char {
     OP_GREATER,
     OP_GREATER_OR_EQUALS,
 
+    // bitwise operators
+    OP_BIT_AND,
+    OP_BIT_OR,
+    OP_BIT_SHIFT_LEFT,
+    OP_BIT_SHIFT_RIGHT,
+    OP_BIT_NOT,
+    OP_BIT_XOR,
+
     OP_TRUE,
     OP_FALSE,
     OP_NIL,

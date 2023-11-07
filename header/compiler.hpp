@@ -210,7 +210,7 @@ class compiler {
 
 	static void preCrement(bool canAssign, compiler& cmp);
 
-	precFuncTableEntry precedenceTable[56] = {
+	precFuncTableEntry precedenceTable[62] = {
 			{nullptr, nullptr, PREC_NONE}, //[TOKEN_ERROR] = 
 			{nullptr, nullptr, PREC_NONE}, //[TOKEN_SEMICOLON] = 
 			{nullptr, dot, PREC_CALL}, //[TOKEN_DOT] =
@@ -238,6 +238,12 @@ class compiler {
 			{nullptr, binary, PREC_COMPARISON}, //[TOKEN_GREATER_EQUALS] = 
 			{nullptr, and_f, PREC_AND}, //[TOKEN_AND]
 			{nullptr, or_f, PREC_OR}, //[TOKEN_OR]
+			{nullptr, binary, PREC_TERM}, //TOKEN_BIT_AND,
+			{nullptr, binary, PREC_TERM}, //TOKEN_BIT_OR,
+			{nullptr, binary, PREC_TERM}, //TOKEN_BIT_SHIFT_LEFT,
+			{nullptr, binary, PREC_TERM}, //TOKEN_BIT_SHIFT_RIGHT,
+			{unary, nullptr, PREC_UNARY}, //TOKEN_BIT_NOT,
+			{nullptr, binary, PREC_FACTOR}, //TOKEN_BIT_XOR
 			{grouping, call, PREC_CALL}, //[TOKEN_PAREN_OPEN] = 
 			{nullptr, nullptr, PREC_NONE},//[TOKEN_PAREN_CLOSE] = 
 			{literal, nullptr, PREC_PRIMARY},//[TOKEN_NIL] = 

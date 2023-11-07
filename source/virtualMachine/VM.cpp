@@ -770,6 +770,72 @@ exitCodes VM::run() {
                 }
                 break;
             }
+            // bitwise operations
+            case OP_BIT_AND: {
+                value b = pop();
+                value a = pop();
+                if (!IS_NUM(a) || !IS_INT(a) || !IS_NUM(b) || !IS_INT(b)) {
+                    runtimeError("bitwise operations can only be done on whole numbers");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                long long result = AS_INT(a) & AS_INT(b);
+                push(NUM_VAL(double(result)));
+                break;
+            }
+            case OP_BIT_OR: {
+                value b = pop();
+                value a = pop();
+                if (!IS_NUM(a) || !IS_INT(a) || !IS_NUM(b) || !IS_INT(b)) {
+                    runtimeError("bitwise operations can only be done on whole numbers");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                long long result = AS_INT(a) | AS_INT(b);
+                push(NUM_VAL(double(result)));
+                break;
+            }
+            case OP_BIT_SHIFT_LEFT: {
+                value b = pop();
+                value a = pop();
+                if (!IS_NUM(a) || !IS_INT(a) || !IS_NUM(b) || !IS_INT(b)) {
+                    runtimeError("bitwise operations can only be done on whole numbers");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                long long result = AS_INT(a) << AS_INT(b);
+                push(NUM_VAL(double(result)));
+                break;
+            }
+            case OP_BIT_SHIFT_RIGHT: {
+                value b = pop();
+                value a = pop();
+                if (!IS_NUM(a) || !IS_INT(a) || !IS_NUM(b) || !IS_INT(b)) {
+                    runtimeError("bitwise operations can only be done on whole numbers");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                long long result = AS_INT(a) >> AS_INT(b);
+                push(NUM_VAL(double(result)));
+                break;
+            }
+            case OP_BIT_NOT: {
+                value a = pop();
+                if (!IS_NUM(a) || !IS_INT(a)) {
+                    runtimeError("bitwise operations can only be done on whole numbers");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                long long result = ~AS_INT(a);
+                push(NUM_VAL(double(result)));
+                break;
+            }
+            case OP_BIT_XOR: {
+                value b = pop();
+                value a = pop();
+                if (!IS_NUM(a) || !IS_INT(a) || !IS_NUM(b) || !IS_INT(b)) {
+                    runtimeError("bitwise operations can only be done on whole numbers");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                long long result = AS_INT(a) ^ AS_INT(b);
+                push(NUM_VAL(double(result)));
+                break;
+            }
             case OP_DEFINE_GLOBAL: {
                 objString *name = (objString *)AS_OBJ(activeFunc->getChunkPtr()->getConstant(readShort()));
                 globals.insert_or_assign(name, peek(0));

@@ -89,14 +89,14 @@ token scanner::scanToken() {
                 advance();
                 return makeToken(TOKEN_AND);
             }
-            return makeToken(TOKEN_ERROR);
+            return makeToken(TOKEN_BIT_AND);
         }
         case '|': {
             if (peek(1) == '|') {
                 advance();
                 return makeToken(TOKEN_OR);
             }
-            return makeToken(TOKEN_ERROR);
+            return makeToken(TOKEN_BIT_OR);
         }
         case '(':
             return makeToken(TOKEN_PAREN_OPEN);
@@ -119,6 +119,10 @@ token scanner::scanToken() {
                 advance();
                 return makeToken(TOKEN_LESS_EQUALS);
             }
+            else if (peek(1) == '<') {
+                advance();
+                return makeToken(TOKEN_BIT_SHIFT_LEFT);
+            }
             return makeToken(TOKEN_LESS);
         }
         case '>': {
@@ -126,8 +130,16 @@ token scanner::scanToken() {
                 advance();
                 return makeToken(TOKEN_GREATER_EQUALS);
             }
+            else if (peek(1) == '>') {
+                advance();
+                return makeToken(TOKEN_BIT_SHIFT_RIGHT);
+            }
             return makeToken(TOKEN_GREATER);
         }
+        case '~':
+            return makeToken(TOKEN_BIT_NOT);
+        case '^':
+            return makeToken(TOKEN_BIT_XOR);
         case '!': {
             if(peek(1) == '=') {
                 advance();

@@ -32,6 +32,14 @@ enum tokenType {
     TOKEN_AND,
     TOKEN_OR,
 
+    // bitwise operators
+    TOKEN_BIT_AND,
+    TOKEN_BIT_OR,
+    TOKEN_BIT_SHIFT_LEFT,
+    TOKEN_BIT_SHIFT_RIGHT,
+    TOKEN_BIT_NOT,
+    TOKEN_BIT_XOR,
+
     TOKEN_PAREN_OPEN,
     TOKEN_PAREN_CLOSE,
     TOKEN_NIL,

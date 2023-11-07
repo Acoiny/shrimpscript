@@ -45,6 +45,12 @@ union value {
 #define IS_OBJ(val) ((val.as_uint64 & NANISH_MASK) ==  OBJ_MASK)
 #define IS_RET(val) ((val.as_uint64 & NANISH_MASK) == RET_MASK)
 
+// macro for testing if number is an integer
+
+#define IS_INT(val) ((val.as_double) == ((long long)(val.as_double)))
+
+#define AS_INT(val) ((long long)(val.as_double))
+
 //macros for pulling data out of values
 #define AS_NUM(val) (val.as_double)
 #define AS_BOOL(val) ((bool)(val.as_uint64 & 0x1))
@@ -79,6 +85,10 @@ const std::string stringify(value val);
 #define AS_OBJ(val) (val.as.object)
 #define AS_RET(val) (val.as.address)
 
+
+// macro for testing if number is an integer
+
+#define IS_INT(val) ((val.as.number) == ((long long)(val.as.number)))
 
 class obj;
 
@@ -123,5 +133,6 @@ const std::string stringify(value val);
 
 //nanbox define endif
 #endif
+
 
 #endif //SHRIMPP_VALUE_HPP

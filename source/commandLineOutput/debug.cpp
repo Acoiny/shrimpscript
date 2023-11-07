@@ -110,6 +110,19 @@ int debug::disassembleInstruction(char inst, chunk *ch, int offset) {
             return simpleInstruction("OP_GREATER", ch, offset);
         case OP_GREATER_OR_EQUALS:
             return simpleInstruction("OP_GREATER_OR_EQUALS", ch, offset);
+        // bitwise operations
+        case OP_BIT_AND:
+            return simpleInstruction("OP_BIT_AND", ch, offset);
+        case OP_BIT_OR:
+            return simpleInstruction("OP_BIT_OR", ch, offset);
+        case OP_BIT_SHIFT_LEFT:
+            return simpleInstruction("OP_BIT_SHIFT_LEFT", ch, offset);
+        case OP_BIT_SHIFT_RIGHT:
+            return simpleInstruction("OP_BIT_SHIFT_RIGHT", ch, offset);
+        case OP_BIT_NOT:
+            return simpleInstruction("OP_BIT_NOT", ch, offset);
+        case OP_BIT_XOR:
+            return simpleInstruction("OP_BIT_XOR", ch, offset);
         case OP_DEFINE_GLOBAL:
             return constantInstruction("OP_DEFINE_GLOBAL", ch, offset);
         case OP_GET_GLOBAL:

@@ -8,7 +8,7 @@
 #include "../header/virtualMachine/VM.hpp"
 
 #ifdef DEBUG_PRINT_CODE
-#include "debug.hpp"
+#include "../header/commandLineOutput/debug.hpp"
 #endif
 
 static bool identifiersEqual(token &a, token &b) {
@@ -24,6 +24,8 @@ precFuncTableEntry *compiler::getRule(token tk) {
 compiler::compiler(VM &vm) : scanr(), currentChunk(nullptr), vm(vm) {}
 
 void compiler::errorAt(token tk, const char *msg) {
+    if (panicMode) return;
+
     if (tk.type == TOKEN_EOF) {
         std::cerr << "at end -> " << msg << std::endl;
     } else {
@@ -133,6 +135,9 @@ void compiler::unary(bool canAssign, compiler &cmp) {
         case TOKEN_BANG:
             cmp.emitByte(OP_NOT);
             break;
+        case TOKEN_BIT_NOT:
+            cmp.emitByte(OP_BIT_NOT);
+            break;
     }
 }
 
@@ -174,6 +179,23 @@ void compiler::binary(bool canAssign, compiler &cmp) {
             break;
         case TOKEN_GREATER_EQUALS:
             cmp.emitByte(OP_GREATER_OR_EQUALS);
+            break;
+
+            // bitwise operations
+        case TOKEN_BIT_AND:
+            cmp.emitByte(OP_BIT_AND);
+            break;
+        case TOKEN_BIT_OR:
+            cmp.emitByte(OP_BIT_OR);
+            break;
+        case TOKEN_BIT_SHIFT_LEFT:
+            cmp.emitByte(OP_BIT_SHIFT_LEFT);
+            break;
+        case TOKEN_BIT_SHIFT_RIGHT:
+            cmp.emitByte(OP_BIT_SHIFT_RIGHT);
+            break;
+        case TOKEN_BIT_XOR:
+            cmp.emitByte(OP_BIT_XOR);
             break;
         default:
             cmp.errorAt(opType, "unknown operator");
@@ -706,12 +728,11 @@ void compiler::returnStatement() {
         error("can't return from top level script");
     }
     if (currentPosition == TYPE_INIT) {
-        error("init method can't return anything");
+        error("init method can't return any value");
     }
     if(check(TOKEN_SEMICOLON)) {
         emitByte(OP_NIL);
     } else {
-        
         expression();
     }
     emitByte(OP_RETURN);
