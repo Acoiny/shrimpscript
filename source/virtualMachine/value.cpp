@@ -56,7 +56,7 @@ const std::string stringify(value val) {
 			buffer << "{";
 			if (map->data.size() == 0) {
 				buffer << "}";
-				break;
+				return buffer.str();
 			}
 
 			bool setComma = false;

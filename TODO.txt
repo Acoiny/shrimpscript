@@ -1,12 +1,15 @@
 Features to implement:
 
--fine tuning modulo for big numbers
 
 -improve error reporting
 -make global const checking runtime?
+-add automatic ';' insertion if no character like '+', '(' etc is found?
+-if auto ';' then also use direct printing of ';' in errors, because some tokens
+	wont't have a content
 
 
 -stack trace -- IN TESTING
+-fine tuning modulo for big numbers -- IN TESTING (double is error prone!)
 
 Fixes to do:
 
