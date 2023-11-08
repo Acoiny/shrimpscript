@@ -57,6 +57,11 @@ class VM {
 
     std::unordered_map<objString*, value> globals;
 
+    // the compiler uses this vector to store all the consts names
+    // if import is used, the new compiler gets the same vector,
+    // so consts are still known as const during the compilation time
+    std::vector<std::string> constVector;
+
     //tables with methods for objects like lists & strings
     std::unordered_map<objString*, value> stringFunctions;
     std::unordered_map<objString*, value> arrayFunctions;

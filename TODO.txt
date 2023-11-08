@@ -1,8 +1,8 @@
 Features to implement:
 
-
+-add destructuring syntaxes for lists (maybe dicts)
 -improve error reporting
--make global const checking runtime?
+-make global const checking runtime? => fix compiler "forgetting" consts when importing
 -add automatic ';' insertion if no character like '+', '(' etc is found?
 -if auto ';' then also use direct printing of ';' in errors, because some tokens
 	wont't have a content

@@ -12,7 +12,7 @@ memoryManager globalMemory;
 
 VM::VM() : ip(), activeFunc(nullptr), memory(globalMemory), callFrames() {
     memory.setVM(this);
-    currentCompiler = new compiler(*this);
+    currentCompiler = new compiler(*this, constVector);
 
     stack = new value[STACK_MAX];
     activeCallFrameBottom = stack;
@@ -33,8 +33,8 @@ void VM::interpret(char *str) {
 void VM::interpretImportFile(const char* name, char* str) {
     compiler* prevCompiler = currentCompiler;
 
-    currentCompiler = new compiler(*this);
-
+    currentCompiler = new compiler(*this, constVector);
+    
     //no GC when compiling
     gcReady = false;
     activeFunc = currentCompiler->compiling(name, str);

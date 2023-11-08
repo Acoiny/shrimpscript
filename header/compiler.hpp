@@ -112,7 +112,7 @@ class compiler {
 	//overload to use in preCrement, which can't consume the identifier
 	int resolveLocal(bool& isConst, token comp);
 
-	void checkConsts(bool isConst, opCodes setOP, token& checkNameGlobal);
+	void checkConsts(bool isConst, opCodes setOP, const std::string& checkNameGlobal);
 
 	void namedVariable(token name, bool canAssign);
 
@@ -278,10 +278,11 @@ class compiler {
 
 	std::vector<local> locals;
 
-	std::vector<token> globalConsts;
+	std::vector<std::string>& globalConsts;
 
 public:
-	explicit compiler(VM& vm);
+
+	explicit compiler(VM& vm, std::vector<std::string>& constVec);
 
 	objFunction* compiling(const char* name, char* str);
 
