@@ -62,9 +62,19 @@ void compiler::synchronize() {
 }
 
 void compiler::advance() {
+repeat:
+	
 	prevToken = currentToken;
 	for (;;) {
 		currentToken = scanr.scanToken();
+
+		/* 
+		* implement adding a newline token, that gets replaced by a semicolon if +,-,(,) or other
+		* symbols that indicate a longer expression are in prevToken
+		*/
+
+		// allowing multiple semicolons in succession
+		if (prevToken.type == currentToken.type == TOKEN_SEMICOLON) goto repeat;
 
 		if (currentToken.type != TOKEN_ERROR) break;
 
@@ -671,6 +681,7 @@ void compiler::importStatement() {
 
 void compiler::expressionStatement() {
 	expression();
+
 	consume("expect ';' after end of expression", TOKEN_SEMICOLON);
 	emitByte(OP_POP);
 }
