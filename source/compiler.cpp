@@ -62,7 +62,7 @@ void compiler::synchronize() {
 }
 
 void compiler::advance() {
-repeat:
+//repeat:
 	
 	prevToken = currentToken;
 	for (;;) {
@@ -74,7 +74,7 @@ repeat:
 		*/
 
 		// allowing multiple semicolons in succession
-		if (prevToken.type == currentToken.type == TOKEN_SEMICOLON) goto repeat;
+		//if (prevToken.type == currentToken.type == TOKEN_SEMICOLON) goto repeat;
 
 		if (currentToken.type != TOKEN_ERROR) break;
 
@@ -680,6 +680,9 @@ void compiler::importStatement() {
 }
 
 void compiler::expressionStatement() {
+	if (match(TOKEN_SEMICOLON)) {
+		return;
+	}
 	expression();
 
 	consume("expect ';' after end of expression", TOKEN_SEMICOLON);
@@ -1119,7 +1122,7 @@ void compiler::function() {
 	emitByte(OP_RETURN);
 	endFunctionScope();
 
-
+	// adding function to previous chunk, with currentchunk containing its body
 	unsigned int fun = prevChunk->addConstantGetLine(OBJ_VAL(objFunction::createObjFunction(name, currentChunk, argc)), prevToken.line);
 
 #ifdef DEBUG_PRINT_CODE

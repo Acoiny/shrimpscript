@@ -1,5 +1,6 @@
 Features to implement:
 
+-NEXT: closures, like in lox/lua
 -add destructuring syntaxes for lists (maybe dicts)
 -improve error reporting
 -make global const checking runtime? => fix compiler "forgetting" consts when importing

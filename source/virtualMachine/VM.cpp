@@ -896,11 +896,13 @@ exitCodes VM::run() {
                     auto* name = (objString*)AS_OBJ(activeFunc->getChunkPtr()->getConstant(ind));
                     value val = instance->tableGet(name);
                     if(IS_NIL(val)) {
-                        runtimeError("no property of name ", name->getChars(), " on instance");
-                        return INTERPRET_RUNTIME_ERROR;
+                        pop();
+                        push(NIL_VAL);
                     }
-                    pop();
-                    push(val);
+                    else {
+                        pop();
+                        push(val);
+                    }
                 } else {
                     runtimeError("only instances have properties");
                     return INTERPRET_RUNTIME_ERROR;
