@@ -139,7 +139,7 @@ public:
 
     VM();
 
-    void interpret(char *str);
+    exitCodes interpret(char *str);
 
     void interpretImportFile(const char* name, char* str);
 
@@ -147,6 +147,8 @@ public:
     compiler *currentCompiler;
 
     exitCodes run();
+
+    value replGetLast();
 };
 
 

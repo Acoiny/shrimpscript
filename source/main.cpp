@@ -17,8 +17,9 @@ static void repl() {
     std::cout << ">";
     while(std::getline(std::cin, input)) {
 
-        vm.interpret(input.data());
-        
+        ;
+        if(vm.interpret(input.data()) == INTERPRET_OK)
+            std::cout << "\033[33m" << vm.replGetLast() << "\033[0m" << std::endl;
         std::cout << ">";
     }
 }

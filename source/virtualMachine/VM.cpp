@@ -21,13 +21,18 @@ VM::VM() : ip(), activeFunc(nullptr), memory(globalMemory), callFrames() {
     nativeFunctions::initNatives(*this);
 }
 
-void VM::interpret(char *str) {
+exitCodes VM::interpret(char *str) {
     activeFunc = currentCompiler->compiling("script", str);
     scriptFuncs.push_back(activeFunc);
     gcReady = true;
+
+    exitCodes exited = INTERPRET_RUNTIME_ERROR;
+
     if(!currentCompiler->errorOccured()) {
-        run();
+        exited = run();
     }
+
+    return exited;
 }
 
 void VM::interpretImportFile(const char* name, char* str) {
@@ -1164,4 +1169,8 @@ bool VM::runtimeError(const char *msg, Ts... args) {
         }
     }
     return false;
+}
+
+value VM::replGetLast() {
+    return stack[0];
 }
