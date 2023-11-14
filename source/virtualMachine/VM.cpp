@@ -1172,5 +1172,7 @@ bool VM::runtimeError(const char *msg, Ts... args) {
 }
 
 value VM::replGetLast() {
+    // resettin stack, in case of errors
+    stackTop = stack;
     return stack[0];
 }
