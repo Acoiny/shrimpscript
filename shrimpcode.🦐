@@ -1,13 +1,10 @@
 let in;
-
-while(in != "end") {
+while(true) {
 	in = input();
-	const i = in;
-	if(in == "c")
-		break;
-		
-	println(in);
-}
 
-let i = 12312313;
-i = input();
+	const asd = in;
+
+	if(in == "c") {
+		break;
+	}
+}

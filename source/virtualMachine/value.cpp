@@ -19,7 +19,7 @@ const std::string stringify(value val) {
 		return AS_BOOL(val) ? "true" : "false";
 	}
 	if (IS_RET(val)) {
-		return std::to_string(AS_RET(val));
+		return "<return " + std::to_string(AS_RET(val)) + ">";
 	}
 	if (IS_OBJ(val)) {
 		obj* object = AS_OBJ(val);

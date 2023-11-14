@@ -70,6 +70,7 @@ class compiler {
 	unsigned int loopDepth = 0;
 
 	int64_t currentContinue = -1;
+	int64_t currentLoopDepth = -1;
 
 	std::vector<breaks> breakJumps;
 

@@ -705,11 +705,15 @@ void compiler::whileStatement() {
 	emitByte(OP_POP);
 
 	int64_t prevContinue = currentContinue;
+	int64_t prevContinueDepth = currentLoopDepth;
+
 	currentContinue = loopStart;
+	currentLoopDepth = scopeDepth;
 	loopDepth++;
 	statement();
 	loopDepth--;
 	currentContinue = prevContinue;
+	currentLoopDepth = prevContinueDepth;
 
 	emitLoop(loopStart);
 
@@ -801,11 +805,15 @@ void compiler::forEachLoop() {
 
 
 	int64_t prevContinue = currentContinue;
+	int64_t prevContinueDepth = currentLoopDepth;
+
 	currentContinue = loopStart;
+	currentLoopDepth = scopeDepth;
 	loopDepth++;
 	statement();
 	loopDepth--;
 	currentContinue = prevContinue;
+	currentLoopDepth = prevContinueDepth;
 
 
 	emitLoop(loopStart);
@@ -846,7 +854,7 @@ void compiler::breakStatement() {
 	for (int i = locals.size() - 1; i >= 0; --i)
 	{
 		local tmp = locals.at(i);
-		if (tmp.depth < scopeDepth)
+		if (tmp.depth <= currentLoopDepth)
 			break;
 		emitByte(OP_POP);
 	}
@@ -868,7 +876,7 @@ void compiler::continueStatement() {
 	for (int i = locals.size() - 1; i >= 0; --i)
 	{
 		local tmp = locals.at(i);
-		if (tmp.depth < scopeDepth)
+		if (tmp.depth <= currentLoopDepth)
 			break;
 		emitByte(OP_POP);
 	}
