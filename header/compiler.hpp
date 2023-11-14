@@ -126,7 +126,7 @@ class compiler {
 
 	void letDeclaration();
 
-	void varDeclaration(bool isConst = false);
+	bool varDeclaration(bool isConst = false);
 
 	int argumentList();
 

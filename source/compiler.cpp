@@ -1027,9 +1027,9 @@ multiDeclaration:
 
 	token constIdentifier = currentToken;
 
-	varDeclaration(true);
+	const bool constSuccess = varDeclaration(true);
 
-	if (scopeDepth == 0) {
+	if (scopeDepth == 0 && constSuccess) {
 		std::string constName(constIdentifier.start, constIdentifier.len);
 		globalConsts.emplace_back(constName);
 	}
@@ -1051,7 +1051,7 @@ multiDeclaration:
 	consume("expect ';' after variable declaration", TOKEN_SEMICOLON);
 }
 
-void compiler::varDeclaration(bool isConst) {
+bool compiler::varDeclaration(bool isConst) {
 	unsigned int global = parseVariable("expect variable name", false);
 
 	if (scopeDepth == 0) {
@@ -1067,12 +1067,16 @@ void compiler::varDeclaration(bool isConst) {
 		expression();
 	}
 	else {
-		if (isConst)
+		if (isConst) {
 			error("can't implicitly initialize 'const' with nil");
+			return false;
+		}
 		emitByte(OP_NIL);
 	}
 
 	defineVariable(global);
+
+	return true;
 }
 
 int compiler::argumentList() {
