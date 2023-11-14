@@ -1,7 +1,0 @@
-class A{
-	i = 23;
-}
-
-const a = A();
-a.i = nil;
-println(a.i);

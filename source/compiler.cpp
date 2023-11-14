@@ -47,13 +47,14 @@ void compiler::synchronize() {
 		if (prevToken.type == TOKEN_SEMICOLON) return;
 		switch (currentToken.type) {
 		case TOKEN_BRACE_CLOSE:
-		case TOKEN_PAREN_CLOSE:
+		// case TOKEN_PAREN_CLOSE:
 		case TOKEN_CLASS:
 		case TOKEN_WHILE:
 		case TOKEN_FOR:
 		case TOKEN_LET:
 		case TOKEN_FUN:
-			//case TOKEN_SEMICOLON:
+			// case TOKEN_SEMICOLON:
+			// advance();
 			return;
 		default:
 			advance();
@@ -62,19 +63,10 @@ void compiler::synchronize() {
 }
 
 void compiler::advance() {
-//repeat:
-	
+
 	prevToken = currentToken;
 	for (;;) {
 		currentToken = scanr.scanToken();
-
-		/* 
-		* implement adding a newline token, that gets replaced by a semicolon if +,-,(,) or other
-		* symbols that indicate a longer expression are in prevToken
-		*/
-
-		// allowing multiple semicolons in succession
-		//if (prevToken.type == currentToken.type == TOKEN_SEMICOLON) goto repeat;
 
 		if (currentToken.type != TOKEN_ERROR) break;
 

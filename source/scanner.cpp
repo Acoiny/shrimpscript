@@ -190,7 +190,7 @@ token scanner::numberToken() {
 
 token scanner::stringToken(char endAt) {
     advance();
-    token str{TOKEN_STRING, current};
+    token str{TOKEN_STRING, current, 0, line};
     if (endAt == '\"')
         str.type = TOKEN_STRING_ESCAPE;
     int len = 0;
