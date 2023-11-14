@@ -1,0 +1,13 @@
+let in;
+
+while(in != "end") {
+	in = input();
+	const i = in;
+	if(in == "c")
+		break;
+		
+	println(in);
+}
+
+let i = 12312313;
+i = input();

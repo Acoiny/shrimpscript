@@ -47,11 +47,15 @@ void compiler::synchronize() {
 		if (prevToken.type == TOKEN_SEMICOLON) return;
 		switch (currentToken.type) {
 		case TOKEN_BRACE_CLOSE:
+		// testing open braces
+		case TOKEN_BRACE_OPEN:
 		// case TOKEN_PAREN_CLOSE:
 		case TOKEN_CLASS:
 		case TOKEN_WHILE:
 		case TOKEN_FOR:
+		case TOKEN_IF:
 		case TOKEN_LET:
+		case TOKEN_CONST:
 		case TOKEN_FUN:
 			// case TOKEN_SEMICOLON:
 			// advance();
@@ -767,7 +771,7 @@ void compiler::returnStatement() {
 
 //TODO: finish for-each
 void compiler::forEachLoop() {
-	error("for-each loop not working");
+	error("for-each loop not fully implemented yet");
 	//here saving slot on stack for the counter
 	emitByte(OP_NIL);
 	//creating local variable
@@ -838,6 +842,15 @@ void compiler::breakStatement() {
 
 	consume("expect ';' after break statement", TOKEN_SEMICOLON);
 
+	// poppint of all local variables when jumping out of loops
+	for (int i = locals.size() - 1; i >= 0; --i)
+	{
+		local tmp = locals.at(i);
+		if (tmp.depth < scopeDepth)
+			break;
+		emitByte(OP_POP);
+	}
+
 	breakJumps.push_back({ emitJump(OP_JUMP) ,loopDepth });
 }
 
@@ -849,6 +862,16 @@ void compiler::continueStatement() {
 
 	consume("expect ';' after continue statement", TOKEN_SEMICOLON);
 
+	// trying popping all current local variables
+
+	// endScope();
+	for (int i = locals.size() - 1; i >= 0; --i)
+	{
+		local tmp = locals.at(i);
+		if (tmp.depth < scopeDepth)
+			break;
+		emitByte(OP_POP);
+	}
 	emitLoop(currentContinue);
 }
 
