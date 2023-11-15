@@ -52,7 +52,21 @@ bool runFile(const char* path) {
     if (cont == nullptr)
         return false;
 
+    std::string pathWithoutFile(path);
+
+    size_t indexOfPathEnd = pathWithoutFile.find_last_of('\\');
+    if (indexOfPathEnd == std::string::npos) {
+        indexOfPathEnd = pathWithoutFile.find_last_of('/');
+    }
+    if (indexOfPathEnd != std::string::npos) {
+        pathWithoutFile = pathWithoutFile.substr(0, indexOfPathEnd + 1);
+    }
+    else {
+        pathWithoutFile = "";
+    }
+
     VM vm;
+    vm.currentPath = pathWithoutFile;
     vm.interpret(cont);
 
     delete[] cont;

@@ -39,6 +39,7 @@ class VM {
     friend class memoryManager;
     friend class nativeFunctions;
 
+
     bool gcReady = false;
 
     objFunction* activeFunc;
@@ -135,6 +136,10 @@ class VM {
     bool importFile(const char* filename);
 
 public:
+
+    // the path that gets added to imported files, so they are always relative to the executed file
+    std::string currentPath;
+
     ~VM();
 
     VM();

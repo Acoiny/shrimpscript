@@ -1,0 +1,3 @@
+import '..\shrimpcode.shrimp';
+
+runTest();

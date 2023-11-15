@@ -2,16 +2,15 @@ Features to implement:
 
 -NEXT: closures, like in lox/lua
 -add destructuring syntaxes for lists (maybe dicts)
--improve error reporting
 -make global const checking runtime? => fix compiler "forgetting" consts when importing
 -add automatic ';' insertion if no character like '+', '(' etc is found?
 -if auto ';' then also use direct printing of ';' in errors, because some tokens
 	wont't have a content
 
 
--stack trace -- IN TESTING
--fine tuning modulo for big numbers -- IN TESTING (double is error prone!)
 
 Fixes to do:
 
--correct pre- and post increment and decrement -- IN TESTING
+-stack trace -- IN TESTING
+
+-improve error reporting

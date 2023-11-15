@@ -585,7 +585,9 @@ bool VM::setObjectIndex(obj* object, value index, value val) {
 
 bool VM::importFile(const char* filename) {
 
-    return runImportFile(filename, *this);
+    std::string path = this->currentPath + filename;
+    // path = path.substr(0, path.size() - 1);
+    return runImportFile(path.data(), *this);
 }
 
 exitCodes VM::run() {
