@@ -82,8 +82,6 @@ class Foo : Bar{
   init() {
     //super keyword calls superclass function
     super.init('foo');
-    //can also access superclass variables (only class variables)
-    super.variable = 32;
   }
 }
 ```
