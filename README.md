@@ -59,7 +59,7 @@ fun foo(num) {
 ```
 import 'file.shrimp';
 ```
-**import takes a file path (relative to the current directory) and executes the corresponding file
+**import takes a file path (relative to the executed file) and executes the corresponding file
 this can be used to import functions/classes and more**
 ## classes:
 ### class declaration
@@ -82,8 +82,6 @@ class Foo : Bar{
   init() {
     //super keyword calls superclass function
     super.init('foo');
-    //can also access superclass variables (only class variables)
-    super.variable = 32;
   }
 }
 ```
