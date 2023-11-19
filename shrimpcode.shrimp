@@ -1,3 +1,16 @@
-fun runTest() {
-	println("adjalfa");
+class A {
+	var = "hello";
+	
+	
 }
+
+class B : A {
+	var = "world";
+	init() {
+		
+	}
+}
+
+const b = B();
+
+println(b.var);
