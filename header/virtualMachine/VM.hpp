@@ -76,20 +76,27 @@ class VM {
     inline unsigned char readByte() { return *(ip++); }
 
     inline short readShort() {
-        short res = readByte() << 8;
+        short res = short(readByte()) << 8;
         res |= readByte();
         return res;
     }
-
+    // optimize this function
     inline size_t readSizeT() {
-        size_t res = size_t(*(ip++)) << 56;
-        res |= size_t(*(ip++)) << 48;
-        res |= size_t(*(ip++)) << 40;
-        res |= size_t(*(ip++)) << 32;
-        res |= size_t(*(ip++)) << 24;
-        res |= size_t(*(ip++)) << 16;
-        res |= size_t(*(ip++)) << 8;
-        res |= *(ip++);
+        size_t res = size_t(*(ip++));
+        res <<= 8;
+        res |= size_t(*(ip++));
+    	res <<= 8;
+        res |= size_t(*(ip++));
+        res <<= 8;
+        res |= size_t(*(ip++));
+        res <<= 8;
+        res |= size_t(*(ip++));
+        res <<= 8;
+        res |= size_t(*(ip++));
+        res <<= 8;
+        res |= size_t(*(ip++));
+        res <<= 8;
+        res |= size_t(*(ip++));
         return res;
     }
 

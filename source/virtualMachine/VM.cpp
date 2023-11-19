@@ -1166,8 +1166,13 @@ bool VM::runtimeError(const char *msg, Ts... args) {
 
     //simple stack traceback
     if (callDepth > 0) {
+        std::cerr << "in function -> " << activeFunc->name->getChars() << std::endl;
+
+        auto prevName = activeFunc->name->getChars();
+
         for (size_t i = callDepth - 1; i > 0; i--) {
-            std::cerr << "[in function] -> " << callFrames[i].func->name->getChars() << std::endl;
+            std::cerr << prevName << " <- " << callFrames[i].func->name->getChars() << std::endl;
+            prevName = callFrames[i].func->name->getChars();
         }
     }
     return false;

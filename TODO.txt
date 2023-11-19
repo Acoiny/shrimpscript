@@ -1,12 +1,17 @@
 Features to implement:
 
 -NEXT: closures, like in lox/lua
--add destructuring syntaxes for lists (maybe dicts)
--make global const checking runtime? => fix compiler "forgetting" consts when importing
+-add destructuring syntaxes for lists (maybe instances)
+
+
+
+-make global const checking runtime? => fix compiler "forgetting" consts when importing -- IN TESTING
+
+
+Discarded:
 -add automatic ';' insertion if no character like '+', '(' etc is found?
 -if auto ';' then also use direct printing of ';' in errors, because some tokens
 	wont't have a content
-
 
 
 Fixes to do:

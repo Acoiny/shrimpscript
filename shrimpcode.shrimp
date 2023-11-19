@@ -1,16 +1,13 @@
-class A {
-	var = "hello";
-	
-	
+fun a() {
+	return "asd" + 3;
 }
 
-class B : A {
-	var = "world";
-	init() {
-		
-	}
+fun b() {
+	a();
 }
 
-const b = B();
+fun c() {
+	b();
+}
 
-println(b.var);
+c();
