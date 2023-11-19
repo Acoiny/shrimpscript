@@ -84,7 +84,7 @@ public:
     void setVM(VM* v);
 
     template<typename T>
-    obj *allocateObject();
+    T *allocateObject();
 
     template<typename T>
     T* allocateArray(unsigned long long len);
@@ -96,7 +96,8 @@ public:
 };
 
 template<typename T>
-obj *memoryManager::allocateObject() {
+T *memoryManager::allocateObject() {
+
 #ifdef DEBUG_STRESS_GC
     collectGarbage();
 #else
@@ -104,15 +105,15 @@ obj *memoryManager::allocateObject() {
         collectGarbage();
     }
 #endif
-    obj *res;
 
-    res = new T;
+    obj *res = new T;
+
     addToObjects(res);
 
     bytesAllocated += sizeof(T);
 
     //std::cout << "allocated:" << bytesAllocated << std::endl;
-    return res;
+    return (T*)res;
 }
 
 
@@ -125,7 +126,7 @@ void memoryManager::freeArray(T *arr, unsigned int len) {
 
 
 template<typename T>
-T *memoryManager::allocateArray(unsigned long long int len) {
+T *memoryManager::allocateArray(unsigned long long len) {
 #ifdef DEBUG_STRESS_GC
     collectGarbage();
 #endif

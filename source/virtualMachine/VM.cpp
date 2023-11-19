@@ -75,12 +75,9 @@ void VM::push(value val) {
 }
 
 value VM::pop() {
-
-
     stackTop--;
     return *stackTop;
 }
-
 
 void VM::concatenateTwoStrings() {
     auto *b = (objString *) AS_OBJ(peek(0));
@@ -93,9 +90,11 @@ void VM::concatenateTwoStrings() {
     res[len] = '\0';
 
     objString *strObj = nullptr;
-    push(OBJ_VAL(strObj));
+    // strObj->mark();
+    // push(OBJ_VAL(strObj));
     strObj = objString::takeString(res, len);
-    pop();
+    // pop();
+    // strObj->unmark();
     pop();
     pop();
     push(OBJ_VAL(strObj));
@@ -105,13 +104,19 @@ bool VM::add() {
     value b = peek(0);
     value a = peek(1);
     if (IS_OBJ(a) && IS_OBJ(b)) {
-        if ((AS_OBJ(a))->getType() == OBJ_STR && (AS_OBJ(b))->getType() == OBJ_STR) {
+        if (IS_STR(a) && IS_STR(b)) {
             concatenateTwoStrings();
             return true;
         } else {
             return runtimeError("can't add '", a, "' and '", b, "'");
         }
     }
+    /*if (IS_STR(a) && IS_NUM(b)) {
+        std::string bStr = stringify(b);
+        peek_set(0, OBJ_VAL(objString::copyString(bStr.data(), bStr.size())));
+        concatenateTwoStrings();
+		return true;
+    }*/
     if (!(IS_NUM(a) && IS_NUM(b)))
         return runtimeError("can't add '", a, "' and '", b, "'");
     b = pop();
@@ -1093,7 +1098,7 @@ exitCodes VM::run() {
                 break;
             }
             case OP_SUPER: {
-                auto name =(objString*)AS_OBJ(activeFunc->getChunkPtr()->getConstant(readShort()));
+                auto name = (objString*)AS_OBJ(activeFunc->getChunkPtr()->getConstant(readShort()));
 
                 //TODO: access activeFuncs superclass -- add class to methods
                 if (!activeFunc->isMethod()) {

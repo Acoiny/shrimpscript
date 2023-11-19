@@ -25,14 +25,14 @@ enum objType {
 };
 
 class obj {
+    friend class memoryManager;
 protected:
     objType type;
     bool isMarked = false;
     obj *next = nullptr;
 public:
 
-    obj* getNext();
-    void setNext(obj* ne);
+    obj* getNext() const;
     virtual ~obj() = default;
     inline objType getType() const {
         return type;
@@ -65,7 +65,7 @@ public:
 
     static objString* copyString(const char* chars, const unsigned int len);
     static objString* copyStringEscape(const char* chars, const unsigned int len);
-    static objString* takeString(const char* chars, const unsigned int len);
+    static objString* takeString(char* chars, const unsigned int len);
 };
 
 //forward declaring objClass

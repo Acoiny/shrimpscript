@@ -3,17 +3,22 @@
 #include "../../header/virtualMachine/VM.hpp"
 
 
-memoryManager::memoryManager(VM& v) : vm(&v), initString(objString::copyString("init",4)) {}
+memoryManager::memoryManager(VM& v) : vm(&v), initString(objString::copyString("init", 4)) {}
 
-memoryManager::memoryManager() : vm(nullptr), initString(objString::copyString("init",4)) {}
+memoryManager::memoryManager() : vm(nullptr), initString(objString::copyString("init", 4)) {}
 
 memoryManager::~memoryManager() {
 	obj* object = allObjects;
+
+	std::cout << " -- before memory manager destroyed: " << bytesAllocated << std::endl;
+
 	while (object != nullptr) {
-		obj* next = object->getNext();
+		obj* next = object->next;
 		freeObject(object);
 		object = next;
 	}
+
+	std::cout << " -- memory manager destroyed: " << bytesAllocated << std::endl;
 }
 
 void memoryManager::setVM(VM* v) {
@@ -21,15 +26,15 @@ void memoryManager::setVM(VM* v) {
 }
 
 void memoryManager::addToObjects(obj* o) {
-	o->setNext(allObjects);
+	o->next = allObjects;
 	allObjects = o;
 }
 
 void memoryManager::freeObject(obj* el) {
-	switch (el->getType()) {
+	switch (el->type) {
 	case OBJ_STR: {
 		auto str = (objString*)el;
-		const char* tmpArr = str->getChars();
+		// const char* tmpArr = str->getChars();
 		bytesAllocated -= sizeof(objString);
 		freeArray(str->getChars(), str->getLen() + 1);
 		delete str;
@@ -49,7 +54,7 @@ void memoryManager::freeObject(obj* el) {
 	}
 	case OBJ_CLASS: {
 		bytesAllocated -= sizeof(objClass);
-		auto* object = (objClass*)el;
+		// auto* object = (objClass*)el;
 		delete el;
 		break;
 	}
@@ -60,27 +65,27 @@ void memoryManager::freeObject(obj* el) {
 	}
 	case OBJ_INSTANCE: {
 		bytesAllocated -= sizeof(objInstance);
-		auto* object = (objInstance*)el;
+		// auto* object = (objInstance*)el;
 		delete el;
 		break;
 	}
 	case OBJ_LIST: {
 		bytesAllocated -= sizeof(objList);
-		auto* list = (objList*)el;
+		// auto* list = (objList*)el;
 		delete el;
 		break;
 	}
 	case OBJ_FILE: {
 		bytesAllocated -= sizeof(objFile);
 		auto* file = (objFile*)el;
-		if(file->isOpen())
+		if (file->isOpen())
 			file->file.close();
 		delete el;
 		break;
 	}
 	case OBJ_MAP: {
 		bytesAllocated -= sizeof(objMap);
-		auto* map = (objMap*)el;
+		// auto* map = (objMap*)el;
 		delete el;
 		break;
 	}
@@ -89,7 +94,7 @@ void memoryManager::freeObject(obj* el) {
 
 void memoryManager::markObject(obj* obj) {
 	if (obj == nullptr) return;
-	if (obj->isMark()) return;
+	if (obj->isMarked) return;
 
 	obj->mark();
 	grayStack.push_back(obj);
@@ -106,24 +111,24 @@ void memoryManager::markValue(value val) {
 
 
 void memoryManager::markRoots() {
-	//marking the stack
-	for (int i = 0; i < vm->stackTop - vm->stack; ++i) {
-		markValue(vm->stack[i]);
+	// marking the stack
+	for (value* slot = vm->stack; slot < vm->stackTop; slot++) {
+		markValue(*slot);
 	}
 
-	//marking the callstack
+	// marking the callstack
 	for (size_t i = 0; i < vm->callDepth; ++i) {
 		markObject(vm->callFrames[i].func);
 	}
 
-	//marking all globals
+	// marking all globals
 	for (auto& el : vm->globals) {
 		markObject(el.first);
 		markValue(el.second);
 	}
 
 	markObject(vm->activeFunc);
-	
+
 	for (auto& el : vm->scriptFuncs) {
 		markObject(el);
 	}
@@ -197,6 +202,7 @@ void memoryManager::blackenObject(obj* obj) {
 	}
 	case OBJ_NAT_FUN:
 	case OBJ_STR:
+	case OBJ_FILE:
 		break;
 	}
 }
@@ -220,44 +226,56 @@ void memoryManager::traceReferences() {
 }
 
 void memoryManager::stringsRemoveWhite() {
+	std::vector<const char*> tmp;
 
-safetyMark:
-
-	for (auto& el : internedStrings) {
+	for (const auto& el : internedStrings) {
 		if (!el.second->isMark()) {
-			internedStrings.erase(el.first);
-			goto safetyMark;
+			tmp.push_back(el.first);
 		}
+	}
+
+	for (const auto& el : tmp) {
+		internedStrings.erase(el);
 	}
 }
 
 void memoryManager::sweep() {
+
+#ifdef DEBUG_LOG_GC
+	size_t freedNum = 0;
+#endif
+
 	obj* previous = nullptr;
 	obj* object = allObjects;
 	while (object != nullptr) {
 		//std::cout << value(object) << std::endl;
-		if (object->isMark()) {
-			object->unmark();
+		if (object->isMarked) {
+			object->isMarked = false;
 			previous = object;
-			object = object->getNext();
+			object = object->next;
 		}
 		else {
 			obj* unreached = object;
-			object = object->getNext();
+			object = object->next;
 			if (previous == nullptr) {
 				allObjects = object;
 			}
 			else {
-				previous->setNext(object);
+				previous->next = object;
 			}
 
 #ifdef DEBUG_LOG_GC
-			std::cout << "freed: " << value(unreached)<< std::endl;
+			std::cout << "freed: " << unreached << std::endl;
+			freedNum++;
 #endif
 
 			freeObject(unreached);
 		}
 	}
+
+#ifdef DEBUG_LOG_GC
+	std::cout << "objects freed: " << freedNum << std::endl;
+#endif
 }
 
 void memoryManager::collectGarbage() {
@@ -266,6 +284,8 @@ void memoryManager::collectGarbage() {
 		return;
 	}
 
+	std::cout << " -- GC started:" << std::endl;
+	size_t before = bytesAllocated;
 #ifdef DEBUG_LOG_GC
 	std::cout << " -- GC started:" << std::endl;
 	size_t before = bytesAllocated;
@@ -279,6 +299,8 @@ void memoryManager::collectGarbage() {
 
 	nextGC = bytesAllocated * GC_GROWTH_FACTOR;
 
+	std::cout << " -- end GC: from " << before << " to " << bytesAllocated <<
+		" next at " << nextGC << std::endl;
 #ifdef DEBUG_LOG_GC
 	std::cout << " -- end GC: from " << before << " to " << bytesAllocated <<
 		" next at " << nextGC << std::endl;

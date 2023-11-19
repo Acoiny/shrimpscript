@@ -25,17 +25,17 @@ void objString::init(const char* ch, unsigned int strlen) {
 
 objString* objString::copyString(const char* chars, const unsigned int len) {
 	//TODO: eliminate unnecessary new & delete
-	char* tmp = new char[len + 1];
+	char* tmp = globalMemory.allocateArray<char>(len + 1);
 	memcpy(tmp, chars, len);
 	tmp[len] = '\0';
 
 	if (globalMemory.internedStrings.count(tmp)) {
 		objString* ret = globalMemory.internedStrings.at(tmp);
-		delete[] tmp;
+		globalMemory.freeArray(tmp, len + 1);
 		return ret;
 	}
 
-	delete[] tmp;
+	globalMemory.freeArray(tmp, len + 1);
 
 	auto* str = (objString*)globalMemory.allocateObject<objString>();
 	str->mark();
@@ -84,7 +84,7 @@ objString* objString::copyStringEscape(const char* chars, const unsigned int len
 			pos++;
 		}
 	}
-	char* escapedStr = new char[newLen + 1];
+	char* escapedStr = globalMemory.allocateArray<char>(newLen + 1);
 	memcpy(escapedStr, tmp, newLen);
 	escapedStr[newLen] = '\0';
 	delete[] tmp;
@@ -92,7 +92,7 @@ objString* objString::copyStringEscape(const char* chars, const unsigned int len
 
 	if (globalMemory.internedStrings.count(tmp)) {
 		objString* ret = globalMemory.internedStrings.at(tmp);
-		delete[] tmp;
+		globalMemory.freeArray(tmp, newLen + 1);
 		return ret;
 	}
 
@@ -103,14 +103,14 @@ objString* objString::copyStringEscape(const char* chars, const unsigned int len
 	globalMemory.internedStrings.insert_or_assign(str->chars, str);
 	str->unmark();
 
-	delete[] tmp;
+	globalMemory.freeArray(tmp, newLen + 1);
 	return str;
 }
 
-objString* objString::takeString(const char* chars, const unsigned int len) {
+objString* objString::takeString(char* chars, const unsigned int len) {
 
 	auto interned = globalMemory.internedStrings.find(chars);
-	
+
 	if (interned != globalMemory.internedStrings.end()) {
 		globalMemory.freeArray(chars, len + 1);
 		return interned->second;
@@ -118,7 +118,8 @@ objString* objString::takeString(const char* chars, const unsigned int len) {
 
 	auto* str = (objString*)globalMemory.allocateObject<objString>();
 	str->mark();
-	str->init(chars, len);
+	str->chars = chars;
+	str->len = len;
 	globalMemory.internedStrings.insert_or_assign(str->chars, str);
 	str->unmark();
 	return str;
@@ -132,13 +133,10 @@ const char* objString::getChars() const {
 	return chars;
 }
 
-obj* obj::getNext() {
+obj* obj::getNext() const {
 	return next;
 }
 
-void obj::setNext(obj* ne) {
-	next = ne;
-}
 
 void obj::mark() {
 	isMarked = true;

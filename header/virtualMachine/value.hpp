@@ -45,6 +45,10 @@ union value {
 #define IS_OBJ(val) ((val.as_uint64 & NANISH_MASK) ==  OBJ_MASK)
 #define IS_RET(val) ((val.as_uint64 & NANISH_MASK) == RET_MASK)
 
+#define IS_STR(val) (IS_OBJ(val) && AS_OBJ(val)->getType() == OBJ_STR)
+#define IS_FUN(val) (IS_OBJ(val) && AS_OBJ(val)->getType() == OBJ_FUN)
+#define IS_INSTANCE(val) (IS_OBJ(val) && AS_OBJ(val)->getType() == OBJ_INSTANCE)
+
 // macro for testing if number is an integer
 
 #define IS_INT(val) ((val.as_double) == ((long long)(val.as_double)))

@@ -1,13 +1,38 @@
-fun a() {
-	return "asd" + 3;
+const inputP1 = "3113322113";
+
+const testInput = "1";
+
+fun process(numStr) {
+    const len = numStr.len();
+
+    let resultStr = '';
+
+    for(let i = 0; i < len; ) {
+        const dig = numStr.at(i);
+        
+        let amt = 1;
+        i++;
+        while(i < len and numStr.at(i) == dig) {
+            amt++;
+            i++;
+        }
+
+        resultStr += to_string(amt) + dig;
+    }
+
+    return resultStr;
 }
 
-fun b() {
-	a();
+fun runAmount(times, numStr) {
+    while(times > 0) {
+        numStr = process(numStr);
+        times--;
+    }
+
+    return numStr.len();
 }
 
-fun c() {
-	b();
-}
+println(runAmount(33, inputP1));
 
-c();
+// println(collectGarbage());
+

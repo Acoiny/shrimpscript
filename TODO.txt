@@ -14,8 +14,9 @@ Discarded:
 	wont't have a content
 
 
-Fixes to do:
-
--stack trace -- IN TESTING
+FIXES TO DO:
+-find out if there is a memory leak in the GC
 
 -improve error reporting
+
+-stack trace -- IN TESTING
