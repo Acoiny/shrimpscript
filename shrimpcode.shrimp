@@ -32,7 +32,7 @@ fun runAmount(times, numStr) {
     return numStr.len();
 }
 
-println(runAmount(33, inputP1));
+println(runAmount(40, inputP1));
 
 // println(collectGarbage());
 

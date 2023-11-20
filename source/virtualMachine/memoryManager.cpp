@@ -10,7 +10,7 @@ memoryManager::memoryManager() : vm(nullptr), initString(objString::copyString("
 memoryManager::~memoryManager() {
 	obj* object = allObjects;
 
-	std::cout << " -- before memory manager destroyed: " << bytesAllocated << std::endl;
+	// std::cout << " -- before memory manager destroyed: " << bytesAllocated << std::endl;
 
 	while (object != nullptr) {
 		obj* next = object->next;
@@ -18,7 +18,7 @@ memoryManager::~memoryManager() {
 		object = next;
 	}
 
-	std::cout << " -- memory manager destroyed: " << bytesAllocated << std::endl;
+	// std::cout << " -- memory manager destroyed: " << bytesAllocated << std::endl;
 }
 
 void memoryManager::setVM(VM* v) {
@@ -284,7 +284,7 @@ void memoryManager::collectGarbage() {
 		return;
 	}
 
-	std::cout << " -- GC started:" << std::endl;
+	
 	size_t before = bytesAllocated;
 #ifdef DEBUG_LOG_GC
 	std::cout << " -- GC started:" << std::endl;
@@ -299,8 +299,7 @@ void memoryManager::collectGarbage() {
 
 	nextGC = bytesAllocated * GC_GROWTH_FACTOR;
 
-	std::cout << " -- end GC: from " << before << " to " << bytesAllocated <<
-		" next at " << nextGC << std::endl;
+	
 #ifdef DEBUG_LOG_GC
 	std::cout << " -- end GC: from " << before << " to " << bytesAllocated <<
 		" next at " << nextGC << std::endl;
