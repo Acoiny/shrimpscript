@@ -1,38 +1,89 @@
-const inputP1 = "3113322113";
+let i = 0;
 
-const testInput = "1";
+const file = open("test.shrimp");
+const json = file.read();
+file.close();
 
-fun process(numStr) {
-    const len = numStr.len();
+const zeroChr = '0'.chr();
+const nineChr = '9'.chr();
 
-    let resultStr = '';
+fun isNum(c) {
 
-    for(let i = 0; i < len; ) {
-        const dig = numStr.at(i);
-        
-        let amt = 1;
-        i++;
-        while(i < len and numStr.at(i) == dig) {
-            amt++;
-            i++;
-        }
-
-        resultStr += to_string(amt) + dig;
-    }
-
-    return resultStr;
+	const char = c.chr();
+	
+	return char <= nineChr and char >= zeroChr;
 }
 
-fun runAmount(times, numStr) {
-    while(times > 0) {
-        numStr = process(numStr);
-        times--;
-    }
-
-    return numStr.len();
+fun parseNum() {
+	let numStr	= '';
+	
+	if(json.at(i) == '-') {
+		numStr += '-';
+		i++;
+	}
+	
+	while(isNum(json.at(i))) {
+		numStr += json.at(i++);
+	}
+	
+	return numStr.number();
 }
 
-println(runAmount(40, inputP1));
 
-// println(collectGarbage());
+fun enterArray() {
+	let sum = 0;
+	
+	i++;
+	while(i < json.len() and json.at(i) != ']') {
+		
+		if(isNum(json.at(i)) or json.at(i) == '-') {
+			const num = parseNum();
+			sum += num;
+		} else if(json.at(i) == '{') {
+			sum += enterObject();
+		} else if(json.at(i) == '[') {
+			sum += enterArray();
+		}
+		
+		i++;
+	}
+	
+	return sum;
+}
 
+fun enterObject() {
+	let sum = 0;
+	
+	let ignoreThis = false;
+	
+	let matches = '';
+	i++;
+	while(i < json.len() and json.at(i) != '}') {
+		
+		if(json.at(i) == 'r' and matches == '') {
+			matches = 'r';
+			continue;
+		} else if(json.at(i) == 'e' and matches == 'r') {
+			matches = 're';
+			continue;
+		} else if(json.at(i) == 'd' and matches == 're') {
+			ignoreThis = true;
+		} else if(isNum(json.at(i)) or json.at(i) == '-') {
+			matches = '';
+			const num = parseNum();
+			sum += num;
+		} else if(json.at(i) == '{') {
+			sum += enterObject();
+		} else if(json.at(i) == '[') {
+			sum += enterArray();
+		}
+		
+		matches = '';
+		
+		i++;
+	}
+	
+	return ignoreThis ? 0 : sum;
+}
+
+println(enterArray());

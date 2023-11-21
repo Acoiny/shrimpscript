@@ -65,6 +65,8 @@ VM::~VM() {
     memory.internedStrings.clear();
     globals.clear();
 
+    delete currentCompiler;
+
     delete[] stack;
     //std::cout << memory.bytesAllocated;
 }
@@ -257,7 +259,7 @@ bool VM::call(value callee, int arity) {
     callFrames[callDepth].top = stackTop - arity;
     callDepth++;
 
-    if (callDepth > FRAMES_MAX)
+    if (callDepth >= FRAMES_MAX)
         return runtimeError("stack overflow");
 
     if (arity != fun->getArity())
