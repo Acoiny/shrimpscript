@@ -15,7 +15,6 @@ const b = "i can't be changed";
 let i = 1, j = 1;
 const n = 5, m = 10;
 ```
-**NOTE: const variables currently don't work in repl, due to them being compile-time evaluated**
 ### strings
 ```
 let str1 = "hello\tworld";  //contains "hello  world"
