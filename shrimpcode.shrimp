@@ -1,89 +1,17 @@
-let i = 0;
+{
+	let a = "a";
 
-const file = open("test.shrimp");
-const json = file.read();
-file.close();
+	for (let i = 0; i < 100000; i++) {
+	  a += "a";
+	}
 
-const zeroChr = '0'.chr();
-const nineChr = '9'.chr();
-
-fun isNum(c) {
-
-	const char = c.chr();
-	
-	return char <= nineChr and char >= zeroChr;
+	println(a);
 }
 
-fun parseNum() {
-	let numStr	= '';
-	
-	if(json.at(i) == '-') {
-		numStr += '-';
-		i++;
-	}
-	
-	while(isNum(json.at(i))) {
-		numStr += json.at(i++);
-	}
-	
-	return numStr.number();
+let a = 0;
+collectGarbage();
+while(a < 100000000) {
+	a++;
 }
 
-
-fun enterArray() {
-	let sum = 0;
-	
-	i++;
-	while(i < json.len() and json.at(i) != ']') {
-		
-		if(isNum(json.at(i)) or json.at(i) == '-') {
-			const num = parseNum();
-			sum += num;
-		} else if(json.at(i) == '{') {
-			sum += enterObject();
-		} else if(json.at(i) == '[') {
-			sum += enterArray();
-		}
-		
-		i++;
-	}
-	
-	return sum;
-}
-
-fun enterObject() {
-	let sum = 0;
-	
-	let ignoreThis = false;
-	
-	let matches = '';
-	i++;
-	while(i < json.len() and json.at(i) != '}') {
-		
-		if(json.at(i) == 'r' and matches == '') {
-			matches = 'r';
-			continue;
-		} else if(json.at(i) == 'e' and matches == 'r') {
-			matches = 're';
-			continue;
-		} else if(json.at(i) == 'd' and matches == 're') {
-			ignoreThis = true;
-		} else if(isNum(json.at(i)) or json.at(i) == '-') {
-			matches = '';
-			const num = parseNum();
-			sum += num;
-		} else if(json.at(i) == '{') {
-			sum += enterObject();
-		} else if(json.at(i) == '[') {
-			sum += enterArray();
-		}
-		
-		matches = '';
-		
-		i++;
-	}
-	
-	return ignoreThis ? 0 : sum;
-}
-
-println(enterArray());
+println(a);

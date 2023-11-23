@@ -41,38 +41,40 @@ void memoryManager::freeObject(obj* el) {
 		break;
 	}
 	case OBJ_FUN: {
-		auto fun = (objFunction*)el;
+		auto* fun = (objFunction*)el;
 		delete fun->funChunk;
 		bytesAllocated -= sizeof(objFunction);
-		delete el;
+		delete fun;
 		break;
 	}
 	case OBJ_NAT_FUN: {
 		bytesAllocated -= sizeof(objNativeFunction);
-		delete el;
+		auto* fun = (objNativeFunction*)el;
+		delete fun;
 		break;
 	}
 	case OBJ_CLASS: {
 		bytesAllocated -= sizeof(objClass);
-		// auto* object = (objClass*)el;
-		delete el;
+		auto* klass = (objClass*)el;
+		delete klass;
 		break;
 	}
 	case OBJ_THIS: {
 		bytesAllocated -= sizeof(objThis);
-		delete el;
+		auto* th = (objThis*)el;
+		delete th;
 		break;
 	}
 	case OBJ_INSTANCE: {
 		bytesAllocated -= sizeof(objInstance);
-		// auto* object = (objInstance*)el;
-		delete el;
+		auto* ins = (objInstance*)el;
+		delete ins;
 		break;
 	}
 	case OBJ_LIST: {
 		bytesAllocated -= sizeof(objList);
-		// auto* list = (objList*)el;
-		delete el;
+		auto* list = (objList*)el;
+		delete list;
 		break;
 	}
 	case OBJ_FILE: {
@@ -80,13 +82,13 @@ void memoryManager::freeObject(obj* el) {
 		auto* file = (objFile*)el;
 		if (file->isOpen())
 			file->file.close();
-		delete el;
+		delete file;
 		break;
 	}
 	case OBJ_MAP: {
 		bytesAllocated -= sizeof(objMap);
-		// auto* map = (objMap*)el;
-		delete el;
+		auto* map = (objMap*)el;
+		delete map;
 		break;
 	}
 	}
@@ -284,7 +286,7 @@ void memoryManager::collectGarbage() {
 		return;
 	}
 
-	
+
 	size_t before = bytesAllocated;
 #ifdef DEBUG_LOG_GC
 	std::cout << " -- GC started:" << std::endl;
@@ -299,7 +301,7 @@ void memoryManager::collectGarbage() {
 
 	nextGC = bytesAllocated * GC_GROWTH_FACTOR;
 
-	
+
 #ifdef DEBUG_LOG_GC
 	std::cout << " -- end GC: from " << before << " to " << bytesAllocated <<
 		" next at " << nextGC << std::endl;

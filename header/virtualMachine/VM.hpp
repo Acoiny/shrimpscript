@@ -109,7 +109,7 @@ class VM {
     inline void peek_set(int dist, const value val) { *(stackTop - 1 - dist) = val; }
 
     ///The functions responsible for executing OP-codes
-    void concatenateTwoStrings();
+    bool concatenateTwoStrings();
 
     bool add();
 

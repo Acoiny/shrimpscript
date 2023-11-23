@@ -6,8 +6,6 @@
 extern memoryManager globalMemory;
 
 ///objString functions
-objString::~objString() = default;
-
 
 objString::objString() : len(0), chars(nullptr) {
 	type = OBJ_STR;
