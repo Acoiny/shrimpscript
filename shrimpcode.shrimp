@@ -1,17 +1,5 @@
-{
-	let a = "a";
+const i = {"a":1, "b": 2};
+const j = {"c": 3, "d": 4};
 
-	for (let i = 0; i < 100000; i++) {
-	  a += "a";
-	}
-
-	println(a);
-}
-
-let a = 0;
-collectGarbage();
-while(a < 100000000) {
-	a++;
-}
-
-println(a);
+j["e"] = j;
+println(j);

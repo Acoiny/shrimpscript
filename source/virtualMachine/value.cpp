@@ -43,7 +43,18 @@ const std::string stringify(value val) {
 				buffer << list->data.at(0);
 				for (size_t i = 1; i < len; i++)
 				{
-					buffer << ", " << list->data.at(i);
+					value current = list->data.at(i);
+					
+					// now only supports lists in itself, not lists in lists in itself
+					if (IS_OBJ(current) && AS_OBJ(current)->getType() == OBJ_LIST) {
+						if (((objList*)AS_OBJ(current)) == list)
+						{
+							buffer << ", [...]";
+							continue;
+						}
+					}
+					
+					buffer << ", " << current;
 				}
 			}
 			buffer << "]";
@@ -67,6 +78,17 @@ const std::string stringify(value val) {
 				else
 					setComma = true;
 
+				value current = el.second;
+
+				// now only supports lists in itself, not lists in lists in itself
+				if (IS_OBJ(current) && AS_OBJ(current)->getType() == OBJ_MAP) {
+					if (((objMap*)AS_OBJ(current)) == map)
+					{
+						buffer << el.first << " : " << "{...}";
+						continue;
+					}
+				}
+
 				buffer << el.first << " : " << el.second;
 
 			}
@@ -80,7 +102,7 @@ const std::string stringify(value val) {
 			return ("<" + std::string(((objThis*)object)->this_instance->klass->name->chars) + " object>");
 
 		}
-}
+	}
 	return "<unknown object>";
 }
 
