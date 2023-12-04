@@ -927,11 +927,15 @@ void compiler::forStatement() {
 
 	//maybe make break a statement and hand jump back to here?
 	int64_t prevContinue = currentContinue;
+	int64_t prevLoopDepth = currentLoopDepth;
+
 	currentContinue = loopStart;
+	currentLoopDepth = scopeDepth;
 	loopDepth++;
 	statement();
 	loopDepth--;
 	currentContinue = prevContinue;
+	currentLoopDepth = prevLoopDepth;
 
 	emitLoop(loopStart);
 
