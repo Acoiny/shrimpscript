@@ -53,7 +53,7 @@ fun foo(num) {
   return result;  
 }
 ```
-**NOTE: functions are first class objects, but cannot be declared in blocks/other functions - also closures aren't supported (yet?)**
+**NOTE: functions can be stored in variables and passed around, but cannot be declared in blocks/other functions - also closures aren't supported (yet?)**
 ## import
 ```
 import 'file.shrimp';
