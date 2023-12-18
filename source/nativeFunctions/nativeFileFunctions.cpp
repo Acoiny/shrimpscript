@@ -8,7 +8,7 @@
 
 static value nativeFile_read(int arity, value* args, bool& success) {
 	if (arity != 0) {
-		
+
 		success = false;
 		return nativeFunctions::error("read: expected 0 arguments");
 	}
@@ -16,15 +16,17 @@ static value nativeFile_read(int arity, value* args, bool& success) {
 	auto* file = (objFile*)AS_OBJ((*args));
 
 	if (!file->isOpen()) {
-		
+
 		success = false;
 		return nativeFunctions::error("read: file is closed");
 	}
 
 	char* tmp = new char[file->fileSize];
 	file->file.read(tmp, file->fileSize);
+	objString* fileStr = objString::copyString(tmp, file->fileSize);
+	delete[] tmp;
 
-	return OBJ_VAL(objString::copyString(tmp, file->fileSize));
+	return OBJ_VAL(fileStr);
 }
 
 static value nativeFile_getline(int arity, value* args, bool& success) {
@@ -51,7 +53,7 @@ static value nativeFile_getline(int arity, value* args, bool& success) {
 
 static value nativeFile_close(int arity, value* args, bool& success) {
 	if (arity != 0) {
-		
+
 		success = false;
 		return nativeFunctions::error("close: expected 0 arguments");
 	}
@@ -63,7 +65,7 @@ static value nativeFile_close(int arity, value* args, bool& success) {
 		return NIL_VAL;
 	}
 	else {
-		
+
 		success = false;
 		return nativeFunctions::error("close: file is already closed");
 	}
@@ -71,12 +73,12 @@ static value nativeFile_close(int arity, value* args, bool& success) {
 
 static value nativeFile_write(int arity, value* args, bool& success) {
 	if (arity != 1) {
-		
+
 		success = false;
 		return nativeFunctions::error("write: expected 1 argument");
 	}
 	if (!(IS_OBJ(args[1]) && AS_OBJ(args[1])->getType() == OBJ_STR)) {
-		
+
 		success = false;
 		return nativeFunctions::error("write: can only write strings");
 	}
@@ -85,12 +87,12 @@ static value nativeFile_write(int arity, value* args, bool& success) {
 	auto* str = (objString*)AS_OBJ(args[1]);
 
 	if (!file->isOpen()) {
-		
+
 		success = false;
 		return nativeFunctions::error("write: file is closed");
 	}
 
-	
+
 	file->file << str->getChars();
 
 	return NIL_VAL;

@@ -1,12 +1,23 @@
-fun asd(l) {
-
-	for(let i = 0; i < 10; i++) {
-		if(i == 4) {
-			continue;
-			
-		}
-		println(l.at(i));
-	}
+fun readF(name)
+{
+	const file = open(name);
+	println(file);
+	const res = file.read();
+	file.close();
+	return res;
 }
 
-asd("asdfgegege");
+fun writeF(name, cont)
+{
+	const file = open(name, "w");
+	println(file);
+	file.write(cont);
+	file.close();
+}
+
+const fName = "test.shrimp";
+
+const cont = readF(fName);
+println(cont);
+// writeF(fName, cont);
+println("finished");
