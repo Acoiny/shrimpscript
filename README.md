@@ -4,7 +4,24 @@ though I added a lot of stuff myself.
 
 ## single line comments
 ```
-//this is a comment
+// this is a comment
+```
+## ASI (automatic semicolon insertion)
+The parser automatically inserts semicolons, if a illegal Token is found, but preceded by a new line or if the illegal Token is '}' or the end of the file it inserts a semicolon before it
+```
+let a = 2
+a = 1
+
+return
+a
++ 2
+```
+becomes
+```
+let a = 2;
+a = 1;
+
+return a + 2;
 ```
 ## variables:
 ```
