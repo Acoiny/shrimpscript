@@ -23,6 +23,7 @@ a = 1;
 
 return a + 2;
 ```
+**This feature is still in testing and may lead to valid, but unintended code!**
 ## variables:
 ```
 let a = "i am a changeable variable";
