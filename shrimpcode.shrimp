@@ -1,6 +1,8 @@
-let a,b = 2,c = 0;
+fun fib(n)
+{
+	if(n < 2) return n
 
-a = b
-++c
+	return fib(n-1) + fib(n-2)
+}
 
-println('a: ', a, "\nb: ", b, "\nc: ", c)
+println(fib(10))
