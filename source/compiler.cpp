@@ -95,6 +95,11 @@ void compiler::consume(const char* msg, tokenType type) {
 		advance();
 		return;
 	}
+
+	if (scanr.checkASIfoundIllegal()) {
+		return;
+	}
+
 	error(msg);
 }
 

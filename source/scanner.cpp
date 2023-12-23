@@ -20,9 +20,23 @@ scanner::scanner() : source(nullptr), current(nullptr), line(1) {}
 void scanner::init(char *str) {
     source = str;
     current = str;
+    scanToken();
+    previousToken = {};
+    currentToken = {};
 }
 
 token scanner::scanToken() {
+    previousToken = currentToken;
+    lineBreakBeforeCurrent = lineBreakAfterCurrent;
+    currentToken = lookoutToken;
+    lookoutToken = advanceTokens();
+
+
+    return currentToken;
+}
+
+token scanner::advanceTokens() {
+    lineBreakAfterCurrent = false;
     skipWhiteSpaces();
     switch (*(current)) {
         case '.':
@@ -347,6 +361,7 @@ void scanner::skipWhiteSpaces() {
             case '\n':
                 advance();
                 line++;
+                lineBreakAfterCurrent = true;
                 break;
             case '/':
                 if(peek(1) == '/') {
@@ -371,4 +386,22 @@ token scanner::makeToken(tokenType type) {
     token res{type, (current), 1, line};
     advance();
     return res;
+}
+
+bool scanner::currentIsOnNewLine() {
+    return lineBreakBeforeCurrent;
+}
+
+tokenType scanner::viewNextType() {
+    return lookoutToken.type;
+}
+
+bool scanner::checkASIfoundIllegal() {
+    // currentToken because compiler mostly works on prevToken
+    if (lineBreakBeforeCurrent || currentToken.type == TOKEN_BRACE_CLOSE ||
+        currentToken.type == TOKEN_EOF) {
+        return true;
+    }
+
+    return false;
 }

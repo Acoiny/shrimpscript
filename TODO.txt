@@ -7,11 +7,9 @@ Features to implement:
 
 -make global const checking runtime? => fix compiler "forgetting" consts when importing -- IN TESTING
 
+-ASI, when illegal token is found, but preceded by line break, or followed by EOF or '}' -- IN TESTING
 
 Discarded:
--add automatic ';' insertion if no character like '+', '(' etc is found?
--if auto ';' then also use direct printing of ';' in errors, because some tokens
-	wont't have a content
 
 
 FIXES TO DO:

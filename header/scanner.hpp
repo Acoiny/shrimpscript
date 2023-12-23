@@ -94,6 +94,12 @@ class scanner {
     char* current;
     int line = 0;
 
+    token previousToken;
+    bool lineBreakBeforeCurrent = false;
+    token currentToken;
+    bool lineBreakAfterCurrent = false;
+    token lookoutToken;
+
     char peek(int dist);
 
     char advance();
@@ -114,11 +120,24 @@ class scanner {
 
 public:
 
+    bool currentIsOnNewLine();
+
+    tokenType viewNextType();
+
     explicit scanner();
 
     void init(char *str);
 
+    token advanceTokens();
     token scanToken();
+
+    /**
+    * checks if a semicolon can be inserted, assuming an illegal token has been found
+    * semicolon can be inserted if current illegal token is preceded by a linebreak
+    * or followed by '}' or the end of the file
+    * @returns true if possible
+    */
+    bool checkASIfoundIllegal();
 };
 
 
