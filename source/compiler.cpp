@@ -96,8 +96,10 @@ void compiler::consume(const char* msg, tokenType type) {
 		return;
 	}
 
-	if (type == TOKEN_SEMICOLON && scanr.checkASIfoundIllegal()) {
-		return;
+	if (scanr.checkASIfoundIllegal()) {
+		token tmp = prevToken;
+		prevToken = { TOKEN_SEMICOLON, NULL, tmp.len, tmp.line };
+		if (prevToken.type == type) return;
 	}
 
 	error(msg);
