@@ -151,8 +151,8 @@ int debug::disassembleInstruction(char inst, chunk *ch, int offset) {
             return simpleInstruction("OP_FOR_EACH_INIT", ch, offset);
         case OP_FOR_ITER:
             return simpleInstruction("OP_FOR_ITER", ch, offset);
-        case OP_FUNCTION:
-            return constantInstruction("OP_FUNCTION", ch, offset);
+        // case OP_FUNCTION:
+            // return constantInstruction("OP_FUNCTION", ch, offset);
         case OP_CALL:
             return callInstruction("OP_CALL", ch, offset);
         case OP_CLASS:

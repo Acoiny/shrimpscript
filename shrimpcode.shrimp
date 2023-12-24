@@ -1,8 +1,10 @@
-fun fib(n)
-{
-	if(n < 2) return n
-
-	return fib(n-1) + fib(n-2)
+fun tailcall(a) {
+	return a*2
 }
 
-println(fib(10))
+fun test(a) {
+	const b = a * a
+	return tailcall(b)
+}
+
+println(test(2))

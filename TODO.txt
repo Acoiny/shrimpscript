@@ -1,6 +1,9 @@
 Features to implement:
 
--NEXT: closures, like in lox/lua
+-move return address into callframes and make instance/functions be at the 'this' place on the stack
+-make String/Array/File classes for their functions and vm access them (like in sob)
+
+-closures, like in lox/lua
 -add destructuring syntaxes for lists (maybe instances)
 
 

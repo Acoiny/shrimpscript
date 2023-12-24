@@ -60,7 +60,7 @@ enum opCodes : char {
     OP_FOR_EACH_INIT,
     OP_FOR_ITER,
 
-    OP_FUNCTION,
+    // OP_FUNCTION,
     
     OP_CALL,
 

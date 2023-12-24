@@ -993,13 +993,6 @@ exitCodes VM::run() {
 
 			break;
 		}
-		case OP_FUNCTION: {
-			int constIndex = readShort();
-			value fn = activeFunc->getChunkPtr()->getConstant(constIndex);
-
-			push(fn);
-			break;
-		}
 		case OP_CALL: {
 			int arity = (unsigned char)readByte();
 			if (!callValue(peek(arity), arity)) {

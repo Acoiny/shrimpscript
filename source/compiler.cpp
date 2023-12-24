@@ -1171,7 +1171,7 @@ void compiler::function() {
 
 	currentChunk = prevChunk;
 
-	emitByte(OP_FUNCTION);
+	emitByte(OP_CONSTANT);
 	emitBytes((fun >> 8) & 0xff, fun & 0xff);
 
 	//fun->setData(jump, argc);
