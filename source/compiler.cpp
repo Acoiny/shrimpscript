@@ -47,9 +47,9 @@ void compiler::synchronize() {
 		if (prevToken.type == TOKEN_SEMICOLON) return;
 		switch (currentToken.type) {
 		case TOKEN_BRACE_CLOSE:
-		// testing open braces
+			// testing open braces
 		case TOKEN_BRACE_OPEN:
-		// case TOKEN_PAREN_CLOSE:
+			// case TOKEN_PAREN_CLOSE:
 		case TOKEN_CLASS:
 		case TOKEN_WHILE:
 		case TOKEN_FOR:
@@ -307,7 +307,10 @@ void compiler::checkConsts(bool isConst, opCodes setOP, const std::string& check
 		error("can't reassign const variables");
 
 	//checking globals here, so memcmp isn't called as often
-	if (setOP == OP_SET_GLOBAL) {
+	if (setOP == OP_SET_GLOBAL ||
+		setOP == OP_INCREMENT_GLOBAL ||
+		setOP == OP_DECREMENT_GLOBAL
+		) {
 		for (auto& el : globalConsts) {
 			if (checkNameGlobal == el) {
 				error("can't reassign const variables");
@@ -615,7 +618,7 @@ void compiler::preCrement(bool canAssign, compiler& cmp) {
 
 		std::string constNameStr(cmp.currentToken.start, cmp.currentToken.len);
 
-		cmp.checkConsts(isConst, OP_SET_GLOBAL, constNameStr);
+		cmp.checkConsts(isConst, OP_INCREMENT_GLOBAL, constNameStr);
 
 		if (op.type == TOKEN_PLUS_PLUS) {
 			cmp.emitByte(OP_INCREMENT_GLOBAL);
@@ -692,6 +695,11 @@ void compiler::expressionStatement() {
 	emitByte(OP_POP);
 }
 
+/**
+ * .
+ *
+ * \param offset
+ */
 void compiler::patchJump(size_t offset) {
 	int jump = currentChunk->getSize() - offset - 2;
 
@@ -1086,11 +1094,11 @@ multiDeclaration:
 }
 
 bool compiler::varDeclaration(bool isConst) {
-	unsigned int global = parseVariable("expect variable name", false);
+	unsigned int global = parseVariable("expect variable name", isConst);
 
 	if (scopeDepth == 0) {
 		std::string name(prevToken.start, prevToken.len);
-		for (const auto el : globalConsts) {
+		for (const auto &el : globalConsts) {
 			if (el == name) {
 				error("cannot redeclare previously declared const");
 			}

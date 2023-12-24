@@ -1,10 +1,7 @@
-fun tailcall(a) {
-	return a*2
+fun test() {
+	const i = 0;
+	i++;
+	return i;
 }
 
-fun test(a) {
-	const b = a * a
-	return tailcall(b)
-}
-
-println(test(2))
+test()

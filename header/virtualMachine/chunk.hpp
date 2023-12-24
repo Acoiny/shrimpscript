@@ -61,7 +61,7 @@ enum opCodes : char {
     OP_FOR_ITER,
 
     // OP_FUNCTION,
-    
+
     OP_CALL,
 
     OP_RETURN,

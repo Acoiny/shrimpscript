@@ -50,6 +50,7 @@ struct breaks {
 	unsigned int depth;
 };
 
+
 class compiler {
 	VM& vm;
 

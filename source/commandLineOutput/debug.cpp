@@ -180,13 +180,13 @@ int debug::disassembleInstruction(char inst, chunk *ch, int offset) {
         case OP_IMPORT:
             return simpleInstruction("OP_IMPORT", ch, offset);
         case OP_INCREMENT_GLOBAL:
-            return constantInstruction("OP_INCREMENT_GLOBAL", ch, offset);
+            return byteInstruction("OP_INCREMENT_GLOBAL", ch, offset);
         case OP_DECREMENT_GLOBAL:
-            return constantInstruction("OP_DECREMENT_GLOBAL", ch, offset);
+            return byteInstruction("OP_DECREMENT_GLOBAL", ch, offset);
         case OP_INCREMENT_LOCAL:
-            return constantInstruction("OP_INCREMENT_LOCAL", ch, offset);
+            return byteInstruction("OP_INCREMENT_LOCAL", ch, offset);
         case OP_DECREMENT_LOCAL:
-            return constantInstruction("OP_DECREMENT_LOCAL", ch, offset);
+            return byteInstruction("OP_DECREMENT_LOCAL", ch, offset);
         case OP_PULL_INSTANCE_FROM_THIS:
             return simpleInstruction("OP_THIS_TO_INSTANCE", ch, offset);
         case OP_RETURN:
