@@ -226,7 +226,7 @@ public:
 
 struct myMapHash {
 	size_t operator()(const value& rhs) const {
-		return AS_RET(rhs);
+		return AS_HASH(rhs);
 	}
 };
 

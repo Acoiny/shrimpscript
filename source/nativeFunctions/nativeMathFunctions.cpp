@@ -66,10 +66,15 @@ static value nativeMath_Ceil(int arity, value* args, bool& success) {
 	return NUM_VAL(ceil(AS_NUM((*args))));
 }
 
-void nativeMathFunctions(VM& vm, objClass* math)
+void nativeMathClass::nativeMathFunctions(VM& vm)
 {
+	objString* mathName = objString::copyString("Math", 4);
+	objClass* math = objClass::createObjClass(mathName);
 	math->tableSet(objString::copyString("sqrt", 4), OBJ_VAL(objNativeFunction::createNativeFunction(nativeMath_Sqrt)));
 	math->tableSet(objString::copyString("floor", 5), OBJ_VAL(objNativeFunction::createNativeFunction(nativeMath_Floor)));
 	math->tableSet(objString::copyString("ceil", 4), OBJ_VAL(objNativeFunction::createNativeFunction(nativeMath_Ceil)));
 	math->tableSet(objString::copyString("rand", 4), OBJ_VAL(objNativeFunction::createNativeFunction(nativeMath_Rand)));
+
+	vm.globals.insert_or_assign(mathName, OBJ_VAL(math));
+	vm.constVector.emplace_back("Math");
 }

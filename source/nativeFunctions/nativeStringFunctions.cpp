@@ -7,14 +7,34 @@
 
 #include "../../header/virtualMachine/VM.hpp"
 
+static value nativeString_Init(int arity, value* args, bool& success) {
+	if (arity != 1) {
+		success = false;
+		return nativeFunctions::error("constructor expects one argument");
+	}
+
+	if (!(IS_OBJ(args[0]) && AS_OBJ(args[0])->getType() == OBJ_STR)) {
+		success = false;
+		return nativeFunctions::error("argument must be a string");
+	}
+
+	return (args[0]);
+}
+
 static value nativeString_Len(int arity, value* args, bool& success) {
 	if (arity != 0) {
-		
+
 		success = false;
 		return nativeFunctions::error("len: expects 0 arguments");
 	}
 
-	double len = ((objString*)(AS_OBJ((*args))))->getLen();
+	value _this = NAT_THIS;
+	if (!(IS_OBJ(_this) && AS_OBJ(_this)->getType() == OBJ_STR)) {
+		success = false;
+		return nativeFunctions::error("len: can only be used on strings");
+	}
+
+	double len = ((objString*)(AS_OBJ((_this))))->getLen();
 
 	return NUM_VAL(len);
 }
@@ -22,47 +42,52 @@ static value nativeString_Len(int arity, value* args, bool& success) {
 
 static value nativeString_Slice(int arity, value* args, bool& success) {
 	if (arity < 1 || arity > 2) {
-		
+
 		success = false;
 		return nativeFunctions::error("cut: expects 1 or 2 arguments");
 	}
 
-	if (!IS_NUM(args[1])) {
-		
+	if (!IS_NUM(args[0])) {
+
 		success = false;
 		return nativeFunctions::error("cut: arguments must be numbers");
 	}
-	if (arity == 2 && !IS_NUM(args[2])) {
-		
+	if (arity == 2 && !IS_NUM(args[1])) {
+
 		success = false;
 		return nativeFunctions::error("cut: arguments must be numbers");
 	}
-	objString* str = ((objString*)(AS_OBJ(args[0])));
+	value _this = NAT_THIS;
+	if (!(IS_OBJ(_this) && AS_OBJ(_this)->getType() == OBJ_STR)) {
+		success = false;
+		return nativeFunctions::error("len: can only be used on strings");
+	}
+	objString* str = ((objString*)(AS_OBJ(_this)));
 	double len = str->getLen();
-	double indexOne = AS_NUM(args[1]);
+	double indexOne = AS_NUM(args[0]);
 
 	double indexTwo;
 	if (arity == 2) {
-		indexTwo = AS_NUM(args[2]);
+		indexTwo = AS_NUM(args[1]);
 	}
 	else {
 		indexTwo = len - 1;
 	}
 
 	if (indexOne < 0 || indexTwo < 0) {
-		
+
 		success = false;
 		return nativeFunctions::error("slice: substring can't be created with negativ indices");
 	}
 
 	if (indexTwo >= len) {
-		
+
 		success = false;
 		return nativeFunctions::error("slice: second index must be lesser than string length");
 	}
 
 	if (indexOne > indexTwo) {
-		
+
 		success = false;
 		return nativeFunctions::error("slice: first index must be lesser than second index");
 	}
@@ -73,20 +98,25 @@ static value nativeString_Slice(int arity, value* args, bool& success) {
 
 static value nativeString_Chr(int arity, value* args, bool& success) {
 	if (arity > 1) {
-		
+
 		success = false;
-		return nativeFunctions::error("chr: expects 1 argument");
+		return nativeFunctions::error("chr: expects 0 or 1 arguments");
 	}
-	objString* str = (objString*)AS_OBJ(args[0]);
+	value _this = NAT_THIS;
+	if (!(IS_OBJ(_this) && AS_OBJ(_this)->getType() == OBJ_STR)) {
+		success = false;
+		return nativeFunctions::error("len: can only be used on strings");
+	}
+	objString* str = (objString*)AS_OBJ(_this);
 	unsigned int index = 0;
 
 	if (arity == 1) {
-		if (!IS_NUM(args[1]) || AS_NUM(args[1]) >= (str->getLen())) {
-			
-			success = false;
-			return nativeFunctions::error("chr: invalid index");
-		}
-		index = AS_NUM(args[1]);
+		if (!IS_NUM(args[0]) || AS_NUM(args[0]) >= (str->getLen())) {
+
+		success = false;
+		return nativeFunctions::error("chr: invalid index");
+	}
+		index = AS_NUM(args[0]);
 	}
 
 	unsigned char res = str->getChars()[index];
@@ -110,7 +140,7 @@ static value nativeString_To_String(int arity, value* args, bool& success) {
 		}
 		return OBJ_VAL(objString::copyString(result.data(), result.size()));
 	}
-	if(IS_NIL((*args))) {
+	if (IS_NIL((*args))) {
 		return OBJ_VAL(objString::copyString("nil", 3));
 	}
 	if (IS_BOOL((*args))) {
@@ -125,13 +155,13 @@ static value nativeString_To_String(int arity, value* args, bool& success) {
 
 static value nativeString_To_Chr(int arity, value* args, bool& success) {
 	if (arity != 1) {
-		
+
 		success = false;
 		return nativeFunctions::error("to_chr: expects 1 argument");
 	}
 
 	if (!IS_NUM((*args))) {
-		
+
 		success = false;
 		return nativeFunctions::error("to_chr: argument must be a number");
 	}
@@ -147,18 +177,22 @@ static value nativeString_At(int arity, value* args, bool& success) {
 		success = false;
 		return nativeFunctions::error("at: expects 1 argument");
 	}
-	if (!IS_NUM(args[1])) {
-		
+	if (!IS_NUM(args[0])) {
+
 		success = false;
 		return nativeFunctions::error("at: index must be a number");
 	}
 
-	int index = AS_NUM(args[1]);
-
-	objString* str = (objString*)AS_OBJ(args[0]);
+	int index = AS_NUM(args[0]);
+	value _this = NAT_THIS;
+	if (!(IS_OBJ(_this) && AS_OBJ(_this)->getType() == OBJ_STR)) {
+		success = false;
+		return nativeFunctions::error("len: can only be used on strings");
+	}
+	objString* str = (objString*)AS_OBJ(_this);
 
 	if (index >= (int)str->getLen()) {
-		
+
 		success = false;
 		return nativeFunctions::error("at: invalid index");
 	}
@@ -175,11 +209,15 @@ static value nativeString_At(int arity, value* args, bool& success) {
 static value nativeString_Number(int arity, value* args, bool& success) {
 	if (arity != 0) {
 		success = false;
-		return nativeFunctions::error("number: expects 1 argument");
+		return nativeFunctions::error("number: expects 0 arguments");
 	}
+	value _this = NAT_THIS;
+	if (!(IS_OBJ(_this) && AS_OBJ(_this)->getType() == OBJ_STR)) {
+		success = false;
+		return nativeFunctions::error("len: can only be used on strings");
+	}
+	auto str = (objString*)AS_OBJ((_this));
 
-	auto str = (objString*)AS_OBJ((*args));
-	
 	const char* start = str->getChars();
 
 	if ((start[0] >= '0' && start[0] <= '9') || start[0] == '-') {
@@ -190,17 +228,25 @@ static value nativeString_Number(int arity, value* args, bool& success) {
 	return NIL_VAL;
 }
 
-void nativeStringFunctions(std::unordered_map<objString*, value>& globals, std::unordered_map<objString*, value>& stringFunTable)
+void nativeStringClass::nativeStringFunctions(VM& vm)
 {
+	objString* stringClassName = objString::copyString("String", 6);
+	objClass* StringClass = objClass::createObjClass(stringClassName);
+
+	vm.stringClass = StringClass;
+	vm.constVector.emplace_back("String");
+
 	//standalone
-	globals.insert_or_assign(objString::copyString("to_chr", 6), OBJ_VAL(objNativeFunction::createNativeFunction(nativeString_To_Chr)));
-	globals.insert_or_assign(objString::copyString("to_string", 9), OBJ_VAL(objNativeFunction::createNativeFunction(nativeString_To_String)));
+	vm.globals.insert_or_assign(objString::copyString("to_chr", 6), OBJ_VAL(objNativeFunction::createNativeFunction(nativeString_To_Chr)));
+	vm.globals.insert_or_assign(objString::copyString("to_string", 9), OBJ_VAL(objNativeFunction::createNativeFunction(nativeString_To_String)));
+	vm.globals.insert_or_assign(stringClassName, OBJ_VAL(StringClass));
 
 
 	//tied to string objects
-	stringFunTable.insert_or_assign(objString::copyString("len", 3), OBJ_VAL(objNativeFunction::createNativeFunction(nativeString_Len)));
-	stringFunTable.insert_or_assign(objString::copyString("slice", 5), OBJ_VAL(objNativeFunction::createNativeFunction(nativeString_Slice)));
-	stringFunTable.insert_or_assign(objString::copyString("chr", 3), OBJ_VAL(objNativeFunction::createNativeFunction(nativeString_Chr)));
-	stringFunTable.insert_or_assign(objString::copyString("at", 2), OBJ_VAL(objNativeFunction::createNativeFunction(nativeString_At)));
-	stringFunTable.insert_or_assign(objString::copyString("number", 6), OBJ_VAL(objNativeFunction::createNativeFunction(nativeString_Number)));
+	StringClass->tableSet(vm.memory.initString, OBJ_VAL(objNativeFunction::createNativeFunction(nativeString_Init)));
+	StringClass->tableSet(objString::copyString("len", 3), OBJ_VAL(objNativeFunction::createNativeFunction(nativeString_Len)));
+	StringClass->tableSet(objString::copyString("slice", 5), OBJ_VAL(objNativeFunction::createNativeFunction(nativeString_Slice)));
+	StringClass->tableSet(objString::copyString("chr", 3), OBJ_VAL(objNativeFunction::createNativeFunction(nativeString_Chr)));
+	StringClass->tableSet(objString::copyString("at", 2), OBJ_VAL(objNativeFunction::createNativeFunction(nativeString_At)));
+	StringClass->tableSet(objString::copyString("number", 6), OBJ_VAL(objNativeFunction::createNativeFunction(nativeString_Number)));
 }

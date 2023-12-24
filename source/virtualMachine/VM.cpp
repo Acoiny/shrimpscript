@@ -315,13 +315,21 @@ bool VM::callValue(value callee, int arity) {
 			auto instance = objInstance::createInstance(cl);
 
 			bool success = true;
-			if (cl->hasInitFunction()) {
+			value initFunc = cl->tableGet(globalMemory.initString);
+			if (IS_FUN(initFunc)) {
 				//marking instance, so GC doesnt delete it
 				instance->mark();
 				peek_set(arity, OBJ_VAL(instance));
 				//popping instance again
 				instance->unmark();
-				success = call(instance->tableGet(globalMemory.initString), arity);
+				success = call(initFunc, arity);
+			}
+			else if (IS_OBJ(initFunc) && AS_OBJ(initFunc)->getType() == OBJ_NAT_FUN) {
+				instance->mark();
+				peek_set(arity, OBJ_VAL(instance));
+				//popping instance again
+				instance->unmark();
+				success = callValue(initFunc, arity);
 			}
 			else {
 				if (arity > 0) {
@@ -384,53 +392,82 @@ bool VM::invoke() {
 		if (IS_OBJ(method) && AS_OBJ(method)->getType() == OBJ_FUN) {
 			return call(method, argc);
 		}
+		else if (IS_OBJ(method) && AS_OBJ(method)->getType() == OBJ_NAT_FUN) {
+			return callValue(method, argc);
+		}
 		return runtimeError("no function with name '", name->getChars(), "' on instance");
 		break;
 	}
 	case OBJ_STR: {
-		if (stringFunctions.find(name) != stringFunctions.end()) {
-			bool success = true;
-			value result = ((objNativeFunction*)(AS_OBJ(stringFunctions.at(name))))->fun(argc, stackTop - argc - 1, success);
-			stackTop -= argc + 1;
-			push(result);
-			if (!success)
-				return runtimeError(((objString*)AS_OBJ(result))->getChars());
-			return success;
+		value method = stringClass->tableGet(name);
+
+		// instance should already be at position of 'this'
+		// peek_set(argc, OBJ_VAL(instance));
+
+		if (IS_OBJ(method) && AS_OBJ(method)->getType() == OBJ_FUN) {
+			return call(method, argc);
 		}
-		else {
-			return runtimeError("no function with name '", name->getChars(), "' for strings");
-		}
+		else
+			if (IS_OBJ(method) && AS_OBJ(method)->getType() == OBJ_NAT_FUN) {
+				bool success = true;
+				value result = ((objNativeFunction*)(AS_OBJ(method)))->fun(argc, stackTop - argc, success);
+				stackTop -= argc + 1;
+				push(result);
+				if (!success)
+					return runtimeError(((objString*)AS_OBJ(result))->getChars());
+				return success;
+			}
+			else {
+				return runtimeError("no function with name '", name->getChars(), "' on string class");
+			}
 		break;
 	}
 	case OBJ_LIST: {
-		if (arrayFunctions.find(name) != arrayFunctions.end()) {
-			bool success = true;
-			value result = ((objNativeFunction*)(AS_OBJ(arrayFunctions.at(name))))->fun(argc, stackTop - argc - 1, success);
-			stackTop -= argc + 1;
-			push(result);
-			if (!success)
-				return runtimeError(((objString*)AS_OBJ(result))->getChars());
-			return success;
+		value method = arrayClass->tableGet(name);
+
+		// instance should already be at position of 'this'
+		// peek_set(argc, OBJ_VAL(instance));
+
+		if (IS_OBJ(method) && AS_OBJ(method)->getType() == OBJ_FUN) {
+			return call(method, argc);
 		}
-		else {
-			return runtimeError("no function with name '", name->getChars(), "' for lists");
-		}
-		break;
+		else
+			if (IS_OBJ(method) && AS_OBJ(method)->getType() == OBJ_NAT_FUN) {
+				bool success = true;
+				value result = ((objNativeFunction*)(AS_OBJ(method)))->fun(argc, stackTop - argc, success);
+				stackTop -= argc + 1;
+				push(result);
+				if (!success)
+					return runtimeError(((objString*)AS_OBJ(result))->getChars());
+				return success;
+			}
+			else {
+				return runtimeError("no function with name '", name->getChars(), "' on array class");
+			}
+		break;;
 	}
 	case OBJ_FILE: {
-		if (fileFunctions.find(name) != fileFunctions.end()) {
-			bool success = true;
-			//objNativeFunction* funnn = (objNativeFunction*)fileFunctions.at(name).as.object;
-			value result = ((objNativeFunction*)(AS_OBJ(fileFunctions.at(name))))->fun(argc, stackTop - argc - 1, success);
-			stackTop -= argc + 1;
-			push(result);
-			if (!success)
-				return runtimeError(((objString*)AS_OBJ(result))->getChars());
-			return success;
+		value method = fileClass->tableGet(name);
+
+		// instance should already be at position of 'this'
+		// peek_set(argc, OBJ_VAL(instance));
+
+		if (IS_OBJ(method) && AS_OBJ(method)->getType() == OBJ_FUN) {
+			return call(method, argc);
 		}
-		else {
-			return runtimeError("no function with name '", name->getChars(), "' for files");
-		}
+		else
+			if (IS_OBJ(method) && AS_OBJ(method)->getType() == OBJ_NAT_FUN) {
+				bool success = true;
+				value result = ((objNativeFunction*)(AS_OBJ(method)))->fun(argc, stackTop - argc, success);
+				stackTop -= argc + 1;
+				push(result);
+				if (!success)
+					return runtimeError(((objString*)AS_OBJ(result))->getChars());
+				return success;
+			}
+			else {
+				return runtimeError("no function with name '", name->getChars(), "' on file class");
+			}
 		break;
 	}
 	case OBJ_CLASS: {
@@ -468,7 +505,7 @@ bool VM::superInvoke() {
 	int argc = readByte();
 	value callee = peek(argc);
 
-	auto* instance = (objInstance*)AS_OBJ(callee);
+	// auto* instance = (objInstance*)AS_OBJ(callee);
 
 	// value this_val = OBJ_VAL(objThis::createObjThis(instance));
 
@@ -865,15 +902,29 @@ exitCodes VM::run() {
 		}
 		case OP_SET_PROPERTY: {
 			short ind = readShort();
-			if (IS_OBJ(peek(1)) && AS_OBJ(peek(1))->getType() == OBJ_INSTANCE) {
-				auto* instance = (objInstance*)AS_OBJ(peek(1));
-				auto* name = (objString*)AS_OBJ(activeFunc->getChunkPtr()->getConstant(ind));
-				value val = pop();
-				if (IS_NIL(val)) {
-					instance->tableDelete(name);
+			if (IS_OBJ(peek(1))) {
+				switch (AS_OBJ(peek(1))->getType()) {
+				case OBJ_INSTANCE: {
+					auto* instance = (objInstance*)AS_OBJ(peek(1));
+					auto* name = (objString*)AS_OBJ(activeFunc->getChunkPtr()->getConstant(ind));
+					value val = pop();
+					if (IS_NIL(val)) {
+						instance->tableDelete(name);
+					}
+					else {
+						instance->tableSet(name, val);
+					}
+					break;
 				}
-				else {
-					instance->tableSet(name, val);
+				case OBJ_CLASS: {
+					runtimeError("classes can't be modified");
+					return INTERPRET_RUNTIME_ERROR;
+					break;
+				}
+				default:
+					runtimeError("only instances have properties");
+					return INTERPRET_RUNTIME_ERROR;
+					break;
 				}
 			}
 			else {
@@ -884,17 +935,29 @@ exitCodes VM::run() {
 		}
 		case OP_GET_PROPERTY: {
 			short ind = readShort();
-			if (IS_OBJ(peek(0)) && AS_OBJ(peek(0))->getType() == OBJ_INSTANCE) {
-				auto* instance = (objInstance*)AS_OBJ(peek(0));
-				auto* name = (objString*)AS_OBJ(activeFunc->getChunkPtr()->getConstant(ind));
-				value val = instance->tableGet(name);
-				if (IS_NIL(val)) {
-					pop();
-					push(NIL_VAL);
-				}
-				else {
+			if (IS_OBJ(peek(0))) {
+				switch (AS_OBJ(peek(0))->getType()) {
+				case OBJ_INSTANCE: {
+					auto* instance = (objInstance*)AS_OBJ(peek(0));
+					auto* name = (objString*)AS_OBJ(activeFunc->getChunkPtr()->getConstant(ind));
+					value val = instance->tableGet(name);
+
 					pop();
 					push(val);
+					break;
+				}
+				case OBJ_CLASS: {
+					auto* klass = (objClass*)AS_OBJ(peek(0));
+					auto* name = (objString*)AS_OBJ(activeFunc->getChunkPtr()->getConstant(ind));
+					value val = klass->tableGet(name);
+
+					pop();
+					push(val);
+					break;
+				}
+				default:
+					runtimeError("can only access objects");
+					return INTERPRET_RUNTIME_ERROR;
 				}
 			}
 			else {
@@ -1065,7 +1128,7 @@ exitCodes VM::run() {
 		}
 		case OP_THIS: {
 			value this_val = activeCallFrameBottom[-1];
-			if (!(IS_OBJ(this_val) && AS_OBJ(this_val)->getType() == OBJ_INSTANCE)) {
+			if (!(IS_OBJ(this_val) && AS_OBJ(this_val)->getType() != OBJ_FUN)) {
 				runtimeError("no valid 'this' object");
 				return INTERPRET_RUNTIME_ERROR;
 			}
@@ -1112,10 +1175,10 @@ exitCodes VM::run() {
 				activeCallFrameBottom = callFrames[callDepth].bottom;
 				stackTop = callFrames[callDepth].top;
 				activeFunc = callFrames[callDepth].func;
-				value callee = pop();
+				pop(); // popping the callee
 				//uintptr_t returnAddress = ((objFunction*)(tmpRetAdd.as.object))->retAddress;
 				ip = callFrames[callDepth].returnPtr;
-				
+
 				push(retVal);
 			}
 			break;

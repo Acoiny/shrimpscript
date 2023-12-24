@@ -22,7 +22,8 @@ union value {
 #define NANISH_MASK (0xffff000000000000)
 #define BOOL_MASK (0x7ffe000000000002)
 #define OBJ_MASK (0xfffc000000000000)
-#define RET_MASK (0xfffe000000000000)
+// mask can be resued? CHECK IF WORKING FIRST
+// #define RET_MASK (0xfffe000000000000)
 
 #define TRUE_VAL value{(BOOL_MASK | 3)}
 #define FALSE_VAL value{(BOOL_MASK | 2)}
@@ -31,7 +32,6 @@ union value {
 
 //macros for creating the different values
 #define OBJ_VAL(ptr) value{(uint64_t)(ptr) | OBJ_MASK}
-#define RET_VAL(ptr) value{(uintptr_t)(ptr) | RET_MASK}
 #define NUM_VAL(num) value{ .as_double{num}}
 
 //TODO: add return address thingy
@@ -43,15 +43,16 @@ union value {
 #define IS_BOOL(val) ((val.as_uint64 & BOOL_MASK) == BOOL_MASK)
 
 #define IS_OBJ(val) ((val.as_uint64 & NANISH_MASK) ==  OBJ_MASK)
-#define IS_RET(val) ((val.as_uint64 & NANISH_MASK) == RET_MASK)
 
 #define IS_STR(val) (IS_OBJ(val) && AS_OBJ(val)->getType() == OBJ_STR)
 #define IS_FUN(val) (IS_OBJ(val) && AS_OBJ(val)->getType() == OBJ_FUN)
 #define IS_INSTANCE(val) (IS_OBJ(val) && AS_OBJ(val)->getType() == OBJ_INSTANCE)
+#define IS_ARRAY(val) (IS_OBJ(val) && AS_OBJ(val)->getType() == OBJ_LIST)
+#define IS_FILE(val) (IS_OBJ(val) && AS_OBJ(val)->getType() == OBJ_FILE)
 
 // macro for testing if number is an integer
 
-#define IS_INT(val) ((val.as_double) == ((long long)(val.as_double)))
+#define IS_INT(val) (IS_NUM(val) && ((val.as_double) == ((long long)(val.as_double))))
 
 #define AS_INT(val) ((long long)(val.as_double))
 
@@ -59,7 +60,10 @@ union value {
 #define AS_NUM(val) (val.as_double)
 #define AS_BOOL(val) ((bool)(val.as_uint64 & 0x1))
 #define AS_OBJ(val) ((obj*)(val.as_uint64 & 0xFFFFFFFFFFFF))
-#define AS_RET(val) ((uintptr_t)(val.as_uint64 & 0xFFFFFFFFFFFF))
+#define AS_STR(val) ((objString*)AS_OBJ(val))
+#define AS_CSTR(val) (AS_STR(val)->chars)
+
+#define AS_HASH(val) (val.as_uint64)
 
 std::ostream& operator<<(std::ostream& os, const value val);
 
@@ -77,18 +81,27 @@ const std::string stringify(value val);
 
 //macros for checking type of values
 #define IS_NUM(val) (val.getType() == VAL_NUM)
+#define IS_INT(val) (IS_NUM(val) && AS_NUM(val) == AS_INT(val))
 
 #define IS_NIL(val) (val.getType() == VAL_NIL)
 #define IS_BOOL(val) (val.getType() == VAL_BOOL)
 
 #define IS_OBJ(val) (val.getType() == VAL_OBJ)
-#define IS_RET(val) (val.getType() == VAL_ADDRESS)
+
+#define IS_STR(val) (IS_OBJ(val) && AS_OBJ(val)->getType() == OBJ_STR)
+#define IS_FUN(val) (IS_OBJ(val) && AS_OBJ(val)->getType() == OBJ_FUN)
+#define IS_FILE(val) (IS_OBJ(val) && AS_OBJ(val)->getType() == OBJ_FILE)
+#define IS_INSTANCE(val) (IS_OBJ(val) && AS_OBJ(val)->getType() == OBJ_INSTANCE)
+#define IS_ARRAY(val) (IS_OBJ(val) && AS_OBJ(val)->getType() == OBJ_LIST)
 
 #define AS_NUM(val) (val.as.number)
 #define AS_BOOL(val) (val.as.boolean)
 #define AS_OBJ(val) (val.as.object)
-#define AS_RET(val) (val.as.address)
+#define AS_STR(val) ((objString*)AS_OBJ(val))
 
+#define AS_INT(val) ((long long)val.as.number)
+
+#define AS_HASH(val) (val.as.integer)
 
 // macro for testing if number is an integer
 
@@ -100,14 +113,13 @@ enum valType{
     VAL_NUM,
     VAL_BOOL,
     VAL_NIL,
-    VAL_OBJ,
-    VAL_ADDRESS
+    VAL_OBJ
 };
 
 union trueVal{
     bool boolean;
     double number;
-    uintptr_t address;
+    uint64_t integer;
     obj* object;
 };
 

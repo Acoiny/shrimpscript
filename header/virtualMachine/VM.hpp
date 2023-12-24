@@ -39,6 +39,10 @@ class VM {
     friend class objFunction;
     friend class memoryManager;
     friend class nativeFunctions;
+    friend class nativeStringClass;
+    friend class nativeMathClass;
+    friend class nativeArrayClass;
+    friend class nativeFileClass;
 
 
     bool gcReady = false;
@@ -64,10 +68,12 @@ class VM {
     // so consts are still known as const during the compilation time
     std::vector<std::string> constVector;
 
-    // tables with methods for objects like lists & strings
-    std::unordered_map<objString*, value> stringFunctions;
-    std::unordered_map<objString*, value> arrayFunctions;
-    std::unordered_map<objString*, value> fileFunctions;
+    // pointers to classes for builtins, for fast access
+    // also these don't have the pointers themselves
+    // the vm handles this
+    objClass* stringClass;
+    objClass* arrayClass;
+    objClass* fileClass;
 
     char *ip;
 

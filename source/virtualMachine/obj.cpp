@@ -218,7 +218,7 @@ bool objClass::hasInitFunction() {
 	
 	auto el = tableGet(name);
 
-	if (IS_OBJ(el) && AS_OBJ(el)->getType() == OBJ_FUN)
+	if (IS_OBJ(el) && (AS_OBJ(el)->getType() == OBJ_FUN || AS_OBJ(el)->getType() == OBJ_NAT_FUN))
 		return true;
 
 	return false;

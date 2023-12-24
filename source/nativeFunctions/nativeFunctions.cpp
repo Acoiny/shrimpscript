@@ -70,9 +70,6 @@ static value native_Type(int argc, value* args, bool& success) {
 	else if (IS_NIL((*args))) {
 		str = "nil";
 	}
-	else if (IS_RET((*args))) {
-		str = "retAdd";
-	}
 	else if (IS_OBJ((*args))) {
 		switch (AS_OBJ((*args))->getType()) {
 		case OBJ_STR:
@@ -239,14 +236,11 @@ void nativeFunctions::initNatives(VM& vm) {
 	vm.globals.insert_or_assign(objString::copyString("open", 4), OBJ_VAL(objNativeFunction::createNativeFunction(native_Open)));
 	vm.globals.insert_or_assign(objString::copyString("collectGarbage", 15), OBJ_VAL(objNativeFunction::createNativeFunction(native_GC)));
 
+	nativeStringClass::nativeStringFunctions(vm);
+	nativeArrayClass::nativeArrayFunctions(vm);
+	nativeFileClass::nativeFileFunctions(vm);
 
-	nativeStringFunctions(vm.globals, vm.stringFunctions);
-	nativeArrayFunctions(vm, vm.arrayFunctions);
-	nativeFileFunctions(vm, vm.fileFunctions);
-
-	auto math = objClass::createObjClass(objString::copyString("Math", 4));
-	nativeMathFunctions(vm, math);
-	vm.globals.insert_or_assign(objString::copyString("Math", 4), OBJ_VAL(math));
+	nativeMathClass::nativeMathFunctions(vm);
 }
 
 value nativeFunctions::error(const char* msg)

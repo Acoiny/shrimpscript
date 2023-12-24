@@ -129,20 +129,11 @@ void memoryManager::markRoots() {
 		markObject(el);
 	}
 
-	for (auto& el : vm->stringFunctions) {
-		markObject(el.first);
-		markValue(el.second);
-	}
+	markObject(vm->stringClass);
 
-	for (auto& el : vm->arrayFunctions) {
-		markObject(el.first);
-		markValue(el.second);
-	}
+	//markObject(vm->arrayClass);
 
-	for (auto& el : vm->fileFunctions) {
-		markObject(el.first);
-		markValue(el.second);
-	}
+	//markObject(vm->fileClass);
 
 	markObject(initString);
 }

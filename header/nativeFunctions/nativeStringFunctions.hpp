@@ -3,5 +3,7 @@
 #include <unordered_map>
 #include "../virtualMachine/VM.hpp"
 
-
-void nativeStringFunctions(std::unordered_map<objString*, value>& globals, std::unordered_map<objString*, value>& stringFunTable);
+class nativeStringClass {
+public:
+	static void nativeStringFunctions(VM& globals);
+};

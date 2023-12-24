@@ -2,4 +2,7 @@
 
 #include "../virtualMachine/VM.hpp"
 
-void nativeMathFunctions(VM& vm, objClass* math);
+class nativeMathClass {
+public:
+	static void nativeMathFunctions(VM& vm);
+};
