@@ -85,7 +85,6 @@ static value native_Type(int argc, value* args, bool& success) {
 		case OBJ_CLASS:
 			str = "class";
 			break;
-		case OBJ_THIS:
 		case OBJ_INSTANCE:
 			str = "object";
 			break;

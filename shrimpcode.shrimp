@@ -1,7 +1,9 @@
-fun test() {
-	const i = 0;
-	i++;
-	return i;
+class A{
+	init() {
+		this.name = "jeff"
+		return
+	}
 }
 
-test()
+const a = A();
+println(a.name)

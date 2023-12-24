@@ -30,6 +30,7 @@ enum exitCodes {
 struct callFrame{
     value* bottom;
     objFunction* func;
+    char* returnPtr;
     value* top;
 };
 
@@ -63,7 +64,7 @@ class VM {
     // so consts are still known as const during the compilation time
     std::vector<std::string> constVector;
 
-    //tables with methods for objects like lists & strings
+    // tables with methods for objects like lists & strings
     std::unordered_map<objString*, value> stringFunctions;
     std::unordered_map<objString*, value> arrayFunctions;
     std::unordered_map<objString*, value> fileFunctions;

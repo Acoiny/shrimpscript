@@ -187,8 +187,6 @@ int debug::disassembleInstruction(char inst, chunk *ch, int offset) {
             return byteInstruction("OP_INCREMENT_LOCAL", ch, offset);
         case OP_DECREMENT_LOCAL:
             return byteInstruction("OP_DECREMENT_LOCAL", ch, offset);
-        case OP_PULL_INSTANCE_FROM_THIS:
-            return simpleInstruction("OP_THIS_TO_INSTANCE", ch, offset);
         case OP_RETURN:
             return simpleInstruction("OP_RETURN", ch, offset);
         default: {

@@ -98,9 +98,6 @@ const std::string stringify(value val) {
 		}
 		case OBJ_FILE:
 			return "<file>";
-		case OBJ_THIS:
-			return ("<" + std::string(((objThis*)object)->this_instance->klass->name->chars) + " object>");
-
 		}
 	}
 	return "<unknown object>";

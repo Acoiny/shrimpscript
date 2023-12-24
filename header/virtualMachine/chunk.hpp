@@ -74,7 +74,6 @@ enum opCodes : char {
     OP_MEMBER_VARIABLE,
     OP_METHOD,
     OP_INVOKE,
-    OP_PULL_INSTANCE_FROM_THIS,
 
     OP_LIST,
     OP_APPEND,

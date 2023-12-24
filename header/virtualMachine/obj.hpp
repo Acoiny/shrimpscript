@@ -20,7 +20,6 @@ enum objType : char {
 	OBJ_INSTANCE,
 	OBJ_LIST,
 	OBJ_MAP,
-	OBJ_THIS,
 	OBJ_FILE
 };
 
@@ -187,22 +186,6 @@ public:
 
 	static objInstance* createInstance(objClass* kl);
 };
-
-//return this-object
-class objThis : public obj {
-	friend class memoryManager;
-
-public:
-	objInstance* this_instance;
-	uintptr_t retAddress;
-
-	objThis();
-
-	~objThis() = default;
-
-	static objThis* createObjThis(objInstance* ins);
-};
-
 
 /*
 //native object instance

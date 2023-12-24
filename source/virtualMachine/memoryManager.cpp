@@ -59,12 +59,6 @@ void memoryManager::freeObject(obj* el) {
 		delete klass;
 		break;
 	}
-	case OBJ_THIS: {
-		bytesAllocated -= sizeof(objThis);
-		auto* th = (objThis*)el;
-		delete th;
-		break;
-	}
 	case OBJ_INSTANCE: {
 		bytesAllocated -= sizeof(objInstance);
 		auto* ins = (objInstance*)el;
@@ -197,10 +191,6 @@ void memoryManager::blackenObject(obj* obj) {
 			markValue(el.second);
 		}
 		break;
-	}
-	case OBJ_THIS: {
-		auto th = (objThis*)obj;
-		markObject(th->this_instance);
 	}
 	case OBJ_NAT_FUN:
 	case OBJ_STR:

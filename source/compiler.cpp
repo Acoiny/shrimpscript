@@ -775,13 +775,20 @@ void compiler::returnStatement() {
 	if (currentPosition == TYPE_SCRIPT) {
 		error("can't return from top level script");
 	}
-	if (currentPosition == TYPE_INIT) {
-		error("init method can't return any value");
-	}
 	if (check(TOKEN_SEMICOLON)) {
-		emitByte(OP_NIL);
+		// if method is a constructor, empty return returns the object
+		if (currentPosition == TYPE_INIT) {
+			emitByte(OP_THIS);
+		}
+		else {
+			emitByte(OP_NIL);
+		}
 	}
 	else {
+		// if method is a constructor, return must be empty
+		if (currentPosition == TYPE_INIT) {
+			error("init method can't return any value - use 'return;' to return early");
+		}
 		expression();
 	}
 	emitByte(OP_RETURN);
@@ -1098,7 +1105,7 @@ bool compiler::varDeclaration(bool isConst) {
 
 	if (scopeDepth == 0) {
 		std::string name(prevToken.start, prevToken.len);
-		for (const auto &el : globalConsts) {
+		for (const auto& el : globalConsts) {
 			if (el == name) {
 				error("cannot redeclare previously declared const");
 			}
@@ -1160,7 +1167,8 @@ void compiler::function() {
 	consume("expected '{' before function body", TOKEN_BRACE_OPEN);
 	block();
 	if (currentPosition == TYPE_INIT) {
-		emitByte(OP_PULL_INSTANCE_FROM_THIS);
+		// because init MUST return this
+		emitByte(OP_THIS);
 	}
 	else {
 		emitByte(OP_NIL);

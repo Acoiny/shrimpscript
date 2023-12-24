@@ -239,19 +239,6 @@ objInstance* objInstance::createInstance(objClass* kl) {
 }
 
 
-//this-object functions
-objThis::objThis() : this_instance(nullptr), retAddress(0) {
-	type = OBJ_THIS;
-}
-
-objThis* objThis::createObjThis(objInstance* ins) {
-	auto* th = (objThis*)globalMemory.allocateObject<objThis>();
-
-	th->this_instance = ins;
-
-	return th;
-}
-
 
 ///objList methods
 objList::objList() {

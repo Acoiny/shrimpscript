@@ -266,6 +266,7 @@ bool VM::call(value callee, int arity) {
 	callFrames[callDepth].bottom = activeCallFrameBottom;
 	callFrames[callDepth].func = activeFunc;
 	callFrames[callDepth].top = stackTop - arity;
+	callFrames[callDepth].returnPtr = ip;
 	callDepth++;
 
 	if (callDepth >= FRAMES_MAX)
@@ -274,7 +275,7 @@ bool VM::call(value callee, int arity) {
 	if (arity != fun->getArity())
 		return runtimeError("expected ", fun->getArity(), " arguments, but got ", arity);
 
-	auto retAdr = reinterpret_cast<uintptr_t>(ip);
+	/*auto retAdr = reinterpret_cast<uintptr_t>(ip);
 	//fun->retAddress = retAdr;
 	value replacing = peek(arity);
 	if (AS_OBJ(replacing)->getType() == OBJ_THIS) {
@@ -283,7 +284,7 @@ bool VM::call(value callee, int arity) {
 	else {
 		value tmp = RET_VAL(retAdr);
 		peek_set(arity, tmp);
-	}
+	}*/
 	activeCallFrameBottom = stackTop - arity;
 	activeFunc = fun;
 	ip = activeFunc->getChunkPtr()->getInstructionPointer();
@@ -317,7 +318,7 @@ bool VM::callValue(value callee, int arity) {
 			if (cl->hasInitFunction()) {
 				//marking instance, so GC doesnt delete it
 				instance->mark();
-				peek_set(arity, OBJ_VAL(objThis::createObjThis(instance)));
+				peek_set(arity, OBJ_VAL(instance));
 				//popping instance again
 				instance->unmark();
 				success = call(instance->tableGet(globalMemory.initString), arity);
@@ -331,46 +332,6 @@ bool VM::callValue(value callee, int arity) {
 			}
 			return success;
 		}
-		/*
-		switch (callee.as.object->getType())
-		{
-		case OBJ_FUN:
-			return call(callee, arity);
-		case OBJ_NAT_FUN: {
-			bool success = true;
-			value result = ((objNativeFunction*)callee.as.object)->fun(arity, stackTop - arity, success);
-			stackTop -= arity + 1;
-			push(result);
-			if (success) {
-				return true;
-			}
-			return runtimeError(((objString*)result.as.object)->getChars());
-		}
-		case OBJ_CLASS: {
-			auto* cl = (objClass*)peek(arity).as.object;
-			auto instance = objInstance::createInstance(cl);
-
-			bool success = true;
-			if (cl->hasInitFunction()) {
-				//marking instance, so GC doesnt delete it
-				instance->mark();
-				peek_set(arity, value(objThis::createObjThis(instance)));
-				//popping instance again
-				instance->unmark();
-				success = call(instance->tableGet(globalMemory.initString), arity);
-			}
-			else {
-				if (arity > 0) {
-					return runtimeError("can't call default constructor with arguments");
-				}
-				pop();
-				push(value(instance));
-			}
-			return success;
-		}
-		default:
-			break;
-		}*/
 	}
 	return runtimeError("can only call functions or classes");
 }
@@ -417,7 +378,8 @@ bool VM::invoke() {
 
 		value method = instance->tableGet(name);
 
-		peek_set(argc, OBJ_VAL(objThis::createObjThis(instance)));
+		// instance should already be at position of 'this'
+		// peek_set(argc, OBJ_VAL(instance));
 
 		if (IS_OBJ(method) && AS_OBJ(method)->getType() == OBJ_FUN) {
 			return call(method, argc);
@@ -508,13 +470,14 @@ bool VM::superInvoke() {
 
 	auto* instance = (objInstance*)AS_OBJ(callee);
 
-	value this_val = OBJ_VAL(objThis::createObjThis(instance));
+	// value this_val = OBJ_VAL(objThis::createObjThis(instance));
 
 	//TODO: access activeFunc
 	value method = activeFunc->getClass()->superTableGet(name);
 	//value method = ((objThis*)this_val.as.object)->accessSuperClassVariable(name);
 
-	peek_set(argc, this_val);
+	// instance should be at correct position
+	// peek_set(argc, this_val);
 
 	if (IS_OBJ(method) && AS_OBJ(method)->getType() == OBJ_FUN) {
 		return call(method, argc);
@@ -1102,11 +1065,11 @@ exitCodes VM::run() {
 		}
 		case OP_THIS: {
 			value this_val = activeCallFrameBottom[-1];
-			if (!(IS_OBJ(this_val) && AS_OBJ(this_val)->getType() == OBJ_THIS)) {
+			if (!(IS_OBJ(this_val) && AS_OBJ(this_val)->getType() == OBJ_INSTANCE)) {
 				runtimeError("no valid 'this' object");
 				return INTERPRET_RUNTIME_ERROR;
 			}
-			push(OBJ_VAL(((objThis*)AS_OBJ(activeCallFrameBottom[-1]))->this_instance));
+			push(this_val);
 			break;
 		}
 		case OP_SUPER: {
@@ -1123,12 +1086,6 @@ exitCodes VM::run() {
 		case OP_SUPER_INVOKE: {
 			if (!superInvoke())
 				return INTERPRET_RUNTIME_ERROR;
-			break;
-		}
-		case OP_PULL_INSTANCE_FROM_THIS: {
-			value val = activeCallFrameBottom[-1];
-			objThis* th = (objThis*)(AS_OBJ(val));
-			push(OBJ_VAL(th->this_instance));
 			break;
 		}
 		case OP_IMPORT: {
@@ -1155,17 +1112,10 @@ exitCodes VM::run() {
 				activeCallFrameBottom = callFrames[callDepth].bottom;
 				stackTop = callFrames[callDepth].top;
 				activeFunc = callFrames[callDepth].func;
-				value tmpRetAdd = pop();
+				value callee = pop();
 				//uintptr_t returnAddress = ((objFunction*)(tmpRetAdd.as.object))->retAddress;
-				uintptr_t returnAddress;
-				if (IS_RET(tmpRetAdd)) {
-					returnAddress = AS_RET(tmpRetAdd);
-				}
-				else {
-					returnAddress = ((objThis*)AS_OBJ(tmpRetAdd))->retAddress;
-				}
-
-				ip = reinterpret_cast<char*>(returnAddress);
+				ip = callFrames[callDepth].returnPtr;
+				
 				push(retVal);
 			}
 			break;
