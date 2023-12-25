@@ -204,6 +204,7 @@ bool VM::isFalsey(value a) {
 			auto str = (objString*)AS_OBJ(a);
 			return str->getLen() != 0;
 		}
+		return true;
 	}
 	/*
 	switch (a.getType())
