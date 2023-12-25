@@ -732,6 +732,14 @@ exitCodes VM::run() {
 			else
 				push(FALSE_VAL);
 			break;
+		case OP_CASE_COMPARE: {
+			value caseVal = pop();
+			if (areEqual(caseVal, peek(0)))
+				push(TRUE_VAL);
+			else
+				push(FALSE_VAL);
+			break;
+		}
 		case OP_NOT_EQUALS:
 			if (areEqual(pop(), pop()))
 				push(FALSE_VAL);
@@ -802,7 +810,7 @@ exitCodes VM::run() {
 		case OP_BIT_AND: {
 			value b = pop();
 			value a = pop();
-			if (!IS_NUM(a) || !IS_INT(a) || !IS_NUM(b) || !IS_INT(b)) {
+			if (!IS_INT(a) || !IS_INT(b)) {
 				runtimeError("bitwise operations can only be done on whole numbers");
 				return INTERPRET_RUNTIME_ERROR;
 			}
@@ -813,7 +821,7 @@ exitCodes VM::run() {
 		case OP_BIT_OR: {
 			value b = pop();
 			value a = pop();
-			if (!IS_NUM(a) || !IS_INT(a) || !IS_NUM(b) || !IS_INT(b)) {
+			if (!IS_INT(a) || !IS_INT(b)) {
 				runtimeError("bitwise operations can only be done on whole numbers");
 				return INTERPRET_RUNTIME_ERROR;
 			}
@@ -824,7 +832,7 @@ exitCodes VM::run() {
 		case OP_BIT_SHIFT_LEFT: {
 			value b = pop();
 			value a = pop();
-			if (!IS_NUM(a) || !IS_INT(a) || !IS_NUM(b) || !IS_INT(b)) {
+			if (!IS_INT(a) || !IS_INT(b)) {
 				runtimeError("bitwise operations can only be done on whole numbers");
 				return INTERPRET_RUNTIME_ERROR;
 			}
@@ -835,7 +843,7 @@ exitCodes VM::run() {
 		case OP_BIT_SHIFT_RIGHT: {
 			value b = pop();
 			value a = pop();
-			if (!IS_NUM(a) || !IS_INT(a) || !IS_NUM(b) || !IS_INT(b)) {
+			if (!IS_INT(a) || !IS_INT(b)) {
 				runtimeError("bitwise operations can only be done on whole numbers");
 				return INTERPRET_RUNTIME_ERROR;
 			}
@@ -845,7 +853,7 @@ exitCodes VM::run() {
 		}
 		case OP_BIT_NOT: {
 			value a = pop();
-			if (!IS_NUM(a) || !IS_INT(a)) {
+			if (!IS_INT(a)) {
 				runtimeError("bitwise operations can only be done on whole numbers");
 				return INTERPRET_RUNTIME_ERROR;
 			}
@@ -856,7 +864,7 @@ exitCodes VM::run() {
 		case OP_BIT_XOR: {
 			value b = pop();
 			value a = pop();
-			if (!IS_NUM(a) || !IS_INT(a) || !IS_NUM(b) || !IS_INT(b)) {
+			if (!IS_INT(a) || !IS_INT(b)) {
 				runtimeError("bitwise operations can only be done on whole numbers");
 				return INTERPRET_RUNTIME_ERROR;
 			}

@@ -25,6 +25,7 @@ enum opCodes : char {
     OP_DECREMENT_LOCAL,
 
     OP_EQUALS,
+    OP_CASE_COMPARE,     // pops only the top operand, so if false, other cases still have the original
     OP_NOT_EQUALS,
     OP_LESSER,
     OP_LESSER_OR_EQUALS,
@@ -44,7 +45,9 @@ enum opCodes : char {
     OP_NIL,
 
     OP_DEFINE_GLOBAL,
+
     OP_POP,
+    OP_DUP_TOP, // duplicates the top of the stack
 
     OP_GET_GLOBAL,
     OP_SET_GLOBAL,

@@ -100,6 +100,8 @@ int debug::disassembleInstruction(char inst, chunk *ch, int offset) {
             return simpleInstruction("OP_NIL", ch, offset);
         case OP_EQUALS:
             return simpleInstruction("OP_EQUALS", ch, offset);
+        case OP_CASE_COMPARE:
+            return simpleInstruction("OP_CASE_COMP", ch, offset);
         case OP_NOT_EQUALS:
             return simpleInstruction("OP_NOT_EQUALS", ch, offset);
         case OP_LESSER:

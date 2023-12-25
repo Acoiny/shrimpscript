@@ -270,6 +270,8 @@ token scanner::identifierToken() {
         return confirmNext("reak", 4, TOKEN_BREAK, tk);
         case 'c':
             switch (peek(1)) {
+            case 'a':
+                return confirmNext("ase", 3, TOKEN_CASE, tk);
             case 'l':
                 return confirmNext("lass", 4, TOKEN_CLASS, tk);
             case 'o': {
@@ -295,6 +297,8 @@ token scanner::identifierToken() {
                 return confirmNext("mport", 5, TOKEN_IMPORT, tk);
             }
         }
+        case 'd':
+            return confirmNext("efault", 6, TOKEN_DEFAULT, tk);
         case 'e':
             return confirmNext("lse", 3, TOKEN_ELSE, tk);
         case 'l':
@@ -326,8 +330,16 @@ token scanner::identifierToken() {
             return confirmNext("r", 1, TOKEN_OR, tk);
         case 'r':
             return confirmNext("eturn", 5, TOKEN_RETURN, tk);
-        case 's':
-            return confirmNext("uper", 4, TOKEN_SUPER, tk);
+        case 's': {
+            switch (peek(1)) {
+            case 'u':
+                return confirmNext("uper", 4, TOKEN_SUPER, tk);
+            case 'w':
+                return confirmNext("witch", 5, TOKEN_SWITCH, tk);
+            default:
+                return scanRestIdentifier(tk);
+            }
+        }
         case 'w':
             return confirmNext("hile", 4, TOKEN_WHILE, tk);
         default:{

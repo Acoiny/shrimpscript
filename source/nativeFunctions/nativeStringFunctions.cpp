@@ -44,18 +44,18 @@ static value nativeString_Slice(int arity, value* args, bool& success) {
 	if (arity < 1 || arity > 2) {
 
 		success = false;
-		return nativeFunctions::error("cut: expects 1 or 2 arguments");
+		return nativeFunctions::error("slice: expects 1 or 2 arguments");
 	}
 
 	if (!IS_NUM(args[0])) {
 
 		success = false;
-		return nativeFunctions::error("cut: arguments must be numbers");
+		return nativeFunctions::error("slice: arguments must be numbers");
 	}
 	if (arity == 2 && !IS_NUM(args[1])) {
 
 		success = false;
-		return nativeFunctions::error("cut: arguments must be numbers");
+		return nativeFunctions::error("slice: arguments must be numbers");
 	}
 	value _this = NAT_THIS;
 	if (!(IS_OBJ(_this) && AS_OBJ(_this)->getType() == OBJ_STR)) {
@@ -105,7 +105,7 @@ static value nativeString_Chr(int arity, value* args, bool& success) {
 	value _this = NAT_THIS;
 	if (!(IS_OBJ(_this) && AS_OBJ(_this)->getType() == OBJ_STR)) {
 		success = false;
-		return nativeFunctions::error("len: can only be used on strings");
+		return nativeFunctions::error("chr: can only be used on strings");
 	}
 	objString* str = (objString*)AS_OBJ(_this);
 	unsigned int index = 0;
@@ -187,7 +187,7 @@ static value nativeString_At(int arity, value* args, bool& success) {
 	value _this = NAT_THIS;
 	if (!(IS_OBJ(_this) && AS_OBJ(_this)->getType() == OBJ_STR)) {
 		success = false;
-		return nativeFunctions::error("len: can only be used on strings");
+		return nativeFunctions::error("at: can only be used on strings");
 	}
 	objString* str = (objString*)AS_OBJ(_this);
 
@@ -214,7 +214,7 @@ static value nativeString_Number(int arity, value* args, bool& success) {
 	value _this = NAT_THIS;
 	if (!(IS_OBJ(_this) && AS_OBJ(_this)->getType() == OBJ_STR)) {
 		success = false;
-		return nativeFunctions::error("len: can only be used on strings");
+		return nativeFunctions::error("number: can only be used on strings");
 	}
 	auto str = (objString*)AS_OBJ((_this));
 

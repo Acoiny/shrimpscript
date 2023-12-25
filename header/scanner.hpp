@@ -62,10 +62,15 @@ enum tokenType {
     TOKEN_LET,
     TOKEN_CONST,
 
+    // control flow tokens
     TOKEN_IF,
     TOKEN_ELSE,
     TOKEN_FOR,
     TOKEN_WHILE,
+    TOKEN_SWITCH,
+    TOKEN_CASE,
+    TOKEN_DEFAULT,
+
 
     TOKEN_FUN,
     TOKEN_COMMA,

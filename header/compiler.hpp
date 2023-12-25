@@ -70,8 +70,8 @@ class compiler {
 
 	unsigned int loopDepth = 0;
 
-	int64_t currentContinue = -1;
-	int64_t currentLoopDepth = -1;
+	int currentContinue = -1;
+	int currentLoopDepth = -1;
 
 	std::vector<breaks> breakJumps;
 
@@ -152,12 +152,35 @@ class compiler {
 
 	void importStatement();
 
+	/**
+	 * parses and compiles code for a case,
+	 * IF 'case' keyword is found
+	 * 
+	 */
+	void switchCase(uint64_t& prevCaseJump);
+
+	/**
+	 * parses and compiles code for default case,
+	 * IF 'default' keywords is found
+	 * 
+	 */
+	void defaultCase(uint64_t& prevCaseJump);
+
+	/**
+	 * Parses the switch statement and it's expression.
+	 * Then hands of control to sub functions
+	 * 
+	 */
+	void switchStatement();
+
 	void expressionStatement();
 
 	void ifStatement();
 
 	//NOT FINISHED!!
 	void forEachLoop();
+
+	void patchBreaks();
 
 	void forStatement();
 
@@ -212,7 +235,7 @@ class compiler {
 
 	static void preCrement(bool canAssign, compiler& cmp);
 
-	precFuncTableEntry precedenceTable[62] = {
+	precFuncTableEntry precedenceTable[65] = {
 			{nullptr, nullptr, PREC_NONE}, //[TOKEN_ERROR] = 
 			{nullptr, nullptr, PREC_NONE}, //[TOKEN_SEMICOLON] = 
 			{nullptr, dot, PREC_CALL}, //[TOKEN_DOT] =
@@ -266,6 +289,9 @@ class compiler {
 			{nullptr, nullptr, PREC_NONE}, //[TOKEN_ELSE] = 
 			{nullptr, nullptr, PREC_NONE}, //[TOKEN_FOR] = 
 			{nullptr, nullptr, PREC_NONE},//[TOKEN_WHILE] = 
+			{nullptr, nullptr, PREC_NONE},//[TOKEN_SWITCH] = 
+			{nullptr, nullptr, PREC_NONE},//[TOKEN_CASE] = 
+			{nullptr, nullptr, PREC_NONE},//[TOKEN_DEFAULT] = 
 			{nullptr, nullptr, PREC_NONE}, //[TOKEN_FUN] = 
 			{nullptr, nullptr, PREC_NONE}, //[TOKEN_COMMA] = 
 			{nullptr, nullptr, PREC_NONE}, //[TOKEN_RETURN] = 

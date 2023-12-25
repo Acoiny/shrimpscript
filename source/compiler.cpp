@@ -685,6 +685,69 @@ void compiler::importStatement() {
 	emitByte(OP_IMPORT);
 }
 
+void compiler::switchCase(uint64_t& prevCaseJump) {
+	expression();	// parsing the case 'HERE':
+	emitByte(OP_CASE_COMPARE);
+	uint64_t falseJump = emitJump(OP_JUMP_IF_FALSE);
+	emitByte(OP_POP);
+	emitByte(OP_POP);	// popping the value from the switch
+	if (prevCaseJump != 0) {		// prevCaseJump is 0 for the first case
+		patchJump(prevCaseJump);	// if the previous case was true,
+	}								// it jumps over this comparison and 'falls through' to here
+	consume("expect ':' after case-expression", TOKEN_COLON);
+	while (!(check(TOKEN_BRACE_CLOSE) || check(TOKEN_DEFAULT) || check(TOKEN_CASE))) {
+		statement();
+	}
+	prevCaseJump = emitJump(OP_JUMP);
+	patchJump(falseJump);
+	emitByte(OP_POP);
+}
+
+void compiler::defaultCase(uint64_t& prevCaseJump) {
+	consume("expected ':' after default-case", TOKEN_COLON);
+	emitByte(OP_POP);	// popping the value if default is active/no case was right
+	if (prevCaseJump != 0) {
+		patchJump(prevCaseJump);
+	}
+	while (!(check(TOKEN_BRACE_CLOSE) || check(TOKEN_DEFAULT) || check(TOKEN_CASE))) {
+		statement();
+	}
+
+	// if no break is found, must jump to avoid the extra pop statement
+	prevCaseJump = emitJump(OP_JUMP);
+}
+
+void compiler::switchStatement() {
+	consume("expected '(' after 'switch' keyword", TOKEN_PAREN_OPEN);
+	expression();
+	consume("expected ')' after 'switch' expression", TOKEN_PAREN_CLOSE);
+	consume("expected '{' as switch-body", TOKEN_BRACE_OPEN);
+	loopDepth++;	// entering loopdepth to enable break statements
+	uint64_t previousLoopDepth = currentLoopDepth;
+	uint64_t previousCaseJump = 0;
+	while (match(TOKEN_CASE)) {
+		switchCase(previousCaseJump);
+	}
+	if (match(TOKEN_DEFAULT)) {
+		defaultCase(previousCaseJump);
+	}
+	if (match(TOKEN_CASE)) {
+		error("default must be the last case");
+	}
+	// popping the value if no case was right
+	emitByte(OP_POP);
+	// if last case was right, and they fell through
+	// they jump to this label
+	if (previousCaseJump == 0) {
+		patchJump(previousCaseJump);
+	}
+	consume("expected '}' after switch-statement", TOKEN_BRACE_CLOSE);
+	currentLoopDepth = previousLoopDepth;
+	loopDepth--;
+	patchBreaks();
+	// emitByte(OP_POP);	// only popping at the end
+}
+
 void compiler::expressionStatement() {
 	if (match(TOKEN_SEMICOLON)) {
 		return;
@@ -905,6 +968,21 @@ void compiler::continueStatement() {
 	emitLoop(currentContinue);
 }
 
+void compiler::patchBreaks() {
+	for (int64_t i = breakJumps.size() - 1; i >= 0; --i) {
+		if (breakJumps.empty())
+			break;
+
+		if (breakJumps.at(i).depth == loopDepth + 1) {
+			patchJump(breakJumps.at(i).pos);
+			breakJumps.pop_back();
+		}
+		else {
+			break;
+		}
+	}
+}
+
 void compiler::forStatement() {
 	beginScope();
 	consume("expect '(' after for statement", TOKEN_PAREN_OPEN);
@@ -967,18 +1045,7 @@ void compiler::forStatement() {
 	}
 
 
-	for (int64_t i = breakJumps.size() - 1; i >= 0; --i) {
-		if (breakJumps.empty())
-			break;
-
-		if (breakJumps.at(i).depth == loopDepth + 1) {
-			patchJump(breakJumps.at(i).pos);
-			breakJumps.pop_back();
-		}
-		else {
-			break;
-		}
-	}
+	patchBreaks();
 
 	endScope();
 }
@@ -1010,6 +1077,9 @@ void compiler::statement() {
 	}
 	else if (match(TOKEN_IMPORT)) {
 		importStatement();
+	}
+	else if (match(TOKEN_SWITCH)) {
+		switchStatement();
 	}
 	else {
 		expressionStatement();

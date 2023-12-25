@@ -1,1 +1,16 @@
-File = 123;
+let i = 132
+let res = "|"
+switch(i) {
+	case 0: {
+		let tmp = 123
+		res += to_string(tmp)
+	}
+	case 1:
+		res += 'one'
+	case 2:
+		res += 'two'
+		break
+	case 3:
+		res += 'three'
+}
+println(res)
