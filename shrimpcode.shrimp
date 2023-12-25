@@ -1,16 +1,22 @@
-let i = 132
-let res = "|"
-switch(i) {
-	case 0: {
-		let tmp = 123
-		res += to_string(tmp)
+fun handleInput(i) {
+	switch(i) {
+		case 'tell':
+			print("tell ")
+			break
+		case 'me':
+			print("me ")
+		case 'something':
+			print("something ")
+		case 'girl':
+			print('girl')
+			break
+		default:
+			println("enter lyrics")
+			break;
 	}
-	case 1:
-		res += 'one'
-	case 2:
-		res += 'two'
-		break
-	case 3:
-		res += 'three'
+	println("")
+	println("are you lost in this modern world?")
+	println(i)
 }
-println(res)
+
+handleInput('tell')

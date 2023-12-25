@@ -700,7 +700,7 @@ void compiler::switchCase(uint64_t& prevCaseJump) {
 	}
 	prevCaseJump = emitJump(OP_JUMP);
 	patchJump(falseJump);
-	emitByte(OP_POP);
+	emitByte(OP_POP);	// should pop 'false' from comparison result
 }
 
 void compiler::defaultCase(uint64_t& prevCaseJump) {
@@ -724,6 +724,7 @@ void compiler::switchStatement() {
 	consume("expected '{' as switch-body", TOKEN_BRACE_OPEN);
 	loopDepth++;	// entering loopdepth to enable break statements
 	uint64_t previousLoopDepth = currentLoopDepth;
+	currentLoopDepth = scopeDepth;
 	uint64_t previousCaseJump = 0;
 	while (match(TOKEN_CASE)) {
 		switchCase(previousCaseJump);
@@ -758,11 +759,7 @@ void compiler::expressionStatement() {
 	emitByte(OP_POP);
 }
 
-/**
- * .
- *
- * \param offset
- */
+
 void compiler::patchJump(size_t offset) {
 	int jump = currentChunk->getSize() - offset - 2;
 
