@@ -1,11 +1,13 @@
-fun adder(x) {
-	fun addx(y) {
-		return x + y
+class Student{
+	init(name, year) {
+		this.name = name
+		this.year = year
 	}
 
-	return addx
+	takeExam(exam) {
+		println(this.name, " took the ", exam, " exam")
+	}
 }
 
-const add5 = adder(5)
-
-println(add5(2))
+const harry = Student("Harry Potter", 4)
+harry.takeExam("Potions")

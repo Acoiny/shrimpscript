@@ -153,6 +153,7 @@ int debug::disassembleInstruction(char inst, chunk *ch, int offset) {
                 cout << " " << (isLocal ? "local" : "upvalue");
                 cout << " " << index << std::endl;
             }
+            return offset;
         }
         case OP_SET_UPVALUE:
             return byteInstruction("OP_SET_UPVALUE", ch, offset);

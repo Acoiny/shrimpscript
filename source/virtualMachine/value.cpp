@@ -24,11 +24,11 @@ const std::string stringify(value val) {
 		case OBJ_STR:
 			return ((objString*)object)->chars;
 		case OBJ_FUN:
-			return ("<function " + std::string(((objFunction*)object)->name->chars) + ">");
+			return ("<fn " + std::string(((objFunction*)object)->name->chars) + ">");
 		case OBJ_UPVALUE:
 			return "<upvalue>";
 		case OBJ_CLOSURE:
-			return ("<closure " + std::string(((objClosure*)object)->function->name->chars) + ">");
+			return ("<fn " + std::string(((objClosure*)object)->function->name->chars) + ">");
 		case OBJ_NAT_FUN:
 			return ("<nativeFunction>");
 		case OBJ_CLASS:

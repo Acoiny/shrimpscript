@@ -124,6 +124,13 @@ void memoryManager::markRoots() {
 		markValue(*slot);
 	}
 
+	// marking all openUpvalues
+	objUpvalue* upval = vm->openUpvalues;
+	while (upval) {
+		markObject(upval);
+		upval = upval->next;
+	}
+
 	// marking the callstack
 	for (size_t i = 0; i < vm->callDepth; ++i) {
 		markObject(vm->callFrames[i].closure);
@@ -203,6 +210,9 @@ void memoryManager::blackenObject(obj* obj) {
 	case OBJ_CLOSURE: {
 		objClosure* clos = (objClosure*)obj;
 		markObject(clos->function);
+		for (auto el : clos->upvalues) {
+			markObject(el);
+		}
 		break;
 	}
 	case OBJ_NAT_FUN:

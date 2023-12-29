@@ -90,6 +90,7 @@ const std::string stringify(value val);
 
 #define IS_STR(val) (IS_OBJ(val) && AS_OBJ(val)->getType() == OBJ_STR)
 #define IS_FUN(val) (IS_OBJ(val) && AS_OBJ(val)->getType() == OBJ_FUN)
+#define IS_CLOSURE(val) (IS_OBJ(val) && AS_OBJ(val)->getType() == OBJ_CLOSURE)
 #define IS_FILE(val) (IS_OBJ(val) && AS_OBJ(val)->getType() == OBJ_FILE)
 #define IS_INSTANCE(val) (IS_OBJ(val) && AS_OBJ(val)->getType() == OBJ_INSTANCE)
 #define IS_ARRAY(val) (IS_OBJ(val) && AS_OBJ(val)->getType() == OBJ_LIST)

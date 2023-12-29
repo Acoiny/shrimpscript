@@ -55,7 +55,8 @@ class VM {
     objUpvalue* openUpvalues = nullptr;
 
     objClosure* activeClosure;
-    //all scripts are stored in vector, so GC can reach them when in import script
+
+    // all scripts are stored in vector, so GC can reach them when in import script
     std::vector<objClosure*> scriptClosures;
     size_t currentScript = 0;
 

@@ -324,7 +324,7 @@ bool VM::callValue(value callee, int arity) {
 
 			bool success = true;
 			value initFunc = cl->tableGet(globalMemory.initString);
-			if (IS_FUN(initFunc)) {
+			if (IS_CLOSURE(initFunc)) {
 				//marking instance, so GC doesnt delete it
 				instance->mark();
 				peek_set(arity, OBJ_VAL(instance));
@@ -357,7 +357,7 @@ void VM::defineMethod() {
 	objString* name = (objString*)AS_OBJ(activeClosure->function->getChunkPtr()->getConstant(readShort()));
 	objClass* cl = (objClass*)AS_OBJ(peek(1));
 
-	((objFunction*)AS_OBJ(method))->setClass(cl);
+	((objClosure*)AS_OBJ(method))->function->setClass(cl);
 
 	cl->tableSet(name, method);
 	pop();
@@ -397,7 +397,7 @@ bool VM::invoke() {
 		// instance should already be at position of 'this'
 		// peek_set(argc, OBJ_VAL(instance));
 
-		if (IS_OBJ(method) && AS_OBJ(method)->getType() == OBJ_FUN) {
+		if (IS_OBJ(method) && AS_OBJ(method)->getType() == OBJ_CLOSURE) {
 			return call(method, argc);
 		}
 		else if (IS_OBJ(method) && AS_OBJ(method)->getType() == OBJ_NAT_FUN) {
@@ -412,7 +412,7 @@ bool VM::invoke() {
 		// instance should already be at position of 'this'
 		// peek_set(argc, OBJ_VAL(instance));
 
-		if (IS_OBJ(method) && AS_OBJ(method)->getType() == OBJ_FUN) {
+		if (IS_OBJ(method) && AS_OBJ(method)->getType() == OBJ_CLOSURE) {
 			return call(method, argc);
 		}
 		else
@@ -436,7 +436,7 @@ bool VM::invoke() {
 		// instance should already be at position of 'this'
 		// peek_set(argc, OBJ_VAL(instance));
 
-		if (IS_OBJ(method) && AS_OBJ(method)->getType() == OBJ_FUN) {
+		if (IS_OBJ(method) && AS_OBJ(method)->getType() == OBJ_CLOSURE) {
 			return call(method, argc);
 		}
 		else
@@ -460,7 +460,7 @@ bool VM::invoke() {
 		// instance should already be at position of 'this'
 		// peek_set(argc, OBJ_VAL(instance));
 
-		if (IS_OBJ(method) && AS_OBJ(method)->getType() == OBJ_FUN) {
+		if (IS_OBJ(method) && AS_OBJ(method)->getType() == OBJ_CLOSURE) {
 			return call(method, argc);
 		}
 		else
@@ -494,7 +494,7 @@ bool VM::invoke() {
 			return success;
 		}
 
-		if (IS_OBJ(method) && AS_OBJ(method)->getType() == OBJ_FUN) {
+		if (IS_OBJ(method) && AS_OBJ(method)->getType() == OBJ_CLOSURE) {
 			return call(method, argc);
 		}
 		return runtimeError("no function with name '", name->getChars(), "' on class");
@@ -524,7 +524,7 @@ bool VM::superInvoke() {
 	// instance should be at correct position
 	// peek_set(argc, this_val);
 
-	if (IS_OBJ(method) && AS_OBJ(method)->getType() == OBJ_FUN) {
+	if (IS_OBJ(method) && AS_OBJ(method)->getType() == OBJ_CLOSURE) {
 		return call(method, argc);
 	}
 
@@ -1082,7 +1082,7 @@ exitCodes VM::run() {
 		case OP_CLOSURE: {
 			short ind = readShort();
 			auto function = (objFunction*)AS_OBJ(activeClosure->function->getChunkPtr()->getConstant(ind));
-			function->mark();
+			// function->mark();
 			auto closure = objClosure::createClosure(function);
 			push(OBJ_VAL(closure));
 			closure->upvalues.resize(function->upvalueCount);
@@ -1213,7 +1213,7 @@ exitCodes VM::run() {
 		}
 		case OP_THIS: {
 			value this_val = activeCallFrameBottom[-1];
-			if (!(IS_OBJ(this_val) && AS_OBJ(this_val)->getType() != OBJ_FUN)) {
+			if (!(IS_OBJ(this_val) && AS_OBJ(this_val)->getType() != OBJ_CLOSURE)) {
 				runtimeError("no valid 'this' object");
 				return INTERPRET_RUNTIME_ERROR;
 			}

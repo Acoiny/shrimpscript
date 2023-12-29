@@ -1340,6 +1340,7 @@ void compiler::function() {
 	endFunctionScope();
 
 	currentFunction->arity = argc;
+
 	// adding function to previous chunk, with currentchunk containing its body
 	unsigned int fun = prevFunction->funChunk->addConstantGetLine(OBJ_VAL(currentFunction), prevToken.line);
 
