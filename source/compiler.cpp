@@ -323,6 +323,7 @@ int compiler::addUpvalue(int index, bool isLocal) {
 int compiler::resolveUpvalueInFunctionScope(bool& isConst, token& name, int functionScope) {
 	for (int i = locals.size() - 1; i >= 0; i--) {
 		local &loc = locals.at(i);
+		if (loc.funcDepth > functionScope) continue;
 		if (loc.funcDepth < functionScope) return -1;
 
 		if (identifiersEqual(loc.name, name)) {

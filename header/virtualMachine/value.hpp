@@ -98,6 +98,7 @@ const std::string stringify(value val);
 #define AS_BOOL(val) (val.as.boolean)
 #define AS_OBJ(val) (val.as.object)
 #define AS_STR(val) ((objString*)AS_OBJ(val))
+#define AS_CSTR(val) (AS_STR(val)->chars)
 
 #define AS_INT(val) ((long long)val.as.number)
 
@@ -137,7 +138,6 @@ public:
     explicit value(bool boolean);
     explicit value(double num);
     explicit value(obj* obj);
-    explicit value(uintptr_t address);
     inline valType getType() const { return type; };
 
     bool operator==(const value& rhs) const;

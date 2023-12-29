@@ -149,6 +149,13 @@ class VM {
 
     bool importFile(const char* filename);
 
+    /**
+     * captures the given value from the stack.
+     * 
+     * \param local
+     */
+    objUpvalue* captureUpvalue(value* local);
+
 public:
 
     // the path that gets added to imported files, so they are always relative to the executed file

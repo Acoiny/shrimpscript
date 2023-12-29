@@ -1,5 +1,9 @@
-fun test() {
-	println("asd")
+fun outer() {
+	let i = "innter"
+	fun inner() {
+		println(i)
+	}
+	inner()
 }
 
-test()
+outer()

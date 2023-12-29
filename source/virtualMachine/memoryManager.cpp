@@ -94,9 +94,6 @@ void memoryManager::freeObject(obj* el) {
 	case OBJ_CLOSURE: {
 		bytesAllocated -= sizeof(objClosure);
 		auto* clos = (objClosure*)el;
-		for (auto el : clos->upvalues) {
-			delete el;
-		}
 		delete clos;
 		break;
 	}

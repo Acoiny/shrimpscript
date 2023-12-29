@@ -614,6 +614,12 @@ bool VM::importFile(const char* filename) {
 	return runImportFile(path.data(), *this);
 }
 
+objUpvalue* VM::captureUpvalue(value* local)
+{
+	objUpvalue* createdUpvalue = objUpvalue::createUpvalue(local);
+	return createdUpvalue;
+}
+
 exitCodes VM::run() {
 	ip = activeClosure->function->getChunkPtr()->getInstructionPointer();
 	char c;
@@ -624,7 +630,7 @@ exitCodes VM::run() {
 			std::cout << " [" << std::setw(6) << std::left << stack[i] << "] ";
 		}
 		std::cout << std::endl;
-		debug::disassembleInstruction(*ip, activeFunc->getChunkPtr(), (ip - activeFunc->getChunkPtr()->getInstructionPointer()));
+		debug::disassembleInstruction(*ip, activeClosure->function->getChunkPtr(), (ip - activeClosure->function->getChunkPtr()->getInstructionPointer()));
 #endif
 		switch (c = readByte()) {
 		case OP_CONSTANT: {
@@ -917,13 +923,14 @@ exitCodes VM::run() {
 			break;
 		}
 		case OP_GET_UPVALUE: {
-			runtimeError("OP_GET_UPVALUE");
-			return INTERPRET_RUNTIME_ERROR;
+			int index = readShort();
+			value* upval = activeClosure->upvalues.at(index)->location;
+			push(*upval);
 			break;
 		}
 		case OP_SET_UPVALUE: {
-			runtimeError("OP_SET_UPVALUE");
-			return INTERPRET_RUNTIME_ERROR;
+			int index = readShort();
+			*activeClosure->upvalues.at(index)->location = peek(0);
 			break;
 		}
 		case OP_SET_PROPERTY: {
@@ -1051,8 +1058,16 @@ exitCodes VM::run() {
 			function->mark();
 			auto closure = objClosure::createClosure(function);
 			push(OBJ_VAL(closure));
+			closure->upvalues.resize(function->upvalueCount);
 			for (int i = 0; i < function->upvalueCount; i++) {
-
+				uint8_t isLocal = readByte();
+				uint8_t index = readByte();
+				if (isLocal) {
+					closure->upvalues.at(i) = captureUpvalue(activeCallFrameBottom + index);
+				}
+				else {
+					closure->upvalues.at(i) = activeClosure->upvalues.at(i);
+				}
 			}
 			
 			break;

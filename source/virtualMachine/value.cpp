@@ -28,7 +28,7 @@ const std::string stringify(value val) {
 		case OBJ_UPVALUE:
 			return "<upvalue>";
 		case OBJ_CLOSURE:
-			return ("<closure " + std::string(((objFunction*)object)->name->chars) + ">");
+			return ("<closure " + std::string(((objClosure*)object)->function->name->chars) + ">");
 		case OBJ_NAT_FUN:
 			return ("<nativeFunction>");
 		case OBJ_CLASS:
@@ -135,11 +135,6 @@ value::value(obj* obj) {
 	as.object = obj;
 }
 
-value::value(uintptr_t address) {
-	type = VAL_ADDRESS;
-	as.address = address;
-}
-
 value::value() {
 	type = VAL_NIL;
 }
@@ -150,6 +145,6 @@ std::ostream& operator<<(std::ostream& os, const value& val) {
 }
 
 bool value::operator==(const value& rhs) const {
-	return this->type == rhs.type && this->as.address == rhs.as.address;
+	return this->type == rhs.type && this->as.integer == rhs.as.integer;
 }
 #endif
