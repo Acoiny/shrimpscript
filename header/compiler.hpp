@@ -44,6 +44,7 @@ struct local {
 	token name;
 	bool isConst;
 	uint32_t funcDepth;
+	bool isCaptured;
 };
 
 /**
@@ -83,6 +84,12 @@ class compiler {
 	 * that aren't in the current function.
 	 */
 	unsigned int functionDepth = 0;
+
+	/**
+	 * gets subtracted from the locals index, so the bottom
+	 * of the current callframe always has index 0.
+	 */
+	unsigned int functionLocalOffset = 0;
 
 	position currentPosition = TYPE_SCRIPT;
 

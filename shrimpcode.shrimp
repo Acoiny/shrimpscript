@@ -1,9 +1,11 @@
-fun outer() {
-	let i = "innter"
-	fun inner() {
-		println(i)
+fun adder(x) {
+	fun addx(y) {
+		return x + y
 	}
-	inner()
+
+	return addx
 }
 
-outer()
+const add5 = adder(5)
+
+println(add5(2))

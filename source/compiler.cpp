@@ -289,7 +289,7 @@ int compiler::resolveLocal(bool& isConst, token comp) {
 			if (loc->isConst)
 				isConst = true;
 
-			return i;
+			return i - functionLocalOffset;
 		}
 	}
 
@@ -349,6 +349,7 @@ int compiler::resolveUpvalue(bool& isConst, token &name, int funcDepth) {
 
 	// if found, add it
 	if (local != -1) {
+		locals.at(local).isCaptured = true;
 		return addUpvalue(local, true);
 	}
 
@@ -725,7 +726,12 @@ void compiler::beginScope() {
 void compiler::endScope() {
 	scopeDepth--;
 	while (!locals.empty() && locals.at(locals.size() - 1).depth > scopeDepth) {
-		emitByte(OP_POP);
+		if (locals.at(locals.size() - 1).isCaptured) {
+			emitByte(OP_CLOSE_UPVALUE);
+		}
+		else {
+			emitByte(OP_POP);
+		}
 		locals.pop_back();
 	}
 }
@@ -1162,6 +1168,7 @@ void compiler::addLocal(token name, bool isConst) {
 	tmp.name = name;
 	tmp.isConst = isConst;
 	tmp.funcDepth = functionDepth;
+	tmp.isCaptured = false;
 
 	locals.push_back(tmp);
 }
@@ -1288,6 +1295,9 @@ void compiler::function() {
 
 	functionDepth++;
 
+	auto prevLocalOffset = functionLocalOffset;
+	functionLocalOffset = locals.size();
+
 	auto* prevUpvalues = upvalues;
 
 	/**
@@ -1359,7 +1369,7 @@ void compiler::function() {
 	// deleting the current upvalues, if 
 	delete upvalues;
 	upvalues = prevUpvalues;
-
+	functionLocalOffset = prevLocalOffset;
 
 	//fun->setData(jump, argc);
 

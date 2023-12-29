@@ -58,6 +58,7 @@ enum opCodes : char {
     OP_CLOSURE,
     OP_GET_UPVALUE,
     OP_SET_UPVALUE,
+    OP_CLOSE_UPVALUE,
 
     OP_JUMP,
     OP_JUMP_IF_FALSE,

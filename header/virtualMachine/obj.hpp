@@ -114,6 +114,12 @@ public:
 	friend class memoryManager;
 	value* location;
 
+	// stores the value if upvalue is closed
+	value closed;
+
+	// linked list for the vm
+	objUpvalue* next;
+
 	objUpvalue();
 
 	static objUpvalue* createUpvalue(value* slot);

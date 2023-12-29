@@ -47,6 +47,13 @@ class VM {
 
     bool gcReady = false;
 
+    /**
+     * a linked list containing all open upvalues.
+     * necessary to allow functions in the same scope, to
+     * share the same upvalue
+     */
+    objUpvalue* openUpvalues = nullptr;
+
     objClosure* activeClosure;
     //all scripts are stored in vector, so GC can reach them when in import script
     std::vector<objClosure*> scriptClosures;
@@ -155,6 +162,8 @@ class VM {
      * \param local
      */
     objUpvalue* captureUpvalue(value* local);
+
+    void closeUpvalue(value* last);
 
 public:
 

@@ -177,7 +177,7 @@ objClass* objFunction::getClass() const {
 
 
 ///object upvalue
-objUpvalue::objUpvalue() : location(nullptr) {
+objUpvalue::objUpvalue() : location(nullptr), closed(NIL_VAL), next(nullptr) {
 	type = OBJ_UPVALUE;
 }
 

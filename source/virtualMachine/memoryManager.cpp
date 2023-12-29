@@ -195,6 +195,11 @@ void memoryManager::blackenObject(obj* obj) {
 		}
 		break;
 	}
+	case OBJ_UPVALUE: {
+		objUpvalue* upval = (objUpvalue*)obj;
+		markValue(upval->closed);
+		break;
+	}
 	case OBJ_CLOSURE: {
 		objClosure* clos = (objClosure*)obj;
 		markObject(clos->function);

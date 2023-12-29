@@ -616,8 +616,35 @@ bool VM::importFile(const char* filename) {
 
 objUpvalue* VM::captureUpvalue(value* local)
 {
+	objUpvalue* prevUpvalue = nullptr;
+	objUpvalue* upvalue = openUpvalues;
+	while (upvalue != nullptr &&  upvalue->location > local) {
+		prevUpvalue = upvalue;
+		upvalue = upvalue->next;
+	}
+
+	if (upvalue != nullptr && upvalue->location == local) {
+		return upvalue;
+	}
+
 	objUpvalue* createdUpvalue = objUpvalue::createUpvalue(local);
+	createdUpvalue->next = upvalue;
+	if (prevUpvalue != nullptr) {
+		prevUpvalue->next = createdUpvalue;
+	}
+	else {
+		openUpvalues = createdUpvalue;
+	}
 	return createdUpvalue;
+}
+
+void VM::closeUpvalue(value* last) {
+	while (openUpvalues != nullptr && openUpvalues->location >= last) {
+		objUpvalue* upvalue = openUpvalues;
+		upvalue->closed = *upvalue->location;
+		upvalue->location = &upvalue->closed;
+		openUpvalues = upvalue->next;
+	}
 }
 
 exitCodes VM::run() {
@@ -1107,6 +1134,11 @@ exitCodes VM::run() {
 			if (!invoke())
 				return INTERPRET_RUNTIME_ERROR;
 			break;
+		case OP_CLOSE_UPVALUE: {
+			closeUpvalue(stackTop - 1);
+			pop();
+			break;
+		}
 		case OP_POP: {
 			pop();
 			break;
@@ -1224,6 +1256,7 @@ exitCodes VM::run() {
 			}
 			else {
 				value retVal = pop();
+				closeUpvalue(activeCallFrameBottom);
 				callDepth--;
 				activeCallFrameBottom = callFrames[callDepth].bottom;
 				stackTop = callFrames[callDepth].top;

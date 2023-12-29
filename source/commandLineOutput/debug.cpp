@@ -158,6 +158,8 @@ int debug::disassembleInstruction(char inst, chunk *ch, int offset) {
             return byteInstruction("OP_SET_UPVALUE", ch, offset);
         case OP_GET_UPVALUE:
             return byteInstruction("OP_GET_UPVALUE", ch, offset);
+        case OP_CLOSE_UPVALUE:
+            return simpleInstruction("OP_CLOSE_UPVALUE", ch, offset);
         case OP_SET_PROPERTY:
             return constantInstruction("OP_SET_PROPERTY", ch, offset);
         case OP_GET_PROPERTY:
