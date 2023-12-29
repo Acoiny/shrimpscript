@@ -1,22 +1,5 @@
-fun handleInput(i) {
-	switch(i) {
-		case 'tell':
-			print("tell ")
-			break
-		case 'me':
-			print("me ")
-		case 'something':
-			print("something ")
-		case 'girl':
-			print('girl')
-			break
-		default:
-			println("enter lyrics")
-			break;
-	}
-	println("")
-	println("are you lost in this modern world?")
-	println(i)
+fun test() {
+	println("asd")
 }
 
-handleInput('tell')
+test()

@@ -2,6 +2,8 @@
 
 #include "../../header/commandLineOutput/debug.hpp"
 
+#include "../../header/virtualMachine/obj.hpp"
+
 using namespace std;
 
 int debug::constantInstruction(const char *name, chunk *ch, int offset) {
@@ -133,6 +135,29 @@ int debug::disassembleInstruction(char inst, chunk *ch, int offset) {
             return constantInstruction("OP_SET_GLOBAL", ch, offset);
         case OP_GET_LOCAL:
             return byteInstruction("OP_GET_LOCAL", ch, offset);
+        case OP_CLOSURE: {
+            offset++;
+            short index = (ch->peekByte(offset++)) << 8 | ch->peekByte(offset++);
+            objFunction* func = (objFunction*)AS_OBJ(ch->getConstant(index));
+            cout.width(4);
+            cout << offset - 3;
+            cout.width(20);
+            cout << "OP_CLOSURE" << " '";
+            cout << ch->getConstant(index) << "'" << endl;
+            for (int i = 0; i < func->upvalueCount; i++) {
+                int isLocal = ch->accessAt(offset++);
+                int index = ch->accessAt(offset++);
+                cout.width(4);
+                cout << offset - 2;
+                cout.width(20); cout << "|";
+                cout << " " << (isLocal ? "local" : "upvalue");
+                cout << " " << index << std::endl;
+            }
+        }
+        case OP_SET_UPVALUE:
+            return constantInstruction("OP_SET_UPVALUE", ch, offset);
+        case OP_GET_UPVALUE:
+            return constantInstruction("OP_GET_UPVALUE", ch, offset);
         case OP_SET_PROPERTY:
             return constantInstruction("OP_SET_PROPERTY", ch, offset);
         case OP_GET_PROPERTY:

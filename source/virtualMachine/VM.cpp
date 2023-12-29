@@ -10,7 +10,7 @@
 
 memoryManager globalMemory;
 
-VM::VM() : ip(), activeFunc(nullptr), memory(globalMemory), callFrames() {
+VM::VM() : ip(), activeClosure(nullptr), memory(globalMemory), callFrames() {
 	memory.setVM(this);
 	currentCompiler = new compiler(*this, constVector);
 
@@ -22,8 +22,10 @@ VM::VM() : ip(), activeFunc(nullptr), memory(globalMemory), callFrames() {
 }
 
 exitCodes VM::interpret(char* str) {
-	activeFunc = currentCompiler->compiling("script", str);
-	scriptFuncs.push_back(activeFunc);
+	objFunction* activeFunc = currentCompiler->compiling("script", str);
+	objClosure* mainClosure = objClosure::createClosure(activeFunc);
+	activeClosure = mainClosure;
+	scriptClosures.push_back(mainClosure);
 	gcReady = true;
 
 	exitCodes exited = INTERPRET_RUNTIME_ERROR;
@@ -42,8 +44,10 @@ void VM::interpretImportFile(const char* name, char* str) {
 
 	//no GC when compiling
 	gcReady = false;
-	activeFunc = currentCompiler->compiling(name, str);
-	scriptFuncs.push_back(activeFunc);
+	objFunction* activeFunc = currentCompiler->compiling(name, str);
+	objClosure* importClosure = objClosure::createClosure(activeFunc);
+	activeClosure = importClosure;
+	scriptClosures.push_back(importClosure);
 	currentScript++;
 	gcReady = true;
 
@@ -52,10 +56,10 @@ void VM::interpretImportFile(const char* name, char* str) {
 	}
 
 
-	//mustn't delete function here, because of linked list of all objects in GC
-	//globalMemory.freeObject(scriptFuncs.at(currentScript--));
-	activeFunc = scriptFuncs.at(--currentScript);
-	scriptFuncs.pop_back();
+	//	mustn't delete function here, because of linked list of all objects in GC
+	//	globalMemory.freeObject(scriptFuncs.at(currentScript--));
+	activeClosure = scriptClosures.at(--currentScript);
+	scriptClosures.pop_back();
 
 	delete currentCompiler;
 	currentCompiler = prevCompiler;
@@ -263,9 +267,9 @@ bool VM::areEqual(value b, value a) {
 }
 
 bool VM::call(value callee, int arity) {
-	auto* fun = (objFunction*)AS_OBJ(callee);
+	auto* fun = (objClosure*)AS_OBJ(callee);
 	callFrames[callDepth].bottom = activeCallFrameBottom;
-	callFrames[callDepth].func = activeFunc;
+	callFrames[callDepth].closure = activeClosure;
 	callFrames[callDepth].top = stackTop - arity;
 	callFrames[callDepth].returnPtr = ip;
 	callDepth++;
@@ -273,8 +277,8 @@ bool VM::call(value callee, int arity) {
 	if (callDepth >= FRAMES_MAX)
 		return runtimeError("stack overflow");
 
-	if (arity != fun->getArity())
-		return runtimeError("expected ", fun->getArity(), " arguments, but got ", arity);
+	if (arity != fun->function->getArity())
+		return runtimeError("expected ", fun->function->getArity(), " arguments, but got ", arity);
 
 	/*auto retAdr = reinterpret_cast<uintptr_t>(ip);
 	//fun->retAddress = retAdr;
@@ -287,8 +291,8 @@ bool VM::call(value callee, int arity) {
 		peek_set(arity, tmp);
 	}*/
 	activeCallFrameBottom = stackTop - arity;
-	activeFunc = fun;
-	ip = activeFunc->getChunkPtr()->getInstructionPointer();
+	activeClosure = fun;
+	ip = activeClosure->function->getChunkPtr()->getInstructionPointer();
 
 	return true;
 }
@@ -297,7 +301,10 @@ bool VM::callValue(value callee, int arity) {
 	if (IS_OBJ(callee)) {
 		obj* cal = AS_OBJ(callee);
 
-		if (cal->getType() == OBJ_FUN)
+		if (cal->getType() == OBJ_FUN) return runtimeError("can't call functions directly");
+			// return call(callee, arity);
+
+		if (cal->getType() == OBJ_CLOSURE)
 			return call(callee, arity);
 
 		if (cal->getType() == OBJ_NAT_FUN) {
@@ -347,7 +354,7 @@ bool VM::callValue(value callee, int arity) {
 
 void VM::defineMethod() {
 	value method = peek(0);
-	objString* name = (objString*)AS_OBJ(activeFunc->getChunkPtr()->getConstant(readShort()));
+	objString* name = (objString*)AS_OBJ(activeClosure->function->getChunkPtr()->getConstant(readShort()));
 	objClass* cl = (objClass*)AS_OBJ(peek(1));
 
 	((objFunction*)AS_OBJ(method))->setClass(cl);
@@ -363,7 +370,7 @@ bool VM::defineMemberVar() {
 		return runtimeError("cannot initialize member variables with 'nil'");
 
 	//value tmp = peek(1);
-	objString* name = (objString*)AS_OBJ(activeFunc->getChunkPtr()->getConstant(readShort()));
+	objString* name = (objString*)AS_OBJ(activeClosure->function->getChunkPtr()->getConstant(readShort()));
 	objClass* cl = (objClass*)AS_OBJ(peek(1));
 
 	cl->tableSet(name, val);
@@ -373,7 +380,7 @@ bool VM::defineMemberVar() {
 }
 
 bool VM::invoke() {
-	objString* name = (objString*)AS_OBJ(activeFunc->getChunkPtr()->getConstant(readShort()));
+	objString* name = (objString*)AS_OBJ(activeClosure->function->getChunkPtr()->getConstant(readShort()));
 	int argc = readByte();
 	value callee = peek(argc);
 
@@ -502,7 +509,7 @@ bool VM::invoke() {
 
 bool VM::superInvoke() {
 	//TODO: profile super invoke (and normal super call)
-	objString* name = (objString*)AS_OBJ(activeFunc->getChunkPtr()->getConstant(readShort()));
+	objString* name = (objString*)AS_OBJ(activeClosure->function->getChunkPtr()->getConstant(readShort()));
 	int argc = readByte();
 	value callee = peek(argc);
 
@@ -511,7 +518,7 @@ bool VM::superInvoke() {
 	// value this_val = OBJ_VAL(objThis::createObjThis(instance));
 
 	//TODO: access activeFunc
-	value method = activeFunc->getClass()->superTableGet(name);
+	value method = activeClosure->function->getClass()->superTableGet(name);
 	//value method = ((objThis*)this_val.as.object)->accessSuperClassVariable(name);
 
 	// instance should be at correct position
@@ -608,7 +615,7 @@ bool VM::importFile(const char* filename) {
 }
 
 exitCodes VM::run() {
-	ip = activeFunc->getChunkPtr()->getInstructionPointer();
+	ip = activeClosure->function->getChunkPtr()->getInstructionPointer();
 	char c;
 	for (;;) {
 #ifdef DEBUG_TRACE_EXECUTION
@@ -622,11 +629,11 @@ exitCodes VM::run() {
 		switch (c = readByte()) {
 		case OP_CONSTANT: {
 			short ind = readShort();
-			push(activeFunc->getChunkPtr()->getConstant(ind));
+			push(activeClosure->function->getChunkPtr()->getConstant(ind));
 			break;
 		}
 		case OP_INCREMENT_GLOBAL: {
-			objString* name = (objString*)AS_OBJ(activeFunc->getChunkPtr()->getConstant(readShort()));
+			objString* name = (objString*)AS_OBJ(activeClosure->function->getChunkPtr()->getConstant(readShort()));
 
 			if (!globals.count(name)) {
 				runtimeError("no variable with name '", name->getChars(), "'");
@@ -645,7 +652,7 @@ exitCodes VM::run() {
 			break;
 		}
 		case OP_DECREMENT_GLOBAL: {
-			objString* name = (objString*)AS_OBJ(activeFunc->getChunkPtr()->getConstant(readShort()));
+			objString* name = (objString*)AS_OBJ(activeClosure->function->getChunkPtr()->getConstant(readShort()));
 
 			if (!globals.count(name)) {
 				runtimeError("no variable with name '", name->getChars(), "'");
@@ -874,15 +881,15 @@ exitCodes VM::run() {
 			break;
 		}
 		case OP_DEFINE_GLOBAL: {
-			objString* name = (objString*)AS_OBJ(activeFunc->getChunkPtr()->getConstant(readShort()));
+			objString* name = (objString*)AS_OBJ(activeClosure->function->getChunkPtr()->getConstant(readShort()));
 			globals.insert_or_assign(name, peek(0));
 			pop();
 			break;
 		}
 		case OP_GET_GLOBAL: {
-			chunk* cPtr = activeFunc->getChunkPtr();
+			chunk* cPtr = activeClosure->function->getChunkPtr();
 			short index = readShort();
-			objString* name = (objString*)AS_OBJ(activeFunc->getChunkPtr()->getConstant(index));
+			objString* name = (objString*)AS_OBJ(activeClosure->function->getChunkPtr()->getConstant(index));
 
 			if (!globals.count(name)) {
 				runtimeError("no variable with name '", name->getChars(), "'");
@@ -893,7 +900,7 @@ exitCodes VM::run() {
 			break;
 		}
 		case OP_SET_GLOBAL: {
-			objString* name = (objString*)AS_OBJ(activeFunc->getChunkPtr()->getConstant(readShort()));
+			objString* name = (objString*)AS_OBJ(activeClosure->function->getChunkPtr()->getConstant(readShort()));
 			if (!globals.count(name)) {
 				runtimeError("no global variable with name '", name->getChars(), "'");
 				return INTERPRET_RUNTIME_ERROR;
@@ -909,13 +916,23 @@ exitCodes VM::run() {
 			activeCallFrameBottom[readShort()] = peek(0);
 			break;
 		}
+		case OP_GET_UPVALUE: {
+			runtimeError("OP_GET_UPVALUE");
+			return INTERPRET_RUNTIME_ERROR;
+			break;
+		}
+		case OP_SET_UPVALUE: {
+			runtimeError("OP_SET_UPVALUE");
+			return INTERPRET_RUNTIME_ERROR;
+			break;
+		}
 		case OP_SET_PROPERTY: {
 			short ind = readShort();
 			if (IS_OBJ(peek(1))) {
 				switch (AS_OBJ(peek(1))->getType()) {
 				case OBJ_INSTANCE: {
 					auto* instance = (objInstance*)AS_OBJ(peek(1));
-					auto* name = (objString*)AS_OBJ(activeFunc->getChunkPtr()->getConstant(ind));
+					auto* name = (objString*)AS_OBJ(activeClosure->function->getChunkPtr()->getConstant(ind));
 					value val = pop();
 					if (IS_NIL(val)) {
 						instance->tableDelete(name);
@@ -948,7 +965,7 @@ exitCodes VM::run() {
 				switch (AS_OBJ(peek(0))->getType()) {
 				case OBJ_INSTANCE: {
 					auto* instance = (objInstance*)AS_OBJ(peek(0));
-					auto* name = (objString*)AS_OBJ(activeFunc->getChunkPtr()->getConstant(ind));
+					auto* name = (objString*)AS_OBJ(activeClosure->function->getChunkPtr()->getConstant(ind));
 					value val = instance->tableGet(name);
 
 					pop();
@@ -957,7 +974,7 @@ exitCodes VM::run() {
 				}
 				case OBJ_CLASS: {
 					auto* klass = (objClass*)AS_OBJ(peek(0));
-					auto* name = (objString*)AS_OBJ(activeFunc->getChunkPtr()->getConstant(ind));
+					auto* name = (objString*)AS_OBJ(activeClosure->function->getChunkPtr()->getConstant(ind));
 					value val = klass->tableGet(name);
 
 					pop();
@@ -1028,6 +1045,18 @@ exitCodes VM::run() {
 
 			break;
 		}
+		case OP_CLOSURE: {
+			short ind = readShort();
+			auto function = (objFunction*)AS_OBJ(activeClosure->function->getChunkPtr()->getConstant(ind));
+			function->mark();
+			auto closure = objClosure::createClosure(function);
+			push(OBJ_VAL(closure));
+			for (int i = 0; i < function->upvalueCount; i++) {
+
+			}
+			
+			break;
+		}
 		case OP_CALL: {
 			int arity = (unsigned char)readByte();
 			if (!callValue(peek(arity), arity)) {
@@ -1036,7 +1065,7 @@ exitCodes VM::run() {
 			break;
 		}
 		case OP_CLASS: {
-			objString* klassName = (objString*)AS_OBJ(activeFunc->getChunkPtr()->getConstant(readShort()));
+			objString* klassName = (objString*)AS_OBJ(activeClosure->function->getChunkPtr()->getConstant(readShort()));
 			objClass* klass = objClass::createObjClass(klassName);
 			push(OBJ_VAL(klass));
 			break;
@@ -1145,14 +1174,14 @@ exitCodes VM::run() {
 			break;
 		}
 		case OP_SUPER: {
-			auto name = (objString*)AS_OBJ(activeFunc->getChunkPtr()->getConstant(readShort()));
+			auto name = (objString*)AS_OBJ(activeClosure->function->getChunkPtr()->getConstant(readShort()));
 
 			//TODO: access activeFuncs superclass -- add class to methods
-			if (!activeFunc->isMethod()) {
+			if (!activeClosure->function->isMethod()) {
 				runtimeError("no superclass");
 				return INTERPRET_RUNTIME_ERROR;
 			}
-			push(activeFunc->getClass()->superTableGet(name));
+			push(activeClosure->function->getClass()->superTableGet(name));
 			break;
 		}
 		case OP_SUPER_INVOKE: {
@@ -1183,7 +1212,7 @@ exitCodes VM::run() {
 				callDepth--;
 				activeCallFrameBottom = callFrames[callDepth].bottom;
 				stackTop = callFrames[callDepth].top;
-				activeFunc = callFrames[callDepth].func;
+				activeClosure = callFrames[callDepth].closure;
 				pop(); // popping the callee
 				//uintptr_t returnAddress = ((objFunction*)(tmpRetAdd.as.object))->retAddress;
 				ip = callFrames[callDepth].returnPtr;
@@ -1198,7 +1227,7 @@ exitCodes VM::run() {
 template<typename... Ts>
 bool VM::runtimeError(const char* msg, Ts... args) {
 
-	unsigned int line = activeFunc->getChunkPtr()->getLine((ip - activeFunc->getChunkPtr()->getInstructionPointer()));
+	unsigned int line = activeClosure->function->getChunkPtr()->getLine((ip - activeClosure->function->getChunkPtr()->getInstructionPointer()));
 
 	std::cerr << "[line " << line << "] -> " << msg;
 	(std::cerr << ... << args);
@@ -1206,13 +1235,13 @@ bool VM::runtimeError(const char* msg, Ts... args) {
 
 	//simple stack traceback
 	if (callDepth > 0) {
-		std::cerr << "in function -> " << activeFunc->name->getChars() << std::endl;
+		std::cerr << "in function -> " << activeClosure->function->name->getChars() << std::endl;
 
-		auto prevName = activeFunc->name->getChars();
+		auto prevName = activeClosure->function->name->getChars();
 
 		for (size_t i = callDepth - 1; i > 0; i--) {
-			std::cerr << prevName << " <- " << callFrames[i].func->name->getChars() << std::endl;
-			prevName = callFrames[i].func->name->getChars();
+			std::cerr << prevName << " <- " << callFrames[i].closure->function->name->getChars() << std::endl;
+			prevName = callFrames[i].closure->function->name->getChars();
 		}
 	}
 	return false;

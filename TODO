@@ -1,0 +1,22 @@
+current -> Closures:
+1. hide locals not in current function from compiler
+2. add closure objects
+3. add upvalue resolving + opcodes
+4. ...
+
+Features to implement:
+
+-closures, like in lox/lua
+
+-make String/Array/File classes for their functions and vm access them (like in sob) -- IN TESTING
+
+-add destructuring syntaxes for lists (maybe instances)
+
+
+Discarded:
+
+
+FIXES TO DO:
+-improve error reporting
+
+-stack trace -- improve readability and add skip

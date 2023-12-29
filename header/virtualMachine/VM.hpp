@@ -29,7 +29,7 @@ enum exitCodes {
 
 struct callFrame{
     value* bottom;
-    objFunction* func;
+    objClosure* closure;
     char* returnPtr;
     value* top;
 };
@@ -47,9 +47,9 @@ class VM {
 
     bool gcReady = false;
 
-    objFunction* activeFunc;
+    objClosure* activeClosure;
     //all scripts are stored in vector, so GC can reach them when in import script
-    std::vector<objFunction*> scriptFuncs;
+    std::vector<objClosure*> scriptClosures;
     size_t currentScript = 0;
 
     //size_t stackSize = 0;

@@ -43,6 +43,16 @@ struct local {
 	int depth;
 	token name;
 	bool isConst;
+	uint32_t funcDepth;
+};
+
+/**
+ * the upvalue object the compiler uses
+ * to store info about the upvalue.
+ */
+struct upvalue {
+	int index;
+	bool isLocal;
 };
 
 struct breaks {
@@ -56,7 +66,9 @@ class compiler {
 
 	scanner scanr;
 
-	chunk* currentChunk;
+	objFunction* currentFunction;
+
+	// chunk* currentChunk;
 
 	bool hadError = false;
 	bool panicMode = false;
@@ -65,6 +77,12 @@ class compiler {
 	token currentToken{};
 
 	unsigned int scopeDepth = 0;
+
+	/**
+	 * prohibits the compiler from seeing locals
+	 * that aren't in the current function.
+	 */
+	unsigned int functionDepth = 0;
 
 	position currentPosition = TYPE_SCRIPT;
 
@@ -110,6 +128,35 @@ class compiler {
 	void declareVariable(bool isConst);
 
 	int resolveLocal(bool &isConst);
+
+	/**
+	 * adds an upvalue to the compiler.
+	 * 
+	 * \param index the index in the locals array
+	 * \param isLocal indicates if the local is DIRECTLY in
+	 * the enclosing scope or an upvalue from a sourrounding function
+	 * \returns the index of the new upvalue
+	 */
+	int addUpvalue(int index, bool isLocal);
+
+	/**
+	 * tries to find an local in the given function scope.
+	 * 
+	 * \param isConst stores if found local is const
+	 * \param functionScope to search
+	 * \returns the index, or -1
+	 */
+	int resolveUpvalueInFunctionScope(bool& isConst, token &name, int functionScope);
+
+	/**
+	 * searches for a fitting upvalue.
+	 * 
+	 * \param isConst will be set to true, if found value is const
+	 * \param name the name-token of the variable
+	 * \param funcDepth the function depth to search
+	 * \return 
+	 */
+	int resolveUpvalue(bool& isConst, token& name, int funcDepth);
 
 	//overload to use in preCrement, which can't consume the identifier
 	int resolveLocal(bool& isConst, token comp);
@@ -177,7 +224,7 @@ class compiler {
 
 	void ifStatement();
 
-	//NOT FINISHED!!
+	// NOT FINISHED!!
 	void forEachLoop();
 
 	void patchBreaks();
@@ -306,11 +353,15 @@ class compiler {
 
 	std::vector<local> locals;
 
+	std::vector<upvalue>* upvalues;
+
 	std::vector<std::string>& globalConsts;
 
 public:
 
 	explicit compiler(VM& vm, std::vector<std::string>& constVec);
+
+	~compiler();
 
 	objFunction* compiling(const char* name, char* str);
 

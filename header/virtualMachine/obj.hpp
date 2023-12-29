@@ -15,6 +15,8 @@ typedef value(*nativeFn)(int arity, value* args, bool& success);
 enum objType : char {
 	OBJ_STR,
 	OBJ_FUN,
+	OBJ_UPVALUE,
+	OBJ_CLOSURE,
 	OBJ_NAT_FUN,
 	OBJ_CLASS,
 	OBJ_INSTANCE,
@@ -67,6 +69,7 @@ public:
 	static objString* takeString(char* chars, const unsigned int len);
 };
 
+
 //forward declaring objClass
 
 class objClass;
@@ -80,6 +83,8 @@ public:
 	chunk* funChunk;
 
 	objClass* klass;
+
+	int upvalueCount = 0;
 
 	unsigned char arity;
 
@@ -98,6 +103,34 @@ public:
 	objClass* getClass() const;
 
 	static objFunction* createObjFunction(objString* name, chunk* ch, int arity);
+};
+
+/**
+ * the upvalue object points to a slot in the stack.
+ * if the upvalue is closed, the value is copied into this object
+ */
+class objUpvalue : public obj {
+public:
+	friend class memoryManager;
+	value* location;
+
+	objUpvalue();
+
+	static objUpvalue* createUpvalue(value* slot);
+};
+
+class objClosure : public obj {
+public:
+	friend class memoryManager;
+	objFunction* function;
+
+	std::vector<objUpvalue*> upvalues;
+
+	objClosure();
+
+	~objClosure() = default;
+
+	static objClosure* createClosure(objFunction* function);
 };
 
 class objNativeFunction : public obj {

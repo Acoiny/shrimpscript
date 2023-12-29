@@ -22,7 +22,11 @@ precFuncTableEntry* compiler::getRule(token tk) {
 }
 
 compiler::compiler(VM& vm, std::vector<std::string>& constVec)
-	: scanr(), currentChunk(nullptr), vm(vm), globalConsts(constVec) {}
+	: scanr(), currentFunction(nullptr), vm(vm), globalConsts(constVec), upvalues(new std::vector<upvalue>) {}
+
+compiler::~compiler() {
+	delete upvalues;
+}
 
 void compiler::errorAt(token tk, const char* msg) {
 	if (panicMode) return;
@@ -106,24 +110,24 @@ void compiler::consume(const char* msg, tokenType type) {
 }
 
 void compiler::emitByte(opCodes op) {
-	currentChunk->addByte(op, prevToken.line);
+	currentFunction->funChunk->addByte(op, prevToken.line);
 }
 
 void compiler::emitBytes(char a, char b) {
-	currentChunk->addByte(a, prevToken.line);
-	currentChunk->addByte(b, prevToken.line);
+	currentFunction->funChunk->addByte(a, prevToken.line);
+	currentFunction->funChunk->addByte(b, prevToken.line);
 }
 
 size_t compiler::emitJump(opCodes jmpCode) {
 	emitByte(jmpCode);
 	emitBytes(0xff, 0xff);
-	return currentChunk->getSize() - 2;
+	return currentFunction->funChunk->getSize() - 2;
 }
 
 void compiler::emitLoop(size_t loopStart) {
 	emitByte(OP_LOOP);
 
-	int dest = currentChunk->getSize() - loopStart + 2;
+	int dest = currentFunction->funChunk->getSize() - loopStart + 2;
 
 	if (dest > UINT16_MAX)
 		error("loop body too big");
@@ -135,7 +139,7 @@ void compiler::emitLoop(size_t loopStart) {
 
 void compiler::number(bool canAssign, compiler& cmp) {
 	double num = std::strtod(cmp.prevToken.start, nullptr);
-	cmp.currentChunk->writeConstant(NUM_VAL(num), cmp.prevToken.line);
+	cmp.currentFunction->funChunk->writeConstant(NUM_VAL(num), cmp.prevToken.line);
 }
 
 void compiler::unary(bool canAssign, compiler& cmp) {
@@ -258,18 +262,26 @@ void compiler::grouping(bool canAssign, compiler& cmp) {
 
 void compiler::string(bool canAssign, compiler& cmp) {
 	auto* str = objString::copyString(cmp.prevToken.start, cmp.prevToken.len);
-	cmp.currentChunk->writeConstant(OBJ_VAL(str), cmp.prevToken.line);
+	cmp.currentFunction->funChunk->writeConstant(OBJ_VAL(str), cmp.prevToken.line);
 }
 
 void compiler::stringEscape(bool canAssign, compiler& cmp) {
 	auto* str = objString::copyStringEscape(cmp.prevToken.start, cmp.prevToken.len);
-	cmp.currentChunk->writeConstant(OBJ_VAL(str), cmp.prevToken.line);
+	cmp.currentFunction->funChunk->writeConstant(OBJ_VAL(str), cmp.prevToken.line);
 }
 
 int compiler::resolveLocal(bool& isConst) {
+	return resolveLocal(isConst, prevToken);
+}
+
+int compiler::resolveLocal(bool& isConst, token comp) {
 	for (int i = locals.size() - 1; i >= 0; --i) {
 		local* loc = &locals.at(i);
-		if (identifiersEqual(loc->name, prevToken)) {
+		// return if no local in current function
+		if (loc->funcDepth < functionDepth)
+			return -1;
+
+		if (identifiersEqual(loc->name, comp)) {
 			if (loc->depth == -1) {
 				error("can't initialize local with itself");
 			}
@@ -284,19 +296,67 @@ int compiler::resolveLocal(bool& isConst) {
 	return -1;
 }
 
-int compiler::resolveLocal(bool& isConst, token comp) {
-	for (int i = locals.size() - 1; i >= 0; --i) {
-		local* loc = &locals.at(i);
-		if (identifiersEqual(loc->name, comp)) {
-			if (loc->depth == -1) {
+int compiler::addUpvalue(int index, bool isLocal) {
+	// check if upvalue already exists
+	for (size_t i = 0; i < upvalues->size(); i++)
+	{
+		upvalue el = upvalues->at(i);
+		if (el.index == index && el.isLocal)
+			return i;
+	}
+
+	// check if too many, for runtime
+	if (upvalues->size() == 255) {
+		// TODO: give upvalues 2 bytes
+		error("Too many upvalues");
+		return 0;
+	}
+
+	// add new upvalue
+	upvalue upVal;
+	upVal.index = index;
+	upVal.isLocal = isLocal;
+	upvalues->push_back(upVal);
+	return currentFunction->upvalueCount++;
+}
+
+int compiler::resolveUpvalueInFunctionScope(bool& isConst, token& name, int functionScope) {
+	for (int i = locals.size() - 1; i >= 0; i--) {
+		local &loc = locals.at(i);
+		if (loc.funcDepth < functionScope) return -1;
+
+		if (identifiersEqual(loc.name, name)) {
+			if (loc.depth == -1) {
 				error("can't initialize local with itself");
 			}
 
-			if (loc->isConst)
+			if (loc.isConst)
 				isConst = true;
 
 			return i;
 		}
+	}
+
+	return -1;
+}
+
+int compiler::resolveUpvalue(bool& isConst, token &name, int funcDepth) {
+	if (funcDepth == 0) return -1;
+
+	// look for upvalue in directly enclosing function
+	int local = resolveUpvalueInFunctionScope(isConst, name, funcDepth - 1);
+
+	// if found, add it
+	if (local != -1) {
+		return addUpvalue(local, true);
+	}
+
+	// look for upvalue relative to enclosing function
+	int upval = resolveUpvalue(isConst, name, funcDepth - 1);
+
+	// if found add it, but NOT as local
+	if (upval != -1) {
+		return addUpvalue(upval, false);
 	}
 
 	return -1;
@@ -332,6 +392,13 @@ void compiler::namedVariable(token name, bool canAssign) {
 		incOP = OP_INCREMENT_LOCAL;
 		decOP = OP_DECREMENT_LOCAL;
 	}
+	// here add resolveUpvalue call
+	else if ((arg = resolveUpvalue(isConst, name, functionDepth)) != -1) {
+		getOP = OP_GET_UPVALUE;
+		setOP = OP_SET_UPVALUE;
+
+		// maybe add inc and dec upvalue?
+	}
 	else {
 		arg = identifierConstant(name);
 		getOP = OP_GET_GLOBAL;
@@ -340,8 +407,8 @@ void compiler::namedVariable(token name, bool canAssign) {
 		incOP = OP_INCREMENT_GLOBAL;
 		decOP = OP_DECREMENT_GLOBAL;
 	}
-
-	if (canAssign && match(TOKEN_PLUS_PLUS)) {
+	
+	if (canAssign && match(TOKEN_PLUS_PLUS) && getOP != OP_GET_UPVALUE) {	// currently prohibiting inc and decrement for upvalues
 		std::string constNameStr(name.start, name.len);
 		checkConsts(isConst, setOP, constNameStr);
 		emitByte(getOP);
@@ -349,7 +416,7 @@ void compiler::namedVariable(token name, bool canAssign) {
 		emitByte(incOP);
 		emitBytes((arg >> 8) & 0xff, arg & 0xff);
 	}
-	else if (canAssign && match(TOKEN_MINUS_MINUS)) {
+	else if (canAssign && match(TOKEN_MINUS_MINUS) && getOP != OP_GET_UPVALUE) {
 		std::string constNameStr(name.start, name.len);
 		checkConsts(isConst, setOP, constNameStr);
 		emitByte(getOP);
@@ -761,17 +828,17 @@ void compiler::expressionStatement() {
 
 
 void compiler::patchJump(size_t offset) {
-	int jump = currentChunk->getSize() - offset - 2;
+	int jump = currentFunction->funChunk->getSize() - offset - 2;
 
 	if (jump > UINT16_MAX)
 		error("loop body too big");
 
-	currentChunk->accessAt(offset) = char(short(jump >> 8)) & 0xff;
-	currentChunk->accessAt(offset + 1) = char(jump) & 0xff;
+	currentFunction->funChunk->accessAt(offset) = char(short(jump >> 8)) & 0xff;
+	currentFunction->funChunk->accessAt(offset + 1) = char(jump) & 0xff;
 }
 
 void compiler::whileStatement() {
-	size_t loopStart = currentChunk->getSize();
+	size_t loopStart = currentFunction->funChunk->getSize();
 	consume("expect '(' after while statement", TOKEN_PAREN_OPEN);
 	expression();
 	consume("expect ')' after while condition", TOKEN_PAREN_CLOSE);
@@ -880,7 +947,7 @@ void compiler::forEachLoop() {
 
 	consume("expect ')' after loop declaration", TOKEN_PAREN_CLOSE);
 	emitByte(OP_FOR_EACH_INIT);
-	size_t loopStart = currentChunk->getSize();
+	size_t loopStart = currentFunction->funChunk->getSize();
 	emitByte(OP_FOR_ITER);
 	size_t exitJump = emitJump(OP_JUMP_IF_FALSE);
 	emitByte(OP_POP);
@@ -999,7 +1066,7 @@ void compiler::forStatement() {
 		expressionStatement();
 	}
 
-	size_t loopStart = currentChunk->getSize();
+	size_t loopStart = currentFunction->funChunk->getSize();
 	int exitJump = -1;
 
 	if (!match(TOKEN_SEMICOLON)) {
@@ -1012,7 +1079,7 @@ void compiler::forStatement() {
 
 	if (!match(TOKEN_PAREN_CLOSE)) {
 		size_t bodyJump = emitJump(OP_JUMP);
-		size_t incrementStart = currentChunk->getSize();
+		size_t incrementStart = currentFunction->funChunk->getSize();
 		expression();
 		emitByte(OP_POP);
 		consume("expect ')' after for clause", TOKEN_PAREN_CLOSE);
@@ -1084,12 +1151,17 @@ void compiler::statement() {
 }
 
 int compiler::identifierConstant(token& name) {
-	return currentChunk->addConstantGetLine(OBJ_VAL(objString::copyString(name.start, name.len)),
+	return currentFunction->funChunk->addConstantGetLine(OBJ_VAL(objString::copyString(name.start, name.len)),
 		name.line);
 }
 
 void compiler::addLocal(token name, bool isConst) {
-	local tmp{ -1, name, isConst };
+	local tmp;
+	tmp.depth = -1;
+	tmp.name = name;
+	tmp.isConst = isConst;
+	tmp.funcDepth = functionDepth;
+
 	locals.push_back(tmp);
 }
 
@@ -1213,10 +1285,23 @@ int compiler::argumentList() {
 
 void compiler::function() {
 
-	chunk* prevChunk = currentChunk;
-	currentChunk = new chunk();
+	functionDepth++;
+
+	auto* prevUpvalues = upvalues;
+
+	/**
+	 * TODO: check here, if upvalue vectors
+	 * behave correctly
+	 * 
+	 */
+	upvalues = new std::vector<upvalue>;
+
+	objFunction* prevFunction = currentFunction;
+
 
 	objString* name = objString::copyString(prevToken.start, prevToken.len);
+
+	currentFunction = objFunction::createObjFunction(name, new chunk(), -1);
 
 	int argc = 0;
 
@@ -1243,26 +1328,50 @@ void compiler::function() {
 	emitByte(OP_RETURN);
 	endFunctionScope();
 
+	currentFunction->arity = argc;
 	// adding function to previous chunk, with currentchunk containing its body
-	unsigned int fun = prevChunk->addConstantGetLine(OBJ_VAL(objFunction::createObjFunction(name, currentChunk, argc)), prevToken.line);
+	unsigned int fun = prevFunction->funChunk->addConstantGetLine(OBJ_VAL(currentFunction), prevToken.line);
+
+
+
+	functionDepth--;
+
+	/**
+	 * TODO: check the functions upvalue count, if 0 don't emit closure
+	 * but use regular function
+	 * 
+	 */
+
+	objFunction* newFunc = currentFunction;
+
+	currentFunction = prevFunction;
+
+	emitByte(OP_CLOSURE);
+	emitBytes((fun >> 8) & 0xff, fun & 0xff);
+
+	for (int i = 0; i < newFunc->upvalueCount; i++)
+	{
+		emitByte((opCodes)(upvalues->at(i).isLocal ? 1 : 0));
+		emitByte((opCodes)(upvalues->at(i).index));
+	}
+
+	// deleting the current upvalues, if 
+	delete upvalues;
+	upvalues = prevUpvalues;
+
+
+	//fun->setData(jump, argc);
 
 #ifdef DEBUG_PRINT_CODE
 	std::cout << " == " << name->getChars() << " == " << std::endl;
-	debug::disassembleChunk(currentChunk);
+	debug::disassembleChunk(newFunc->funChunk);
 	std::cout << std::endl;
 #endif
-
-	currentChunk = prevChunk;
-
-	emitByte(OP_CONSTANT);
-	emitBytes((fun >> 8) & 0xff, fun & 0xff);
-
-	//fun->setData(jump, argc);
 }
 
 void compiler::functionDeclaration() {
 	if (scopeDepth != 0) {
-		error("functions can only be declared in top level code");
+		// error("functions can only be declared in top level code");
 	}
 
 	position prevPos = currentPosition;
@@ -1415,7 +1524,8 @@ objFunction* compiler::compiling(const char* name, char* str) {
 
 	scanr.init(str);
 
-	currentChunk = new chunk();
+
+	currentFunction = objFunction::createObjFunction(objString::copyString(name, strlen(name)), new chunk(), 0);
 
 	currentToken = scanr.scanToken();
 
@@ -1425,12 +1535,12 @@ objFunction* compiler::compiling(const char* name, char* str) {
 	emitByte(OP_RETURN);
 
 #ifdef DEBUG_PRINT_CODE
-	char* ptr = currentChunk->getInstructionPointer();
+	char* ptr = currentFunction->funChunk->getInstructionPointer();
 	std::cout << " == " << name << " == " << std::endl;
-	debug::disassembleChunk(currentChunk);
+	debug::disassembleChunk(currentFunction->funChunk);
 #endif
 
-	return objFunction::createObjFunction(objString::copyString(name, strlen(name)), currentChunk, 0);
+	return currentFunction;
 }
 
 bool compiler::errorOccured() {

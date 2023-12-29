@@ -148,6 +148,8 @@ bool obj::isMark() {
 	return isMarked;
 }
 
+
+
 ///object function
 objFunction::objFunction() : funChunk(nullptr), arity(0), klass(nullptr) {
 	type = OBJ_FUN;
@@ -172,6 +174,31 @@ bool objFunction::isMethod() const {
 objClass* objFunction::getClass() const {
 	return klass;
 }
+
+
+///object upvalue
+objUpvalue::objUpvalue() : location(nullptr) {
+	type = OBJ_UPVALUE;
+}
+
+
+objUpvalue* objUpvalue::createUpvalue(value* slot) {
+	auto* upval = globalMemory.allocateObject<objUpvalue>();
+	upval->location = slot;
+	return upval;
+}
+
+///object closure
+objClosure::objClosure() : function(nullptr), upvalues() {
+	type = OBJ_CLOSURE;
+}
+
+objClosure* objClosure::createClosure(objFunction* function) {
+	auto* clos = globalMemory.allocateObject<objClosure>();
+	clos->function = function;
+	return clos;
+}
+
 
 //objNativeFunction functions
 objNativeFunction::objNativeFunction() : fun(nullptr) {

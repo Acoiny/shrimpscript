@@ -25,6 +25,10 @@ const std::string stringify(value val) {
 			return ((objString*)object)->chars;
 		case OBJ_FUN:
 			return ("<function " + std::string(((objFunction*)object)->name->chars) + ">");
+		case OBJ_UPVALUE:
+			return "<upvalue>";
+		case OBJ_CLOSURE:
+			return ("<closure " + std::string(((objFunction*)object)->name->chars) + ">");
 		case OBJ_NAT_FUN:
 			return ("<nativeFunction>");
 		case OBJ_CLASS:

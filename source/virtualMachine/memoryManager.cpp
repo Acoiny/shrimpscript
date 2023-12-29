@@ -85,6 +85,21 @@ void memoryManager::freeObject(obj* el) {
 		delete map;
 		break;
 	}
+	case OBJ_UPVALUE: {
+		bytesAllocated -= sizeof(objUpvalue);
+		auto* upval = (objUpvalue*)el;
+		delete upval;
+		break;
+	}
+	case OBJ_CLOSURE: {
+		bytesAllocated -= sizeof(objClosure);
+		auto* clos = (objClosure*)el;
+		for (auto el : clos->upvalues) {
+			delete el;
+		}
+		delete clos;
+		break;
+	}
 	}
 }
 
@@ -114,7 +129,7 @@ void memoryManager::markRoots() {
 
 	// marking the callstack
 	for (size_t i = 0; i < vm->callDepth; ++i) {
-		markObject(vm->callFrames[i].func);
+		markObject(vm->callFrames[i].closure);
 	}
 
 	// marking all globals
@@ -123,9 +138,9 @@ void memoryManager::markRoots() {
 		markValue(el.second);
 	}
 
-	markObject(vm->activeFunc);
+	markObject(vm->activeClosure);
 
-	for (auto& el : vm->scriptFuncs) {
+	for (auto& el : vm->scriptClosures) {
 		markObject(el);
 	}
 
@@ -181,6 +196,11 @@ void memoryManager::blackenObject(obj* obj) {
 			markValue(el.first);
 			markValue(el.second);
 		}
+		break;
+	}
+	case OBJ_CLOSURE: {
+		objClosure* clos = (objClosure*)obj;
+		markObject(clos->function);
 		break;
 	}
 	case OBJ_NAT_FUN:
