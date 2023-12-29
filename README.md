@@ -71,13 +71,23 @@ fun foo(num) {
   return result;  
 }
 ```
-**NOTE: functions can be stored in variables and passed around, but cannot be declared in blocks/other functions - also closures aren't supported (yet?)**
+Functions can also be declared inside other functions and may capture local variables
+```
+fun foo(num) {
+  fun bar(other) {
+    return num + other;
+  }
+
+  return bar;
+}
+```
 ## import
 ```
-import 'file.shrimp';
+import "file.shrimp";
 ```
 **import takes a file path (relative to the executed file) and executes the corresponding file
 this can be used to import functions/classes and more**
+**BUG: file might not be recognized if using single quotes for name**
 ## classes:
 ### class declaration
 ```
