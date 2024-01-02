@@ -1,13 +1,14 @@
-class Student{
-	init(name, year) {
-		this.name = name
-		this.year = year
+fun test()
+{
+	const asd = 123;
+	fun i()
+	{
+		asd = asd + 2
+		println(asd)
 	}
 
-	takeExam(exam) {
-		println(this.name, " took the ", exam, " exam")
-	}
+	return i
 }
 
-const harry = Student("Harry Potter", 4)
-harry.takeExam("Potions")
+const i = test()
+i()

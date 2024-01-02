@@ -410,7 +410,10 @@ void compiler::namedVariable(token name, bool canAssign) {
 		decOP = OP_DECREMENT_GLOBAL;
 	}
 	
-	if (canAssign && match(TOKEN_PLUS_PLUS) && getOP != OP_GET_UPVALUE) {	// currently prohibiting inc and decrement for upvalues
+	if (canAssign && match(TOKEN_PLUS_PLUS)) {	// currently prohibiting inc and decrement for upvalues
+		if (getOP == OP_GET_UPVALUE)
+			error("increment only works on directly local variables");
+
 		std::string constNameStr(name.start, name.len);
 		checkConsts(isConst, setOP, constNameStr);
 		emitByte(getOP);
@@ -418,7 +421,10 @@ void compiler::namedVariable(token name, bool canAssign) {
 		emitByte(incOP);
 		emitBytes((arg >> 8) & 0xff, arg & 0xff);
 	}
-	else if (canAssign && match(TOKEN_MINUS_MINUS) && getOP != OP_GET_UPVALUE) {
+	else if (canAssign && match(TOKEN_MINUS_MINUS)) {
+		if (getOP == OP_GET_UPVALUE)
+			error("increment only works on directly local variables");
+
 		std::string constNameStr(name.start, name.len);
 		checkConsts(isConst, setOP, constNameStr);
 		emitByte(getOP);
