@@ -2,7 +2,7 @@
 #define SHRIMPP_DEFINES_HPP
 
 // enables NaN-boxing, may not work/be efficient on all devices
-// #define NAN_BOXING
+#define NAN_BOXING
 
 // #define DEBUG_TESTFILE "shrimpcode.shrimp"
 

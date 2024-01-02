@@ -173,7 +173,7 @@ public:
 
 	void tableSet(objString* n, value val);
 
-	inline value tableGet(objString* k) {
+	inline value tableGet(objString* k) const {
 		if (table.count(k) == 0) {
 			if (superClass != nullptr) {
 				return superClass->tableGet(k);
@@ -185,9 +185,9 @@ public:
 		return table.at(k);
 	}
 
-	value superTableGet(objString* k);
+	value superTableGet(objString* k) const;
 
-	bool hasInitFunction();
+	bool hasInitFunction() const;
 
 	static objClass* createObjClass(objString* name);
 

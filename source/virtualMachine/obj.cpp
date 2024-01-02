@@ -226,7 +226,7 @@ void objClass::tableSet(objString* name, value val) {
 	table.insert_or_assign(name, val);
 }
 
-value objClass::superTableGet(objString* k) {
+value objClass::superTableGet(objString* k) const {
 	return superClass->tableGet(k);
 }
 
@@ -240,7 +240,7 @@ void objClass::setSuperClass(objClass* cl) {
 	superClass = cl;
 }
 
-bool objClass::hasInitFunction() {
+bool objClass::hasInitFunction() const {
 	objString* name = globalMemory.initString;
 	
 	auto el = tableGet(name);

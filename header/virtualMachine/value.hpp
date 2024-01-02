@@ -34,7 +34,7 @@ union value {
 #define OBJ_VAL(ptr) value{(uint64_t)(ptr) | OBJ_MASK}
 #define NUM_VAL(num) value{ .as_double{num}}
 
-//TODO: add return address thingy
+
 
 //macros for checking type of values
 #define IS_NUM(val) (((val.as_uint64) & QNAN) != QNAN)
@@ -46,6 +46,7 @@ union value {
 
 #define IS_STR(val) (IS_OBJ(val) && AS_OBJ(val)->getType() == OBJ_STR)
 #define IS_FUN(val) (IS_OBJ(val) && AS_OBJ(val)->getType() == OBJ_FUN)
+#define IS_CLOSURE(val) (IS_OBJ(val) && AS_OBJ(val)->getType() == OBJ_CLOSURE)
 #define IS_INSTANCE(val) (IS_OBJ(val) && AS_OBJ(val)->getType() == OBJ_INSTANCE)
 #define IS_ARRAY(val) (IS_OBJ(val) && AS_OBJ(val)->getType() == OBJ_LIST)
 #define IS_FILE(val) (IS_OBJ(val) && AS_OBJ(val)->getType() == OBJ_FILE)
