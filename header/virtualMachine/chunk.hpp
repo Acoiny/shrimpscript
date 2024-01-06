@@ -47,7 +47,6 @@ enum opCodes : char {
     OP_DEFINE_GLOBAL,
 
     OP_POP,
-    OP_DUP_TOP, // duplicates the top of the stack
 
     OP_GET_GLOBAL,
     OP_SET_GLOBAL,
@@ -55,7 +54,6 @@ enum opCodes : char {
     OP_GET_LOCAL,
     OP_SET_LOCAL,
 
-    OP_CLOSURE,
     OP_GET_UPVALUE,
     OP_SET_UPVALUE,
     OP_CLOSE_UPVALUE,
@@ -65,14 +63,11 @@ enum opCodes : char {
 
     OP_LOOP,
 
-    OP_FOR_EACH_INIT,
-    OP_FOR_ITER,
-
     // OP_FUNCTION,
 
+    OP_CLOSURE,
     OP_CALL,
 
-    OP_RETURN,
 
     OP_SET_PROPERTY,
     OP_GET_PROPERTY,
@@ -95,7 +90,8 @@ enum opCodes : char {
     OP_SUPER,
     OP_SUPER_INVOKE,
 
-    OP_IMPORT
+    OP_IMPORT,
+    OP_RETURN,
 };
 
 class chunk {

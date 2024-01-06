@@ -665,6 +665,43 @@ exitCodes VM::run() {
 			push(activeClosure->function->getChunkPtr()->getConstant(ind));
 			break;
 		}
+		case OP_ADD:
+			if (!add()) {
+				return INTERPRET_RUNTIME_ERROR;
+			}
+			break;
+		case OP_SUB:
+			if (!sub())
+				return INTERPRET_RUNTIME_ERROR;
+			break;
+		case OP_MUL:
+			if (!mul())
+				return INTERPRET_RUNTIME_ERROR;
+			break;
+		case OP_DIV:
+			if (!div())
+				return INTERPRET_RUNTIME_ERROR;
+			break;
+		case OP_MODULO: {
+			if (!modulo()) {
+				return INTERPRET_RUNTIME_ERROR;
+			}
+			break;
+		}
+		case OP_NEGATE: {
+			if (!IS_NUM((*(stackTop - 1)))) {
+				runtimeError("can't negate ", *(stackTop - 1));
+				return INTERPRET_RUNTIME_ERROR;
+			}
+			AS_NUM((*(stackTop - 1))) *= -1;
+			break;
+		}
+		case OP_NOT:
+			if (isFalsey(pop()))
+				push(FALSE_VAL);
+			else
+				push(TRUE_VAL);
+			break;
 		case OP_INCREMENT_GLOBAL: {
 			objString* name = (objString*)AS_OBJ(activeClosure->function->getChunkPtr()->getConstant(readShort()));
 
@@ -721,52 +758,7 @@ exitCodes VM::run() {
 			AS_NUM(activeCallFrameBottom[index])--;
 			break;
 		}
-		case OP_ADD:
-			if (!add()) {
-				return INTERPRET_RUNTIME_ERROR;
-			}
-			break;
-		case OP_SUB:
-			if (!sub())
-				return INTERPRET_RUNTIME_ERROR;
-			break;
-		case OP_MUL:
-			if (!mul())
-				return INTERPRET_RUNTIME_ERROR;
-			break;
-		case OP_DIV:
-			if (!div())
-				return INTERPRET_RUNTIME_ERROR;
-			break;
-		case OP_MODULO: {
-			if (!modulo()) {
-				return INTERPRET_RUNTIME_ERROR;
-			}
-			break;
-		}
-		case OP_TRUE:
-			push(TRUE_VAL);
-			break;
-		case OP_FALSE:
-			push(FALSE_VAL);
-			break;
-		case OP_NIL:
-			push(NIL_VAL);
-			break;
-		case OP_NEGATE: {
-			if (!IS_NUM((*(stackTop - 1)))) {
-				runtimeError("can't negate ", *(stackTop - 1));
-				return INTERPRET_RUNTIME_ERROR;
-			}
-			AS_NUM((*(stackTop - 1))) *= -1;
-			break;
-		}
-		case OP_NOT:
-			if (isFalsey(pop()))
-				push(FALSE_VAL);
-			else
-				push(TRUE_VAL);
-			break;
+		
 		case OP_EQUALS:
 			if (areEqual(pop(), pop()))
 				push(TRUE_VAL);
@@ -913,9 +905,23 @@ exitCodes VM::run() {
 			push(NUM_VAL(double(result)));
 			break;
 		}
+		case OP_TRUE:
+			push(TRUE_VAL);
+			break;
+		case OP_FALSE:
+			push(FALSE_VAL);
+			break;
+		case OP_NIL:
+			push(NIL_VAL);
+			break;
+
 		case OP_DEFINE_GLOBAL: {
 			objString* name = (objString*)AS_OBJ(activeClosure->function->getChunkPtr()->getConstant(readShort()));
 			globals.insert_or_assign(name, peek(0));
+			pop();
+			break;
+		}
+		case OP_POP: {
 			pop();
 			break;
 		}
@@ -958,6 +964,55 @@ exitCodes VM::run() {
 		case OP_SET_UPVALUE: {
 			int index = readShort();
 			*activeClosure->upvalues.at(index)->location = peek(0);
+			break;
+		}
+		case OP_CLOSE_UPVALUE: {
+			closeUpvalue(stackTop - 1);
+			pop();
+			break;
+		}
+		case OP_JUMP: {
+			int offset = readShort();
+			ip += offset;
+			break;
+		}
+		case OP_JUMP_IF_FALSE: {
+			int offset = readShort();
+			if (!isFalsey(peek(0))) {
+				ip += offset;
+			}
+			break;
+		}
+		case OP_LOOP: {
+			int offset = readShort();
+			ip -= offset;
+			break;
+		}
+		case OP_CLOSURE: {
+			short ind = readShort();
+			auto function = (objFunction*)AS_OBJ(activeClosure->function->getChunkPtr()->getConstant(ind));
+			// function->mark();
+			auto closure = objClosure::createClosure(function);
+			push(OBJ_VAL(closure));
+			closure->upvalues.resize(function->upvalueCount);
+			for (int i = 0; i < function->upvalueCount; i++) {
+				uint8_t isLocal = readByte();
+				uint8_t index = readByte();
+				if (isLocal) {
+					closure->upvalues.at(i) = captureUpvalue(activeCallFrameBottom + index);
+				}
+				else {
+					closure->upvalues.at(i) = activeClosure->upvalues.at(i);
+				}
+			}
+			
+			break;
+		}
+		case OP_CALL: {
+			int arity = (unsigned char)readByte();
+			if (!callValue(peek(arity), arity)) {
+				return INTERPRET_RUNTIME_ERROR;
+			}
 			break;
 		}
 		case OP_SET_PROPERTY: {
@@ -1026,86 +1081,6 @@ exitCodes VM::run() {
 			}
 			break;
 		}
-		case OP_JUMP_IF_FALSE: {
-			int offset = readShort();
-			if (!isFalsey(peek(0))) {
-				ip += offset;
-			}
-			break;
-		}
-		case OP_JUMP: {
-			int offset = readShort();
-			ip += offset;
-			break;
-		}
-		case OP_LOOP: {
-			int offset = readShort();
-			ip -= offset;
-			break;
-		}
-		case OP_FOR_EACH_INIT: {
-			value counter = peek(2);
-			//value var = peek(1);
-			value itOver = peek(0);
-
-			if (!(IS_OBJ(itOver) && AS_OBJ(itOver)->getType() == OBJ_LIST)) {
-				runtimeError("cannot iterate over variable");
-				return INTERPRET_RUNTIME_ERROR;
-			}
-
-			objList* arr = ((objList*)AS_OBJ(itOver));
-
-			peek_set(2, NUM_VAL(0.0));
-
-			if (arr->getSize() > 0) {
-				peek_set(1, arr->getValueAt(0));
-			}
-			break;
-		}
-		case OP_FOR_ITER: {
-			value counter = peek(2);
-			//value x_in = peek(1);
-			objList* arr = (objList*)AS_OBJ(peek(0));
-
-			if (AS_NUM(counter) >= arr->getSize()) {
-				push(FALSE_VAL);
-			}
-			else {
-				AS_NUM(counter)++;
-				peek_set(1, arr->getValueAt(AS_NUM(counter) - 1));
-				peek_set(2, counter);
-				push(TRUE_VAL);
-			}
-
-			break;
-		}
-		case OP_CLOSURE: {
-			short ind = readShort();
-			auto function = (objFunction*)AS_OBJ(activeClosure->function->getChunkPtr()->getConstant(ind));
-			// function->mark();
-			auto closure = objClosure::createClosure(function);
-			push(OBJ_VAL(closure));
-			closure->upvalues.resize(function->upvalueCount);
-			for (int i = 0; i < function->upvalueCount; i++) {
-				uint8_t isLocal = readByte();
-				uint8_t index = readByte();
-				if (isLocal) {
-					closure->upvalues.at(i) = captureUpvalue(activeCallFrameBottom + index);
-				}
-				else {
-					closure->upvalues.at(i) = activeClosure->upvalues.at(i);
-				}
-			}
-			
-			break;
-		}
-		case OP_CALL: {
-			int arity = (unsigned char)readByte();
-			if (!callValue(peek(arity), arity)) {
-				return INTERPRET_RUNTIME_ERROR;
-			}
-			break;
-		}
 		case OP_CLASS: {
 			objString* klassName = (objString*)AS_OBJ(activeClosure->function->getChunkPtr()->getConstant(readShort()));
 			objClass* klass = objClass::createObjClass(klassName);
@@ -1134,15 +1109,6 @@ exitCodes VM::run() {
 			if (!invoke())
 				return INTERPRET_RUNTIME_ERROR;
 			break;
-		case OP_CLOSE_UPVALUE: {
-			closeUpvalue(stackTop - 1);
-			pop();
-			break;
-		}
-		case OP_POP: {
-			pop();
-			break;
-		}
 		case OP_LIST: {
 			push(OBJ_VAL(objList::createList()));
 			break;
@@ -1158,30 +1124,6 @@ exitCodes VM::run() {
 			}
 
 			for (size_t i = 0; i < len; i++) {
-				pop();
-			}
-
-			break;
-		}
-		case OP_MAP: {
-			push(OBJ_VAL(objMap::createMap()));
-			break;
-		}
-		case OP_MAP_APPEND: {
-			size_t len = readSizeT();
-			objMap* map = (objMap*)AS_OBJ(peek(len * 2));
-
-			for (size_t i = 1; i <= len * 2; i += 2)
-			{
-				value key = peek(len * 2 - i);
-
-				value val = peek(len * 2 - i - 1);
-
-				map->insertElement(key, val);
-			}
-
-			for (size_t i = 0; i < len; i++) {
-				pop();
 				pop();
 			}
 
@@ -1209,6 +1151,30 @@ exitCodes VM::run() {
 			}
 			if (!setObjectIndex(AS_OBJ(list), index, val))
 				return INTERPRET_RUNTIME_ERROR;
+			break;
+		}
+		case OP_MAP: {
+			push(OBJ_VAL(objMap::createMap()));
+			break;
+		}
+		case OP_MAP_APPEND: {
+			size_t len = readSizeT();
+			objMap* map = (objMap*)AS_OBJ(peek(len * 2));
+
+			for (size_t i = 1; i <= len * 2; i += 2)
+			{
+				value key = peek(len * 2 - i);
+
+				value val = peek(len * 2 - i - 1);
+
+				map->insertElement(key, val);
+			}
+
+			for (size_t i = 0; i < len; i++) {
+				pop();
+				pop();
+			}
+
 			break;
 		}
 		case OP_THIS: {

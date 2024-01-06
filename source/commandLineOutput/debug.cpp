@@ -177,10 +177,6 @@ int debug::disassembleInstruction(char inst, chunk *ch, int offset) {
             return jumpInstruction("OP_JUMP_IF_FALSE", 1, ch, offset);
         case OP_LOOP:
             return jumpInstruction("OP_LOOP", -1, ch, offset);
-        case OP_FOR_EACH_INIT:
-            return simpleInstruction("OP_FOR_EACH_INIT", ch, offset);
-        case OP_FOR_ITER:
-            return simpleInstruction("OP_FOR_ITER", ch, offset);
         // case OP_FUNCTION:
             // return constantInstruction("OP_FUNCTION", ch, offset);
         case OP_CALL:

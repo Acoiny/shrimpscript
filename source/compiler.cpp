@@ -935,75 +935,6 @@ void compiler::returnStatement() {
 	consume("expect ';' after return statement", TOKEN_SEMICOLON);
 }
 
-//TODO: finish for-each
-void compiler::forEachLoop() {
-	error("for-each loop not fully implemented yet");
-	//here saving slot on stack for the counter
-	emitByte(OP_NIL);
-	//creating local variable
-	unsigned int global = parseVariable("expect variable name", true);
-	emitByte(OP_NIL);
-	defineVariable(global);
-
-	token in{ TOKEN_IDENTIFIER, "in", 2, -1 };
-
-	if (identifiersEqual(currentToken, in)) {
-		advance();
-	}
-	else {
-		error("expect 'in' in for-each loop statement");
-	}
-
-	//loading array onto stack
-	namedVariable(currentToken, false);
-	advance();
-
-	consume("expect ')' after loop declaration", TOKEN_PAREN_CLOSE);
-	emitByte(OP_FOR_EACH_INIT);
-	size_t loopStart = currentFunction->funChunk->getSize();
-	emitByte(OP_FOR_ITER);
-	size_t exitJump = emitJump(OP_JUMP_IF_FALSE);
-	emitByte(OP_POP);
-
-
-	int64_t prevContinue = currentContinue;
-	int64_t prevContinueDepth = currentLoopDepth;
-
-	currentContinue = loopStart;
-	currentLoopDepth = scopeDepth;
-	loopDepth++;
-	statement();
-	loopDepth--;
-	currentContinue = prevContinue;
-	currentLoopDepth = prevContinueDepth;
-
-
-	emitLoop(loopStart);
-
-	patchJump(exitJump);
-	emitByte(OP_POP);
-
-	//patching the break jumps
-	for (int64_t i = breakJumps.size() - 1; i >= 0; --i) {
-		if (breakJumps.empty())
-			break;
-
-		if (breakJumps.at(i).depth == loopDepth + 1) {
-			patchJump(breakJumps.at(i).pos);
-			breakJumps.pop_back();
-		}
-		else {
-			break;
-		}
-	}
-
-	endScope();
-
-	//popping the counter and local variable
-	emitByte(OP_POP);
-	emitByte(OP_POP);
-}
-
 void compiler::breakStatement() {
 	if (loopDepth < 1) {
 		error("can only break out of loops");
@@ -1063,13 +994,7 @@ void compiler::patchBreaks() {
 void compiler::forStatement() {
 	beginScope();
 	consume("expect '(' after for statement", TOKEN_PAREN_OPEN);
-	if (check(TOKEN_IDENTIFIER)) {
-		//error("for each loop not supported yet");
-		//advance();
-		forEachLoop();
-		return;
-	}
-	else if (match(TOKEN_SEMICOLON)) {
+	if (match(TOKEN_SEMICOLON)) {
 
 	}
 	else if (match(TOKEN_LET)) {

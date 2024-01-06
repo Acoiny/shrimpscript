@@ -1,14 +1,6 @@
-fun test()
+let i = 2
+for(;;)
 {
-	const asd = 123;
-	fun i()
-	{
-		asd = asd + 2
-		println(asd)
-	}
-
-	return i
+	print("-")
+	break
 }
-
-const i = test()
-i()

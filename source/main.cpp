@@ -62,7 +62,7 @@ int main(int argc, char** argv) {
         }
         runFile(argv[1]);
     } else {
-        std::cerr << "usage: shrimpp [path]" << std::endl;
+        std::cerr << "usage: shrimp [path]\nor try: shrimp -h" << std::endl;
     }
     return 0;
 }
